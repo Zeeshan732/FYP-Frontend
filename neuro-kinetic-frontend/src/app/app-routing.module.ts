@@ -17,6 +17,8 @@ import { CrossValidationComponent } from './pages/cross-validation/cross-validat
 import { PatientTestComponent } from './pages/patient-test/patient-test.component';
 import { TestRecordsComponent } from './pages/test-records/test-records.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
+import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/landing', pathMatch: 'full' },
@@ -32,9 +34,9 @@ const routes: Routes = [
   { path: 'publications/:id', component: PublicationDetailComponent },
   { path: 'metrics', component: MetricsDashboardComponent },
   { path: 'cross-validation', component: CrossValidationComponent },
-  { path: 'patient-test', component: PatientTestComponent },
-  { path: 'test-records', component: TestRecordsComponent },
-  { path: 'admin-dashboard', component: AdminDashboardComponent },
+  { path: 'patient-test', component: PatientTestComponent, canActivate: [AuthGuard] },
+  { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },
+  { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
   { path: 'clinical-use', component: ClinicalUseComponent },
   { path: 'collaboration', component: CollaborationComponent },
   { path: 'voice-analysis', loadChildren: () => import('./modules/voice-analysis/voice-analysis.module').then(m => m.VoiceAnalysisModule) },

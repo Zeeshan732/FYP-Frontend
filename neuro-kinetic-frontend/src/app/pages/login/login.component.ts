@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -12,11 +12,19 @@ export class LoginComponent {
   password = '';
   error = '';
   loading = false;
+  info = '';
 
   constructor(
     private authService: AuthService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    this.route.queryParamMap.subscribe(params => {
+      if (params.get('redirect') === 'true') {
+        this.info = 'Please sign in to access that page.';
+      }
+    });
+  }
 
   onSubmit() {
     if (!this.email || !this.password) {

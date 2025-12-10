@@ -1,4 +1,4 @@
-# Implementation Status - Neuro-Kinetic Frontend
+# Implementation Status - Parkinson's Frontend
 
 **Last Updated:** November 2024  
 **Project Phase:** Active Development  
