@@ -7,7 +7,7 @@
 **Fix:** Escaped all `@` symbols to `&#64;` in HTML templates
 
 **Files Fixed:**
-- `src/app/components/footer/footer.component.html` - `info@neuro-kinetic.com` → `info&#64;neuro-kinetic.com`
+- `src/app/components/footer/footer.component.html` - `info@Parkinson's.com` → `info&#64;Parkinson's.com`
 - `src/app/pages/contact/contact.component.html` - Fixed 2 instances
 - `src/app/pages/landing/landing.component.html` - Fixed 1 instance
 

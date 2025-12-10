@@ -1,4 +1,4 @@
-# Project Execution Plan - Neuro-Kinetic Frontend
+# Project Execution Plan - Parkinson's Frontend
 
 ## ✅ **Task Management System - ACTIVE**
 

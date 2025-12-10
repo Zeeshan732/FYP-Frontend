@@ -11,7 +11,7 @@ import { SidebarService } from './services/sidebar.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'neuro-kinetic-frontend';
+  title = "Parkinson's-frontend";
   isAuthenticated = false;
   sidebarCollapsed = false;
   currentRoute: string = '';

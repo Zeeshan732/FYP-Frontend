@@ -12,6 +12,7 @@ import { HttpEventType } from '@angular/common/http';
   styleUrls: ['./patient-test.component.scss']
 })
 export class PatientTestComponent implements OnInit, OnDestroy {
+  private readonly MAX_AUDIO_MB = 10;
   // Recording state
   isRecording = false;
   isProcessing = false;
@@ -126,6 +127,12 @@ export class PatientTestComponent implements OnInit, OnDestroy {
   async submitTest() {
     if (!this.audioBlob) {
       this.error = 'Please record a voice sample first.';
+      return;
+    }
+
+    // Frontend guardrail for file size before hitting backend
+    if (this.audioBlob.size > this.MAX_AUDIO_MB * 1024 * 1024) {
+      this.error = `Voice recording is too large. Please keep it under ${this.MAX_AUDIO_MB} MB.`;
       return;
     }
 

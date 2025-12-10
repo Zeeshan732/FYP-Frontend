@@ -1,4 +1,4 @@
-# Project Status - Neuro-Kinetic Frontend
+# Project Status - Parkinson's Frontend
 
 **Last Updated:** November 2024  
 **Current Progress:** 25% (3/12 critical tasks completed)

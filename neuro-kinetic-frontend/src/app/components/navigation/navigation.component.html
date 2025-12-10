@@ -138,7 +138,10 @@
     <!-- Sidebar Header -->
     <div class="flex items-center justify-between p-4 border-b border-white/10">
       <div class="flex items-center space-x-3" [class.opacity-0]="sidebarCollapsed" [class.w-0]="sidebarCollapsed" [class.overflow-hidden]="sidebarCollapsed">
-        <div class="text-xl font-bold text-emerald-400 whitespace-nowrap">Neuro-Kinetic</div>
+        <div class="flex flex-col">
+          <div class="text-xl font-bold text-emerald-400 whitespace-nowrap">Parkinson's</div>
+          <div *ngIf="roleLabel" class="text-[11px] uppercase tracking-wide text-gray-400">{{ roleLabel }}</div>
+        </div>
       </div>
       <button (click)="toggleSidebar()" 
               class="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors">

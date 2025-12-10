@@ -25,6 +25,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   isAdmin = false;
   isResearcher = false;
+  roleLabel = '';
   currentRoute: string = '';
   isLandingPage: boolean = false;
   private userSubscription?: Subscription;
@@ -52,6 +53,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.isAuthenticated = !!user;
       this.isAdmin = user?.role === 'Admin';
       this.isResearcher = user?.role === 'Researcher' || user?.role === 'MedicalProfessional';
+      this.roleLabel = user?.role || '';
     });
 
     // Close mobile menu on route change and update route info
