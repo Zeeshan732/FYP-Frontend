@@ -15,66 +15,66 @@
     </div> -->
 
     <!-- Time Range Selectors and Action Buttons -->
-    <div class="max-w-[1600px] mx-auto mb-8">
-      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 mb-4">
-        <div class="flex flex-col md:flex-row gap-4 items-end">
+    <div class="max-w-[1600px] mx-auto mb-6">
+      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 sm:p-5 md:p-6 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-5 items-end">
           <!-- Days Selector -->
-          <div class="flex-1">
+          <div class="w-full">
             <label class="block text-sm font-semibold text-gray-300 mb-2">Usage by Day</label>
-            <select 
+            <select
               [(ngModel)]="selectedDays"
               (change)="onDaysChange()"
               [disabled]="loading"
-              class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              class="w-full h-12 px-3 sm:px-4 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium shadow-sm"
             >
-              <option *ngFor="let option of daysOptions" [value]="option.value" class="bg-gray-800 text-white">
+              <option *ngFor="let option of daysOptions" [value]="option.value" class="bg-gray-900 text-white">
                 {{ option.label }}
               </option>
             </select>
           </div>
 
           <!-- Months Selector -->
-          <div class="flex-1">
+          <div class="w-full">
             <label class="block text-sm font-semibold text-gray-300 mb-2">Usage by Month</label>
-            <select 
+            <select
               [(ngModel)]="selectedMonths"
               (change)="onMonthsChange()"
               [disabled]="loading"
-              class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              class="w-full h-12 px-3 sm:px-4 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium shadow-sm"
             >
-              <option *ngFor="let option of monthsOptions" [value]="option.value" class="bg-gray-800 text-white">
+              <option *ngFor="let option of monthsOptions" [value]="option.value" class="bg-gray-900 text-white">
                 {{ option.label }}
               </option>
             </select>
           </div>
 
           <!-- Years Selector -->
-          <div class="flex-1">
+          <div class="w-full">
             <label class="block text-sm font-semibold text-gray-300 mb-2">Usage by Year</label>
-            <select 
+            <select
               [(ngModel)]="selectedYears"
               (change)="onYearsChange()"
               [disabled]="loading"
-              class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              class="w-full h-12 px-3 sm:px-4 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium shadow-sm"
             >
-              <option *ngFor="let option of yearsOptions" [value]="option.value" class="bg-gray-800 text-white">
+              <option *ngFor="let option of yearsOptions" [value]="option.value" class="bg-gray-900 text-white">
                 {{ option.label }}
               </option>
             </select>
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex gap-3">
+          <div class="w-full flex flex-col sm:flex-row gap-3">
             <button 
               (click)="refreshData()"
               [disabled]="loading"
-              class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg transition-colors font-semibold text-sm whitespace-nowrap"
+              class="w-full sm:w-auto h-12 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg transition-colors font-semibold text-sm sm:text-base whitespace-nowrap shadow-sm flex items-center justify-center"
             >
               {{ loading ? 'Loading...' : 'Refresh' }}
             </button>
             <button 
               (click)="navigateToTestRecords()"
-              class="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-semibold text-sm whitespace-nowrap"
+              class="w-full sm:w-auto h-12 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-semibold text-sm sm:text-base whitespace-nowrap shadow-sm flex items-center justify-center"
             >
               View All Records
             </button>

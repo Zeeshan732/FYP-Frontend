@@ -5,15 +5,49 @@ export interface User {
   firstName: string;
   lastName: string;
   role: 'Public' | 'Researcher' | 'MedicalProfessional' | 'Admin';
+  status?: 'Pending' | 'Approved' | 'Rejected';
   institution?: string;
   researchFocus?: string;
 }
 
 // Auth Response
 export interface AuthResponse {
-  token: string;
-  user: User;
+  token?: string;
+  user?: User;
+  status?: 'Pending' | 'Approved' | 'Rejected';
+  message?: string;
 }
+
+// Admin Account Requests
+export interface AccountRequest {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  comment?: string;
+  createdAt?: string;
+}
+
+export interface UpdateUserStatusRequest {
+  status: 'Approved' | 'Rejected' | 'Pending';
+  comment?: string;
+}
+
+// Notifications (matches backend API)
+export interface NotificationItem {
+  id: number;
+  userId?: number;
+  message: string;
+  status: number; // 0 = Unread, 1 = Read (backend format)
+  relatedEntity?: string;
+  relatedEntityId?: number;
+  createdAt: string;
+  updatedAt?: string | null;
+}
+
+// Helper type for frontend display
+export type NotificationStatus = 'Unread' | 'Read';
 
 // Publication Model
 export interface Publication {

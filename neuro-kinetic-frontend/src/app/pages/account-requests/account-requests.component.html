@@ -1,0 +1,212 @@
+<app-navigation></app-navigation>
+
+<section class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 pt-24 text-white">
+  <div class="container mx-auto px-4 py-8">
+    <div class="header-row">
+      <div>
+        <h1 class="text-3xl font-bold text-white">Account Requests</h1>
+        <p class="text-gray-300 text-sm">Review pending registrations and manage statuses.</p>
+      </div>
+      <div class="filters">
+        <select
+          [(ngModel)]="statusFilter"
+          (change)="onFilterChange()"
+          class="select"
+        >
+          <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Search by name or email"
+          class="search"
+        />
+        <button
+          class="icon-btn apply"
+          [disabled]="loading"
+          (click)="onFilterChange()"
+          title="Apply filters"
+        >
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M4 8h16M6 12h12M9 16h6M11 20h2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="error" class="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4">
+      {{ error }}
+    </div>
+
+    <div class="bg-slate-800/70 border border-white/10 rounded-xl overflow-hidden relative">
+      <div *ngIf="loading" class="loader-overlay">
+        <div class="spinner"></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div>User</div>
+          <div>Email</div>
+          <div>Status</div>
+          <div>Reason</div>
+          <div class="actions-col">Actions</div>
+        </div>
+
+        <div class="table-body">
+          <div class="row state-row" *ngIf="loading">Loading account requests...</div>
+          <div class="row state-row" *ngIf="!loading && requests.length === 0">No account requests found.</div>
+
+          <div class="row" *ngFor="let req of requests">
+            <div class="cell user">
+              <div class="name">{{ req.firstName }} {{ req.lastName }}</div>
+              <div class="meta">ID: {{ req.id }}</div>
+            </div>
+            <div class="cell email">{{ req.email }}</div>
+            <div class="cell">
+              <span
+                class="badge"
+                [ngClass]="{
+                  'pending': req.status === 'Pending',
+                  'approved': req.status === 'Approved',
+                  'rejected': req.status === 'Rejected'
+                }"
+              >
+                {{ req.status }}
+              </span>
+            </div>
+            <div class="cell reason">
+              <div class="pill">{{ req.comment ? req.comment : '-' }}</div>
+            </div>
+            <div class="cell actions">
+              <button
+                class="icon-btn view"
+                [disabled]="loading"
+                (click)="openModal(req)"
+                title="View details"
+              >
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between px-4 py-3 bg-slate-900/80 border-t border-white/5">
+        <div class="text-sm text-gray-400">
+          Showing {{ ((pageNumber - 1) * pageSize) + 1 }}-
+          {{ Math.min(pageNumber * pageSize, totalCount) }} of {{ totalCount }}
+        </div>
+        <div class="pager">
+          <button
+            class="pager-btn"
+            [disabled]="pageNumber === 1 || loading"
+            (click)="changePage('prev')"
+            title="Previous"
+          >
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            class="pager-btn"
+            [disabled]="(pageNumber * pageSize) >= totalCount || loading"
+            (click)="changePage('next')"
+            title="Next"
+          >
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal for Approve / Reject -->
+<div *ngIf="showModal" class="modal-backdrop" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>User Account Details</h2>
+        <p>{{ selectedUser?.email }}</p>
+      </div>
+      <button class="icon-btn close" (click)="closeModal()" title="Close">
+        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedUser">
+      <div class="grid">
+        <div>
+          <label>First Name</label>
+          <div class="value">{{ selectedUser.firstName }}</div>
+        </div>
+        <div>
+          <label>Last Name</label>
+          <div class="value">{{ selectedUser.lastName }}</div>
+        </div>
+        <div>
+          <label>Email</label>
+          <div class="value">{{ selectedUser.email }}</div>
+        </div>
+        <div>
+          <label>User ID</label>
+          <div class="value">{{ selectedUser.id }}</div>
+        </div>
+        <div>
+          <label>Status</label>
+          <span
+            class="badge"
+            [ngClass]="{
+              'pending': selectedUser.status === 'Pending',
+              'approved': selectedUser.status === 'Approved',
+              'rejected': selectedUser.status === 'Rejected'
+            }"
+          >
+            {{ selectedUser.status }}
+          </span>
+        </div>
+        <div *ngIf="selectedUser.createdAt">
+          <label>Registered</label>
+          <div class="value">{{ selectedUser.createdAt | date:'medium' }}</div>
+        </div>
+      </div>
+
+      <div class="field" *ngIf="selectedUser?.status !== 'Approved'">
+        <label>Comment (Optional)</label>
+        <textarea
+          [(ngModel)]="modalComment"
+          rows="3"
+          placeholder="Add a comment for this action..."
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <ng-container *ngIf="selectedUser?.status !== 'Approved'">
+        <button class="icon-btn reject" [disabled]="processing" (click)="submitStatus('Rejected')" title="Reject">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <button class="icon-btn pending" [disabled]="processing" (click)="submitStatus('Pending')" title="Set Pending">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+        <button class="icon-btn approve" [disabled]="processing" (click)="submitStatus('Approved')" title="Approve">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</div>
+

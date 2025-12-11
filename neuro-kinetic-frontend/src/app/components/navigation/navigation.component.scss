@@ -39,6 +39,31 @@ aside {
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.mobile-sidebar-toggle {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 60;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0b1224;
+  color: #e2e8f0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.mobile-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 40;
+}
+
 // Responsive adjustments
 @media (max-width: 768px) {
   aside {
@@ -52,5 +77,9 @@ aside {
 
   .ml-64, .ml-20 {
     margin-left: 0 !important;
+  }
+
+  .mobile-sidebar-toggle {
+    display: inline-flex;
   }
 }

@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../../services/modal.service';
 import { AuthService } from '../../../services/auth.service';
@@ -19,6 +18,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   password = '';
   confirmPassword = '';
   error = '';
+  info = '';
   loading = false;
   private subscription: Subscription = new Subscription();
 
@@ -31,8 +31,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private modalService: ModalService,
-    private authService: AuthService,
-    private router: Router
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -49,6 +48,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
           this.password = '';
           this.confirmPassword = '';
           this.error = '';
+          this.info = '';
           this.loading = false;
         }
       })
@@ -92,6 +92,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
     }
 
     this.error = '';
+    this.info = '';
     this.loading = true;
 
     this.authService.register({
@@ -105,9 +106,9 @@ export class SignupModalComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: (response) => {
         this.loading = false;
-        this.closeModal();
-        // Navigate to home page
-        this.router.navigate(['/home']);
+        // Registration now returns a pending status and message without JWT
+        this.info = response.message || 'Registration submitted. Your account is under review.';
+        // Do not navigate or auto-login
       },
       error: (error) => {
         this.loading = false;
