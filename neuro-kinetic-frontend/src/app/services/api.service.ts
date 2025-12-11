@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
   PagedResult,
@@ -17,7 +17,10 @@ import {
   CrossValidationAggregatedDto,
   UserTestRecord,
   UserTestRecordRequest,
-  AdminDashboardAnalytics
+  AdminDashboardAnalytics,
+  AccountRequest,
+  UpdateUserStatusRequest,
+  NotificationItem
 } from '../models/api.models';
 
 @Injectable({
@@ -460,4 +463,68 @@ export class ApiService {
     
     return this.http.get<AdminDashboardAnalytics>(`${this.apiUrl}/admin/dashboard/analytics`, { params: httpParams });
   }
+
+  // ========== ACCOUNT REQUESTS (ADMIN) ==========
+  getAccountRequests(params: {
+    status?: 'Pending' | 'Approved' | 'Rejected';
+    pageNumber?: number;
+    pageSize?: number;
+    search?: string;
+  } = {}): Observable<PagedResult<AccountRequest>> {
+    let httpParams = new HttpParams();
+
+    if (params.status) {
+      httpParams = httpParams.set('status', params.status);
+    }
+    if (params.pageNumber) {
+      httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+    }
+    if (params.pageSize) {
+      httpParams = httpParams.set('pageSize', params.pageSize.toString());
+    }
+    if (params.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+
+    return this.http.get<any>(`${this.apiUrl}/admin/users/pending`, { params: httpParams }).pipe(
+      map((res: any) => {
+        // If backend returns plain array, wrap into PagedResult shape
+        if (Array.isArray(res)) {
+          const items = res as AccountRequest[];
+          return {
+            items,
+            totalCount: items.length,
+            pageNumber: params.pageNumber || 1,
+            pageSize: params.pageSize || items.length || 10,
+            totalPages: 1,
+            hasPrevious: false,
+            hasNext: false
+          } as PagedResult<AccountRequest>;
+        }
+        return res as PagedResult<AccountRequest>;
+      })
+    );
+  }
+
+  updateAccountStatus(id: number, body: UpdateUserStatusRequest): Observable<AccountRequest> {
+    return this.http.patch<AccountRequest>(`${this.apiUrl}/admin/users/${id}/status`, body);
+  }
+
+  getUserById(id: number): Observable<AccountRequest> {
+    return this.http.get<AccountRequest>(`${this.apiUrl}/admin/users/${id}`);
+  }
+
+  // ========== NOTIFICATIONS ==========
+  getNotifications(status?: 'Unread' | 'Read'): Observable<NotificationItem[]> {
+    let params = new HttpParams();
+    if (status) {
+      params = params.set('status', status);
+    }
+    return this.http.get<NotificationItem[]>(`${this.apiUrl}/notifications`, { params });
+  }
+
+  markNotificationRead(id: number): Observable<NotificationItem> {
+    return this.http.patch<NotificationItem>(`${this.apiUrl}/notifications/${id}/read`, {});
+  }
+
 }

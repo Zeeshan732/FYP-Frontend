@@ -5,6 +5,8 @@ import { filter } from 'rxjs/operators';
 import { ModalService } from '../../services/modal.service';
 import { AuthService } from '../../services/auth.service';
 import { SidebarService } from '../../services/sidebar.service';
+import { NotificationsService } from '../../services/notifications.service';
+import { NotificationItem } from '../../models/api.models';
 
 @Component({
   selector: 'app-navigation',
@@ -16,6 +18,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
   isScrolled = false;
   lastScrollY = 0;
   isNavbarVisible = true;
+  mobileSidebarOpen = false;
+  isMobile = false;
   
   // Sidebar state
   sidebarCollapsed = false;
@@ -28,19 +32,26 @@ export class NavigationComponent implements OnInit, OnDestroy {
   roleLabel = '';
   currentRoute: string = '';
   isLandingPage: boolean = false;
+  showNotifications = false;
+  notifications: NotificationItem[] = [];
+  unreadCount = 0;
   private userSubscription?: Subscription;
   private routerSubscription?: Subscription;
   private sidebarSubscription?: Subscription;
+  private notificationsSubscription?: Subscription;
+  private unreadSubscription?: Subscription;
 
   constructor(
     private modalService: ModalService,
     private authService: AuthService,
     private sidebarService: SidebarService,
-    private router: Router
+    private router: Router,
+    private notificationsService: NotificationsService
   ) {}
 
   ngOnInit() {
     this.lastScrollY = window.scrollY;
+    this.syncSidebarForViewport();
     
     // Subscribe to sidebar state
     this.sidebarSubscription = this.sidebarService.sidebarCollapsed$.subscribe(collapsed => {
@@ -54,6 +65,15 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.isAdmin = user?.role === 'Admin';
       this.isResearcher = user?.role === 'Researcher' || user?.role === 'MedicalProfessional';
       this.roleLabel = user?.role || '';
+      if (user) {
+        this.notificationsService.startRealtime();
+        this.notificationsService.loadNotifications().subscribe();
+      } else {
+        this.showNotifications = false;
+        this.notifications = [];
+        this.unreadCount = 0;
+        this.notificationsService.stopRealtime();
+      }
     });
 
     // Close mobile menu on route change and update route info
@@ -63,11 +83,25 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.currentRoute = event.urlAfterRedirects || event.url;
       this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/';
       this.closeMobileMenu();
+      if (this.isMobile && this.mobileSidebarOpen) {
+        this.closeMobileSidebar();
+      }
     });
     
+    this.notificationsSubscription = this.notificationsService.notifications$.subscribe((items) => {
+      this.notifications = items;
+    });
+    this.unreadSubscription = this.notificationsService.unreadCount$.subscribe((count) => {
+      this.unreadCount = count;
+    });
     // Initial route check
     this.currentRoute = this.router.url;
     this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/';
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.syncSidebarForViewport();
   }
 
   ngOnDestroy() {
@@ -80,6 +114,13 @@ export class NavigationComponent implements OnInit, OnDestroy {
     if (this.sidebarSubscription) {
       this.sidebarSubscription.unsubscribe();
     }
+    if (this.notificationsSubscription) {
+      this.notificationsSubscription.unsubscribe();
+    }
+    if (this.unreadSubscription) {
+      this.unreadSubscription.unsubscribe();
+    }
+    this.notificationsService.stopRealtime();
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -109,6 +150,24 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   toggleSidebar() {
     this.sidebarService.toggleSidebar();
+    this.mobileSidebarOpen = !this.mobileSidebarOpen;
+  }
+
+  closeMobileSidebar() {
+    if (this.mobileSidebarOpen) {
+      this.mobileSidebarOpen = false;
+    }
+  }
+
+  private syncSidebarForViewport() {
+    this.isMobile = window.innerWidth <= 768;
+    if (this.isMobile) {
+      this.mobileSidebarOpen = false;
+      this.sidebarService.setSidebarCollapsed(true);
+    } else {
+      this.mobileSidebarOpen = false;
+      // keep existing collapsed state from service for desktop
+    }
   }
 
   openLoginModal() {
@@ -126,6 +185,18 @@ export class NavigationComponent implements OnInit, OnDestroy {
     this.sidebarService.setSidebarCollapsed(false);
     this.router.navigate(['/landing']);
     this.closeMobileMenu();
+  }
+
+  toggleNotifications() {
+    this.showNotifications = !this.showNotifications;
+    if (this.showNotifications) {
+      this.notificationsService.loadNotifications().subscribe();
+    }
+  }
+
+  markNotificationRead(note: NotificationItem) {
+    if (note.status === 1) return; // Already read
+    this.notificationsService.markAsRead(note.id).subscribe();
   }
 
   navigateTo(route: string) {

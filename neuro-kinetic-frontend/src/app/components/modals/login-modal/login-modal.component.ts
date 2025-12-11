@@ -14,6 +14,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   email = '';
   password = '';
   error = '';
+  info = '';
   loading = false;
   private subscription: Subscription = new Subscription();
 
@@ -32,6 +33,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           this.email = '';
           this.password = '';
           this.error = '';
+          this.info = '';
           this.loading = false;
         }
       })
@@ -64,11 +66,24 @@ export class LoginModalComponent implements OnInit, OnDestroy {
     }
 
     this.error = '';
+    this.info = '';
     this.loading = true;
 
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.loading = false;
+        if (response.status && response.status !== 'Approved') {
+          this.error = response.message || (response.status === 'Pending'
+            ? 'Your account is under review.'
+            : 'Your account request was rejected.');
+          return;
+        }
+
+        if (!response.token || !response.user) {
+          this.error = response.message || 'Login could not be completed. Please try again.';
+          return;
+        }
+
         this.closeModal();
         // Navigate to home page or redirect if needed
         this.router.navigate(['/home']);
@@ -82,11 +97,23 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         if (error.status === 0) {
           this.error = 'Unable to connect to the server. Please ensure the backend is running.';
         } else if (error.status === 401) {
-          this.error = 'Invalid email or password. Please try again.';
+          this.error = error.error?.message || 'Invalid email or password. Please try again.';
+          if (this.error?.toLowerCase().includes('pending')) {
+            this.error = 'Your account is under review.';
+          } else if (this.error?.toLowerCase().includes('rejected')) {
+            this.error = 'Your account request was rejected.';
+          }
         } else if (error.status === 404) {
           this.error = 'API endpoint not found. Please check the API configuration.';
         } else if (error.error?.message) {
-          this.error = error.error.message;
+          const message = error.error.message as string;
+          if (message.toLowerCase().includes('pending')) {
+            this.error = 'Your account is under review.';
+          } else if (message.toLowerCase().includes('rejected')) {
+            this.error = 'Your account request was rejected.';
+          } else {
+            this.error = message;
+          }
         } else if (error.error?.errors) {
           const errors = Object.values(error.error.errors).flat();
           this.error = errors.join(', ');

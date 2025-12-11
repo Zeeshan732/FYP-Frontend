@@ -13,6 +13,7 @@ export class LoginComponent {
   error = '';
   loading = false;
   info = '';
+  success = '';
 
   constructor(
     private authService: AuthService,
@@ -33,12 +34,26 @@ export class LoginComponent {
     }
 
     this.error = '';
+    this.success = '';
     this.loading = true;
 
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.loading = false;
-    
+        // Respect account status responses from backend
+        if (response.status && response.status !== 'Approved') {
+          this.error = response.message || (response.status === 'Pending'
+            ? 'Your account is under review.'
+            : 'Your account request was rejected.');
+          return;
+        }
+
+        if (!response.token || !response.user) {
+          this.error = response.message || 'Login could not be completed. Please try again.';
+          return;
+        }
+
+        this.success = 'Login successful.';
         this.router.navigate(['/patient-test']);
       },
       error: (error) => {
@@ -50,11 +65,24 @@ export class LoginComponent {
         if (error.status === 0) {
           this.error = 'Unable to connect to the server. Please ensure the backend is running.';
         } else if (error.status === 401) {
-          this.error = 'Invalid email or password. Please try again.';
+          // Use backend-provided message when available
+          this.error = error.error?.message || 'Invalid email or password. Please try again.';
+          if (this.error?.toLowerCase().includes('pending')) {
+            this.error = 'Your account is under review.';
+          } else if (this.error?.toLowerCase().includes('rejected')) {
+            this.error = 'Your account request was rejected.';
+          }
         } else if (error.status === 404) {
           this.error = 'API endpoint not found. Please check the API configuration.';
         } else if (error.error?.message) {
-          this.error = error.error.message;
+          const message = error.error.message as string;
+          if (message.toLowerCase().includes('pending')) {
+            this.error = 'Your account is under review.';
+          } else if (message.toLowerCase().includes('rejected')) {
+            this.error = 'Your account request was rejected.';
+          } else {
+            this.error = message;
+          }
         } else if (error.error?.errors) {
           const errors = Object.values(error.error.errors).flat();
           this.error = errors.join(', ');

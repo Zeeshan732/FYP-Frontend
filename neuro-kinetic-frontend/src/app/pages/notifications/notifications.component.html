@@ -1,0 +1,76 @@
+<app-navigation></app-navigation>
+
+<section class="notifications-shell">
+  <div class="notifications-card">
+    <div class="header-row">
+      <div class="title-block">
+        <h1>Notifications</h1>
+        <p>Stay up to date with account and test activity.</p>
+      </div>
+      <div class="toolbar">
+        <div class="tabs">
+          <button class="tab-btn" [class.active]="filter === 'All'" (click)="filter='All'; refresh()">All</button>
+          <button class="tab-btn" [class.active]="filter === 'Unread'" (click)="filter='Unread'; refresh()">Unread</button>
+          <button class="tab-btn" [class.active]="filter === 'Read'" (click)="filter='Read'; refresh()">Read</button>
+        </div>
+        <button class="icon-btn refresh" (click)="refresh()" [disabled]="loading" title="Refresh">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-2.197M19 5a9 9 0 00-14 2.197"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="state" *ngIf="loading">Loading notifications...</div>
+    <div class="state" *ngIf="!loading && notifications.length === 0">No notifications.</div>
+
+    <div class="list" *ngIf="!loading && notifications.length > 0">
+      <div
+        *ngFor="let note of notifications"
+        class="item"
+        [class.unread]="notificationsService.isUnread(note)"
+      >
+        <div class="item-main">
+          <div class="icon-pill" [class.unread]="notificationsService.isUnread(note)">
+            <svg *ngIf="notificationsService.isUnread(note)" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M5.07 19h13.86A2.07 2.07 0 0021 16.93V7.07A2.07 2.07 0 0018.93 5H5.07A2.07 2.07 0 003 7.07v9.86A2.07 2.07 0 005.07 19z"/>
+            </svg>
+            <svg *ngIf="!notificationsService.isUnread(note)" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <div class="item-text">
+            <div class="item-title">{{ note.message }}</div>
+            <div class="item-meta">{{ note.createdAt | date:'medium' }}</div>
+          </div>
+        </div>
+        <div class="item-actions">
+          <button
+            *ngIf="isAccountRequest(note)"
+            class="icon-btn view"
+            (click)="viewUserDetails(note)"
+            title="Open in Account Requests"
+          >
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h8" />
+            </svg>
+          </button>
+          <button
+            *ngIf="notificationsService.isUnread(note)"
+            class="icon-btn mark"
+            (click)="markRead(note)"
+            title="Mark as read"
+          >
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal removed: notifications redirect to Account Requests for actions -->
+

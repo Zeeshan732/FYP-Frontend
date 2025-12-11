@@ -17,6 +17,8 @@ import { CrossValidationComponent } from './pages/cross-validation/cross-validat
 import { PatientTestComponent } from './pages/patient-test/patient-test.component';
 import { TestRecordsComponent } from './pages/test-records/test-records.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
+import { AccountRequestsComponent } from './pages/account-requests/account-requests.component';
+import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -37,6 +39,8 @@ const routes: Routes = [
   { path: 'patient-test', component: PatientTestComponent, canActivate: [AuthGuard] },
   { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },
   { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
+  { path: 'account-requests', component: AccountRequestsComponent, canActivate: [AdminGuard] },
+  { path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
   { path: 'clinical-use', component: ClinicalUseComponent },
   { path: 'collaboration', component: CollaborationComponent },
   { path: 'voice-analysis', loadChildren: () => import('./modules/voice-analysis/voice-analysis.module').then(m => m.VoiceAnalysisModule) },

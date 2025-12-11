@@ -32,6 +32,14 @@ html {
   transition: all 0.3s ease;
 }
 
+/* Mobile: remove layout offsets caused by desktop sidebar margins */
+@media (max-width: 768px) {
+  .ml-64,
+  .ml-20 {
+    margin-left: 0 !important;
+  }
+}
+
 /* Large Screen Optimizations */
 @media (min-width: 1920px) {
   /* Limit maximum content width for readability */

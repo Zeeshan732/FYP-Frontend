@@ -31,8 +31,11 @@ export class AuthService {
       .pipe(
         tap((response: AuthResponse) => {
           console.log('Login response:', response);
-          if (response.token && response.user) {
+          if (response.token && response.user && (response.status === 'Approved' || !response.status)) {
             this.setAuthData(response.token, response.user);
+          } else {
+            // Ensure we do not persist tokens for pending/rejected users
+            this.clearAuthData();
           }
         })
       );
@@ -50,8 +53,11 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data)
       .pipe(
         tap((response: AuthResponse) => {
-          if (response.token && response.user) {
+          // Backend no longer returns JWT for pending accounts
+          if (response.token && response.user && (response.status === 'Approved' || !response.status)) {
             this.setAuthData(response.token, response.user);
+          } else {
+            this.clearAuthData();
           }
         })
       );

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { SidebarService } from '../../services/sidebar.service';
+import { NotificationsService } from '../../services/notifications.service';
 
 @Component({
   selector: 'app-header',
@@ -16,10 +17,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   sidebarCollapsed = false;
   isLandingPage: boolean = false;
+  unreadCount = 0;
   
   private routerSubscription?: Subscription;
   private userSubscription?: Subscription;
   private sidebarSubscription?: Subscription;
+  private unreadSubscription?: Subscription;
 
   // Route to label mapping
   routeLabels: { [key: string]: string } = {
@@ -48,7 +51,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private authService: AuthService,
-    private sidebarService: SidebarService
+    private sidebarService: SidebarService,
+    private notificationsService: NotificationsService
   ) {}
 
   ngOnInit() {
@@ -71,6 +75,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // Subscribe to user changes
     this.userSubscription = this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
+      if (user) {
+        this.notificationsService.startRealtime();
+        this.notificationsService.loadNotifications().subscribe();
+      } else {
+        this.unreadCount = 0;
+        this.notificationsService.stopRealtime();
+      }
+    });
+
+    this.unreadSubscription = this.notificationsService.unreadCount$.subscribe(count => {
+      this.unreadCount = count;
     });
 
     // Subscribe to sidebar state
@@ -89,6 +104,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.sidebarSubscription) {
       this.sidebarSubscription.unsubscribe();
     }
+    if (this.unreadSubscription) {
+      this.unreadSubscription.unsubscribe();
+    }
+    this.notificationsService.stopRealtime();
   }
 
   updateBreadcrumb() {
@@ -180,6 +199,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   navigateToProfile() {
     // Can navigate to profile page if exists
     // this.router.navigate(['/profile']);
+  }
+
+  goToNotifications() {
+    this.router.navigate(['/notifications']);
   }
 }
 

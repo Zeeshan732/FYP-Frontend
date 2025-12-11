@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -42,6 +43,8 @@ import { TestRecordsComponent } from './pages/test-records/test-records.componen
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { TestRecordDialogComponent } from './components/test-record-dialog/test-record-dialog.component';
 import { HeaderComponent } from './components/header/header.component';
+import { AccountRequestsComponent } from './pages/account-requests/account-requests.component';
+import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
@@ -70,10 +73,13 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     TestRecordsComponent,
     AdminDashboardComponent,
     TestRecordDialogComponent,
-    HeaderComponent
+    HeaderComponent,
+    AccountRequestsComponent,
+    NotificationsComponent
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
