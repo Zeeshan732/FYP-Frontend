@@ -18,6 +18,7 @@ import { PatientTestComponent } from './pages/patient-test/patient-test.componen
 import { TestRecordsComponent } from './pages/test-records/test-records.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { AccountRequestsComponent } from './pages/account-requests/account-requests.component';
+import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
@@ -40,6 +41,7 @@ const routes: Routes = [
   { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },
   { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
   { path: 'account-requests', component: AccountRequestsComponent, canActivate: [AdminGuard] },
+  { path: 'admin-users', component: AdminUsersComponent, canActivate: [AdminGuard] },
   { path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
   { path: 'clinical-use', component: ClinicalUseComponent },
   { path: 'collaboration', component: CollaborationComponent },

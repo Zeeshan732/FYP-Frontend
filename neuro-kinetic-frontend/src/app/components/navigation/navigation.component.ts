@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ModalService } from '../../services/modal.service';
 import { AuthService } from '../../services/auth.service';
 import { SidebarService } from '../../services/sidebar.service';
@@ -11,7 +12,14 @@ import { NotificationItem } from '../../models/api.models';
 @Component({
   selector: 'app-navigation',
   templateUrl: './navigation.component.html',
-  styleUrls: ['./navigation.component.scss']
+  styleUrls: ['./navigation.component.scss'],
+  animations: [
+    trigger('slideToggle', [
+      state('expanded', style({ height: '*', opacity: 1 })),
+      state('collapsed', style({ height: '0px', opacity: 0, overflow: 'hidden' })),
+      transition('expanded <=> collapsed', animate('200ms ease-in-out'))
+    ])
+  ]
 })
 export class NavigationComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
@@ -35,6 +43,12 @@ export class NavigationComponent implements OnInit, OnDestroy {
   showNotifications = false;
   notifications: NotificationItem[] = [];
   unreadCount = 0;
+  
+  // Section collapse states
+  myAccountExpanded = true;
+  researchExpanded = true;
+  adminExpanded = true;
+  
   private userSubscription?: Subscription;
   private routerSubscription?: Subscription;
   private sidebarSubscription?: Subscription;
@@ -82,6 +96,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
     ).subscribe((event) => {
       this.currentRoute = event.urlAfterRedirects || event.url;
       this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/';
+      this.updateSectionStates();
       this.closeMobileMenu();
       if (this.isMobile && this.mobileSidebarOpen) {
         this.closeMobileSidebar();
@@ -97,6 +112,32 @@ export class NavigationComponent implements OnInit, OnDestroy {
     // Initial route check
     this.currentRoute = this.router.url;
     this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/';
+    
+    // Auto-expand sections based on current route
+    this.updateSectionStates();
+  }
+  
+  updateSectionStates() {
+    // Auto-expand sections if current route matches items within them
+    const myAccountRoutes = ['/patient-test', '/test-records', '/notifications'];
+    const researchRoutes = ['/metrics', '/cross-validation'];
+    const adminRoutes = ['/admin-dashboard', '/account-requests', '/admin-users'];
+    
+    this.myAccountExpanded = myAccountRoutes.some(route => this.currentRoute.startsWith(route));
+    this.researchExpanded = researchRoutes.some(route => this.currentRoute.startsWith(route));
+    this.adminExpanded = adminRoutes.some(route => this.currentRoute.startsWith(route));
+  }
+  
+  toggleMyAccount() {
+    this.myAccountExpanded = !this.myAccountExpanded;
+  }
+  
+  toggleResearch() {
+    this.researchExpanded = !this.researchExpanded;
+  }
+  
+  toggleAdmin() {
+    this.adminExpanded = !this.adminExpanded;
   }
 
   @HostListener('window:resize')

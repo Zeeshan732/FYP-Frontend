@@ -44,6 +44,7 @@ import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard
 import { TestRecordDialogComponent } from './components/test-record-dialog/test-record-dialog.component';
 import { HeaderComponent } from './components/header/header.component';
 import { AccountRequestsComponent } from './pages/account-requests/account-requests.component';
+import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
@@ -75,6 +76,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     TestRecordDialogComponent,
     HeaderComponent,
     AccountRequestsComponent,
+    AdminUsersComponent,
     NotificationsComponent
   ],
   imports: [

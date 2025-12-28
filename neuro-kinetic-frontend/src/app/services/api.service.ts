@@ -20,7 +20,8 @@ import {
   AdminDashboardAnalytics,
   AccountRequest,
   UpdateUserStatusRequest,
-  NotificationItem
+  NotificationItem,
+  User
 } from '../models/api.models';
 
 @Injectable({
@@ -512,6 +513,51 @@ export class ApiService {
 
   getUserById(id: number): Observable<AccountRequest> {
     return this.http.get<AccountRequest>(`${this.apiUrl}/admin/users/${id}`);
+  }
+
+  // Get all users (admin only)
+  getAllUsers(params?: {
+    pageNumber?: number;
+    pageSize?: number;
+    search?: string;
+    role?: string;
+    status?: string;
+  }): Observable<PagedResult<User>> {
+    let httpParams = new HttpParams();
+    if (params?.pageNumber) {
+      httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+    }
+    if (params?.pageSize) {
+      httpParams = httpParams.set('pageSize', params.pageSize.toString());
+    }
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    if (params?.role) {
+      httpParams = httpParams.set('role', params.role);
+    }
+    if (params?.status) {
+      httpParams = httpParams.set('status', params.status);
+    }
+
+    return this.http.get<PagedResult<User>>(`${this.apiUrl}/admin/users`, { params: httpParams }).pipe(
+      map((res: any) => {
+        // If backend returns plain array, wrap into PagedResult shape
+        if (Array.isArray(res)) {
+          const items = res as User[];
+          return {
+            items,
+            totalCount: items.length,
+            pageNumber: params?.pageNumber || 1,
+            pageSize: params?.pageSize || items.length || 10,
+            totalPages: 1,
+            hasPrevious: false,
+            hasNext: false
+          } as PagedResult<User>;
+        }
+        return res as PagedResult<User>;
+      })
+    );
   }
 
   // ========== NOTIFICATIONS ==========

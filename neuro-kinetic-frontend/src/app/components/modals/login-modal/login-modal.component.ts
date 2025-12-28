@@ -85,8 +85,12 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         }
 
         this.closeModal();
-        // Navigate to home page or redirect if needed
-        this.router.navigate(['/home']);
+        // Redirect based on user role
+        if (response.user?.role === 'Admin') {
+          this.router.navigate(['/admin-dashboard']);
+        } else {
+          this.router.navigate(['/home']);
+        }
       },
       error: (error) => {
         this.loading = false;
