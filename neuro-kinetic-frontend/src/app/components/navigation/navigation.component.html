@@ -177,7 +177,7 @@
     <!-- Navigation Links -->
     <nav class="flex-1 overflow-y-auto p-4 space-y-2">
       <!-- Public Links -->
-      <a routerLink="/landing" 
+      <a [routerLink]="isAdmin ? '/admin-dashboard' : '/home'" 
          routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
          [routerLinkActiveOptions]="{exact: true}"
          class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
@@ -231,84 +231,124 @@
 
       <!-- User Links Section -->
       <div class="pt-4 mt-4 border-t border-white/10" [class.hidden]="sidebarCollapsed && !isAuthenticated">
-        <div [class.hidden]="sidebarCollapsed" class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">My Account</div>
-        <a routerLink="/patient-test" 
-           routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group mt-2"
-           [title]="sidebarCollapsed ? 'Take Test' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+        <button 
+          (click)="toggleMyAccount()"
+          [class.hidden]="sidebarCollapsed"
+          class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-300 transition-colors group">
+          <span>My Account</span>
+          <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!myAccountExpanded" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Take Test</span>
-        </a>
+        </button>
+        <div [@slideToggle]="myAccountExpanded ? 'expanded' : 'collapsed'" class="overflow-hidden">
+          <a routerLink="/patient-test" 
+             routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+             class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group mt-2"
+             [title]="sidebarCollapsed ? 'Take Test' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Take Test</span>
+          </a>
 
-        <a routerLink="/test-records" 
-           routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
-           [title]="sidebarCollapsed ? 'My Tests' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">My Tests</span>
-        </a>
+          <a routerLink="/test-records" 
+             routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+             class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+             [title]="sidebarCollapsed ? 'My Tests' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">My Tests</span>
+          </a>
 
-        <a routerLink="/notifications"
-           routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
-           [title]="sidebarCollapsed ? 'Notifications' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Notifications</span>
-        </a>
+          <a routerLink="/notifications"
+             routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+             class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+             [title]="sidebarCollapsed ? 'Notifications' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Notifications</span>
+          </a>
+        </div>
       </div>
 
       <!-- Researcher/Admin Links -->
       <div *ngIf="isResearcher || isAdmin" class="pt-4 mt-4 border-t border-white/10">
-        <div [class.hidden]="sidebarCollapsed" class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Research</div>
-        <a routerLink="/metrics" 
-           routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group mt-2"
-           [title]="sidebarCollapsed ? 'Metrics' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        <button 
+          (click)="toggleResearch()"
+          [class.hidden]="sidebarCollapsed"
+          class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-300 transition-colors group">
+          <span>Research</span>
+          <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!researchExpanded" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Metrics</span>
-        </a>
+        </button>
+        <div [@slideToggle]="researchExpanded ? 'expanded' : 'collapsed'" class="overflow-hidden">
+          <a routerLink="/metrics" 
+             routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+             class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group mt-2"
+             [title]="sidebarCollapsed ? 'Metrics' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Metrics</span>
+          </a>
 
-        <a routerLink="/cross-validation" 
-           routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
-           [title]="sidebarCollapsed ? 'Validation' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Validation</span>
-        </a>
+          <a routerLink="/cross-validation" 
+             routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+             class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+             [title]="sidebarCollapsed ? 'Validation' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Validation</span>
+          </a>
+        </div>
       </div>
 
       <!-- Admin Links -->
       <div *ngIf="isAdmin" class="pt-4 mt-4 border-t border-white/10">
-        <div [class.hidden]="sidebarCollapsed" class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Admin</div>
-        <a routerLink="/admin-dashboard" 
-           routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group mt-2"
-           [title]="sidebarCollapsed ? 'Admin Dashboard' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        <button 
+          (click)="toggleAdmin()"
+          [class.hidden]="sidebarCollapsed"
+          class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-300 transition-colors group">
+          <span>Admin</span>
+          <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!adminExpanded" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
-        </a>
+        </button>
+        <div [@slideToggle]="adminExpanded ? 'expanded' : 'collapsed'" class="overflow-hidden">
+          <a routerLink="/admin-dashboard" 
+             routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+             class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group mt-2"
+             [title]="sidebarCollapsed ? 'Admin Dashboard' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
+          </a>
 
-        <a routerLink="/account-requests" 
-           routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
-           [title]="sidebarCollapsed ? 'Account Requests' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h4m6 0h4a7 7 0 00-7-7z" />
-          </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Account Requests</span>
-        </a>
+          <a routerLink="/account-requests" 
+             routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+             class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+             [title]="sidebarCollapsed ? 'Account Requests' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h4m6 0h4a7 7 0 00-7-7z" />
+            </svg>
+            <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Account Requests</span>
+          </a>
+
+          <a routerLink="/admin-users" 
+             routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+             class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+             [title]="sidebarCollapsed ? 'All Users' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">All Users</span>
+          </a>
+        </div>
       </div>
 
       <!-- Contact Link -->

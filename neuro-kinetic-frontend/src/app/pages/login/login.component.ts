@@ -54,7 +54,13 @@ export class LoginComponent {
         }
 
         this.success = 'Login successful.';
-        this.router.navigate(['/patient-test']);
+        
+        // Redirect based on user role
+        if (response.user?.role === 'Admin') {
+          this.router.navigate(['/admin-dashboard']);
+        } else {
+          this.router.navigate(['/patient-test']);
+        }
       },
       error: (error) => {
         this.loading = false;
