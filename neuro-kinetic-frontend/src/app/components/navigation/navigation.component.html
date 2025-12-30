@@ -1,5 +1,5 @@
-<!-- Top Navbar (Public/Not Authenticated OR Landing Page) -->
-<nav *ngIf="!isAuthenticated || isLandingPage" 
+<!-- Top Navbar (Public/Not Authenticated OR Landing Page, but NOT Login/Signup) -->
+<nav *ngIf="(!isAuthenticated || isLandingPage) && currentRoute !== '/login' && currentRoute !== '/signup'" 
      class="fixed w-full top-0 z-50 transition-transform duration-300 ease-in-out" 
      [class.-translate-y-full]="!isNavbarVisible"
      [class.scrolled]="isScrolled">
@@ -130,7 +130,7 @@
 
 <!-- Mobile Sidebar Toggle -->
 <button
-  *ngIf="isAuthenticated && !isLandingPage && !mobileSidebarOpen"
+  *ngIf="isAuthenticated && !isLandingPage && currentRoute !== '/login' && currentRoute !== '/signup' && !mobileSidebarOpen"
   class="mobile-sidebar-toggle"
   (click)="toggleSidebar()"
   aria-label="Toggle sidebar"
@@ -142,13 +142,13 @@
 
 <!-- Backdrop for mobile sidebar -->
 <div
-  *ngIf="isAuthenticated && !isLandingPage && mobileSidebarOpen"
+  *ngIf="isAuthenticated && !isLandingPage && currentRoute !== '/login' && currentRoute !== '/signup' && mobileSidebarOpen"
   class="mobile-sidebar-backdrop"
   (click)="toggleSidebar()"
 ></div>
 
-<!-- Sidebar (Authenticated Users - NOT on Landing Page) -->
-<aside *ngIf="isAuthenticated && !isLandingPage" 
+<!-- Sidebar (Authenticated Users - NOT on Landing/Login/Signup Pages) -->
+<aside *ngIf="isAuthenticated && !isLandingPage && currentRoute !== '/login' && currentRoute !== '/signup'" 
        class="fixed left-0 top-0 h-full z-50 bg-slate-800 border-r border-white/10 transition-all duration-300 ease-in-out"
        [class.w-64]="!sidebarCollapsed"
        [class.w-20]="sidebarCollapsed"

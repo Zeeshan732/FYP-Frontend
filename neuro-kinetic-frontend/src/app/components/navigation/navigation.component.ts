@@ -95,7 +95,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event) => {
       this.currentRoute = event.urlAfterRedirects || event.url;
-      this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/';
+      this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/' || this.currentRoute === '/login' || this.currentRoute === '/signup';
       this.updateSectionStates();
       this.closeMobileMenu();
       if (this.isMobile && this.mobileSidebarOpen) {
@@ -111,7 +111,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
     });
     // Initial route check
     this.currentRoute = this.router.url;
-    this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/';
+    this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/' || this.currentRoute === '/login' || this.currentRoute === '/signup';
     
     // Auto-expand sections based on current route
     this.updateSectionStates();
