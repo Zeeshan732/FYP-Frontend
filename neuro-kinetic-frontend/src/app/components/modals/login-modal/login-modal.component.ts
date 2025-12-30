@@ -72,7 +72,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.loading = false;
-        if (response.status && response.status !== 'Approved') {
+        if (response.status && response.status !== 'Approved' && response.status !== 'Activated') {
           this.error = response.message || (response.status === 'Pending'
             ? 'Your account is under review.'
             : 'Your account request was rejected.');

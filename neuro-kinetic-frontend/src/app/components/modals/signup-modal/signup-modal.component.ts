@@ -139,21 +139,38 @@ export class SignupModalComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.loading = false;
         
-        // Check if account was approved/activated (admin accounts or auto-approved)
-        const isApproved = response.status === 'Approved' || !!response.token;
+        // Check if this is an admin account (from email pattern or response)
+        const isAdminAccount = this.isAdminEmail || response.user?.role === 'Admin';
         
-        if (isApproved) {
-          // Account is approved/activated (admin or auto-approved)
+        // Check if account was approved/activated
+        const isApproved = response.status === 'Approved' || response.status === 'Activated';
+        const isLoggedIn = !!response.token && !!response.user && !isAdminAccount; // Admin accounts are NOT auto-logged in
+        
+        if (isAdminAccount && isApproved) {
+          // Admin account is approved/activated but NOT logged in
+          this.info = response.message || 'Admin account created successfully. Please log in to continue.';
+        } else if (isApproved) {
+          // Other accounts are approved/activated and auto-logged in
           this.info = response.message || 'Account created successfully.';
         } else {
           // Account is pending approval
           this.info = response.message || 'Registration submitted. Your account is under review.';
         }
         
-        // Close modal and redirect to login after a short delay
+        // Close modal and redirect based on account status
         setTimeout(() => {
           this.modalService.closeSignupModal();
-          this.router.navigate(['/login']);
+          
+          // Admin accounts always redirect to login page (they must log in manually)
+          if (isAdminAccount) {
+            this.router.navigate(['/login']);
+          } else if (isLoggedIn) {
+            // Other approved accounts, redirect to patient test page
+            this.router.navigate(['/patient-test']);
+          } else {
+            // Pending accounts, redirect to login page
+            this.router.navigate(['/login']);
+          }
         }, 2000); // 2 second delay to show success message
       },
       error: (error) => {
