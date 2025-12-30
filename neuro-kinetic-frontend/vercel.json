@@ -1,4 +1,7 @@
 {
+  "buildCommand": "npm run build -- --configuration production",
+  "outputDirectory": "dist/NeuroSync-frontend",
+  "installCommand": "npm install",
   "rewrites": [
     {
       "source": "/(.*)",
