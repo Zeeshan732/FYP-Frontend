@@ -1,4 +1,4 @@
-# Project Execution Plan - Parkinson's Frontend
+# Project Execution Plan - NeuroSync Frontend
 
 ## 🎯 **Current Status: Task Management System Active**
 
@@ -55,7 +55,7 @@ A priority-based task management system is now implemented and tracking all proj
 9. Gait Analysis Module
 
 ### **Week 3 - Medium Priority**
-10. Parkinsons Progression Timeline
+10. NeuroSync Progression Timeline
 11. Domain Adaptation Explainer
 
 ### **Week 4 - Low Priority**

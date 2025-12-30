@@ -106,7 +106,7 @@ All 7 endpoints implemented:
 ## 📊 **Available Features**
 
 ### **For Users:**
-- ✅ Take Parkinson's test with voice recording
+- ✅ Take NeuroSync test with voice recording
 - ✅ View own test history
 - ✅ See test results with accuracy
 - ✅ Filter and sort own records

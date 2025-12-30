@@ -1,4 +1,4 @@
-# Project Status - Parkinson's Frontend
+# Project Status - NeuroSync Frontend
 
 **Last Updated:** November 2024  
 **Current Progress:** 25% (3/12 critical tasks completed)
@@ -101,7 +101,7 @@
 
 #### 10. ⚠️ Educational Resources - **MISSING**
 - **Status:** No components exist
-- **Needs:** Parkinsons progression timeline, domain adaptation explainer
+- **Needs:** NeuroSync progression timeline, domain adaptation explainer
 
 #### 11. ⚠️ D3.js Visualizations - **MISSING**
 - **Status:** No charts implemented

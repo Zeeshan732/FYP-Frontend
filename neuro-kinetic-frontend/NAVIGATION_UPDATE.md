@@ -60,7 +60,7 @@
 - `/collaboration` - Collaboration page
 
 ### **Authenticated User Routes:**
-- `/patient-test` - Take Parkinson's test
+- `/patient-test` - Take NeuroSync test
 - `/test-records` - View test records
 
 ### **Researcher/Admin Routes:**

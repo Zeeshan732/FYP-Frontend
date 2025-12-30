@@ -164,7 +164,7 @@ Access: Public + User routes
 12. `/collaboration` - Collaboration page (not in nav)
 
 ### **Authenticated User Routes:**
-13. `/patient-test` - Take Parkinson's test
+13. `/patient-test` - Take NeuroSync test
 14. `/test-records` - View test records
 
 ### **Researcher/Admin Routes:**

@@ -167,7 +167,7 @@ export class TaskManagerService {
       },
       {
         id: 'task-10',
-        title: 'Parkinsons Progression Timeline',
+        title: 'NeuroSync Progression Timeline',
         description: 'Interactive timeline visualizer for disease progression stages',
         priority: TaskPriority.Medium,
         status: TaskStatus.Pending,

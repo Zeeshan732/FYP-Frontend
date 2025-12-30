@@ -172,7 +172,7 @@ Based on your project specifications, here's what's **pending** and **needed**:
 
 ## 📚 **Educational Resources - Missing**
 
-### 8. **Parkinson's Progression Timeline Visualizer** ❌
+### 8. **NeuroSync Progression Timeline Visualizer** ❌
 **Status:** Not implemented  
 **Requirements:**
 - Interactive timeline showing disease progression
@@ -312,7 +312,7 @@ Based on your project specifications, here's what's **pending** and **needed**:
 7. ✅ Dataset Information Display
 
 ### **🟢 MEDIUM PRIORITY:**
-8. ✅ Parkinson's Progression Timeline
+8. ✅ NeuroSync Progression Timeline
 9. ✅ Domain Adaptation Explainer
 10. ✅ Case Studies Section
 
