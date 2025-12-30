@@ -1,4 +1,4 @@
-# Project Execution Plan - Parkinson's Frontend
+# Project Execution Plan - NeuroSync Frontend
 
 ## ✅ **Task Management System - ACTIVE**
 
@@ -61,7 +61,7 @@ A priority-based task management system is now implemented and automatically han
 
 ### **🟢 MEDIUM/LOW PRIORITY (3 tasks)**
 
-10. ⏳ **Parkinsons Progression Timeline** - Ready
+10. ⏳ **NeuroSync Progression Timeline** - Ready
 11. ⏳ **Domain Adaptation Explainer** - Waiting (depends on Task 3)
 12. ⏳ **D3.js Visualizations** - Waiting (depends on Task 1 & 2)
 

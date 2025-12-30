@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-production-api-url/api'
+  apiUrl: 'https://fyp-backend-production-9f15.up.railway.app/api',
+  signalRUrl: 'https://fyp-backend-production-9f15.up.railway.app/hubs/notifications'
 };
 
 

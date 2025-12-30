@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Parkinson's-frontend": {
+    "NeuroSync-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/Parkinson's-frontend",
+            "outputPath": "dist/NeuroSync-frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -65,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "Parkinson's-frontend:build:production"
+              "browserTarget": "NeuroSync-frontend:build:production"
             },
             "development": {
-              "browserTarget": "Parkinson's-frontend:build:development"
+              "browserTarget": "NeuroSync-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Parkinson's-frontend:build"
+            "browserTarget": "NeuroSync-frontend:build"
           }
         },
         "test": {

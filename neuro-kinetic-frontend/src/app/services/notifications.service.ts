@@ -165,7 +165,11 @@ export class NotificationsService implements OnDestroy {
   }
 
   private getHubUrl(): string {
-    // Convert https://host:port/api -> https://host:port/hubs/notifications
+    // Use environment.signalRUrl if available, otherwise construct from apiUrl
+    if (environment.signalRUrl) {
+      return environment.signalRUrl;
+    }
+    // Fallback: Convert https://host:port/api -> https://host:port/hubs/notifications
     return this.apiUrl.replace(/\/api\/?$/, '') + '/hubs/notifications';
   }
 }

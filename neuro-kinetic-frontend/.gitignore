@@ -43,8 +43,8 @@ Thumbs.db
 
 # Backend (if accidentally included)
 # Ensure backend project folder is completely ignored by this repo
-/Parkinson's-backend/
-../Parkinson's-backend/
+/NeuroSync-backend/
+../NeuroSync-backend/
 *.sln
 *.csproj
 *.cs

@@ -141,7 +141,7 @@ taskManager.updateTaskStatus('task-1', TaskStatus.Completed);
 9. Gait Analysis Module
 
 ### **Phase 3 - Medium Priority (Week 3):**
-10. Parkinsons Progression Timeline
+10. NeuroSync Progression Timeline
 11. Domain Adaptation Explainer
 
 ### **Phase 4 - Low Priority (Week 4):**

@@ -1,4 +1,4 @@
-# Parkinson's Frontend - Client Layer Details
+# NeuroSync Frontend - Client Layer Details
 
 **Last Updated:** November 2024  
 **Purpose:** Complete Architecture Diagram Client Layer  
@@ -1033,7 +1033,7 @@ ng build --configuration production
 
 **Output Directory:**
 ```
-dist/Parkinson's-frontend/
+dist/NeuroSync-frontend/
 ```
 
 **Build Configuration:**
@@ -1060,7 +1060,7 @@ export const environment = {
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  apiUrl: 'https://api.Parkinson's.com/api' // Update with production URL
+  apiUrl: 'https://api.NeuroSync.com/api' // Update with production URL
 };
 ```
 
@@ -1162,7 +1162,7 @@ export const environment = {
 ## 📞 Contact
 
 **Frontend Developer:** [Your Name]  
-**Repository:** https://github.com/Zeeshan732/FYP (Parkinson's-frontend folder)  
+**Repository:** https://github.com/Zeeshan732/FYP (NeuroSync-frontend folder)  
 **Last Updated:** November 2024
 
 ---
