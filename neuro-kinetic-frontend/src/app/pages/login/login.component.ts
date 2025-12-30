@@ -7,7 +7,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email = '';
   password = '';
   error = '';
@@ -27,6 +27,18 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit() {
+    // If user is already authenticated, redirect to appropriate dashboard
+    if (this.authService.isAuthenticated()) {
+      const user = this.authService.getCurrentUser();
+      if (user?.role === 'Admin') {
+        this.router.navigate(['/admin-dashboard']);
+      } else {
+        this.router.navigate(['/patient-test']);
+      }
+    }
+  }
+
   onSubmit() {
     if (!this.email || !this.password) {
       this.error = 'Please enter both email and password';
@@ -41,7 +53,7 @@ export class LoginComponent {
       next: (response) => {
         this.loading = false;
         // Respect account status responses from backend
-        if (response.status && response.status !== 'Approved') {
+        if (response.status && response.status !== 'Approved' && response.status !== 'Activated') {
           this.error = response.message || (response.status === 'Pending'
             ? 'Your account is under review.'
             : 'Your account request was rejected.');

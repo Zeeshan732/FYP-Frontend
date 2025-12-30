@@ -31,7 +31,7 @@ export class AuthService {
       .pipe(
         tap((response: AuthResponse) => {
           console.log('Login response:', response);
-          if (response.token && response.user && (response.status === 'Approved' || !response.status)) {
+          if (response.token && response.user && (response.status === 'Approved' || response.status === 'Activated' || !response.status)) {
             this.setAuthData(response.token, response.user);
           } else {
             // Ensure we do not persist tokens for pending/rejected users
@@ -48,15 +48,23 @@ export class AuthService {
     lastName: string;
     institution?: string;
     researchFocus?: string;
-    role?: 'Public' | 'Researcher' | 'MedicalProfessional';
+    role?: 'Public' | 'Researcher' | 'MedicalProfessional' | 'Admin';
   }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data)
       .pipe(
         tap((response: AuthResponse) => {
-          // Backend no longer returns JWT for pending accounts
-          if (response.token && response.user && (response.status === 'Approved' || !response.status)) {
+          // Admin accounts are approved but NOT automatically logged in
+          // They need to manually log in after signup
+          const isAdminAccount = response.user?.role === 'Admin';
+          
+          if (isAdminAccount) {
+            // Clear auth data for admin accounts - they must log in manually
+            this.clearAuthData();
+          } else if (response.token && response.user && (response.status === 'Approved' || response.status === 'Activated' || !response.status)) {
+            // Other approved accounts can be auto-logged in
             this.setAuthData(response.token, response.user);
           } else {
+            // Pending accounts - no auto-login
             this.clearAuthData();
           }
         })
