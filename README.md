@@ -1,4 +1,4 @@
-# 🚀 FYP (Parkinson's)
+# 🚀 FYP (NeuroSync)
 
 <div align="center">
 
