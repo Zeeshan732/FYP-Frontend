@@ -13,6 +13,7 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private justLoggedIn = false; // Flag to track if we just logged in
 
   constructor(
     private http: HttpClient,
@@ -32,7 +33,17 @@ export class AuthService {
         tap((response: AuthResponse) => {
           console.log('Login response:', response);
           if (response.token && response.user && (response.status === 'Approved' || response.status === 'Activated' || !response.status)) {
+            // Set auth data synchronously before any redirects
+            console.log('About to call setAuthData with token length:', response.token?.length);
             this.setAuthData(response.token, response.user);
+            
+            // Wait a tick to ensure localStorage operations complete
+            setTimeout(() => {
+              console.log('After setAuthData - Token stored:', !!localStorage.getItem('token'));
+              console.log('After setAuthData - User stored:', !!localStorage.getItem('user'));
+              console.log('After setAuthData - isAuthenticated check:', this.isAuthenticated());
+              console.log('After setAuthData - Current user subject value:', this.currentUserSubject.value);
+            }, 0);
           } else {
             // Ensure we do not persist tokens for pending/rejected users
             this.clearAuthData();
@@ -89,7 +100,42 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token') && !!this.currentUserSubject.value;
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    
+    // If no token or user data, not authenticated
+    if (!token || !userStr) {
+      return false;
+    }
+    
+    // Check if token is expired
+    // BUT: If we just logged in (justLoggedIn flag), skip expiration check
+    // This prevents the token from being cleared immediately after login
+    if (!this.justLoggedIn) {
+      const isExpired = this.isTokenExpired(token);
+      if (isExpired) {
+        // Token expired, clear auth data
+        this.clearAuthData();
+        return false;
+      }
+    }
+    
+    // Check if user data exists in both localStorage and BehaviorSubject
+    // If user exists in localStorage but not in BehaviorSubject, load it
+    if (!this.currentUserSubject.value) {
+      try {
+        const user = JSON.parse(userStr) as User;
+        this.currentUserSubject.next(user);
+        return true;
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        this.clearAuthData();
+        return false;
+      }
+    }
+    
+    // User data exists in both places, authenticated
+    return true;
   }
 
   hasRole(role: string): boolean {
@@ -110,9 +156,49 @@ export class AuthService {
   // ========== PRIVATE METHODS ==========
 
   private setAuthData(token: string, user: User): void {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    this.currentUserSubject.next(user);
+    try {
+      console.log('setAuthData called with token length:', token?.length, 'user:', user);
+      
+      // Check if localStorage is available
+      if (typeof(Storage) === "undefined") {
+        console.error('localStorage is not available');
+        return;
+      }
+      
+      // Store token
+      localStorage.setItem('token', token);
+      const verifyToken = localStorage.getItem('token');
+      console.log('Token setItem result - stored:', !!verifyToken, 'matches:', verifyToken === token);
+      
+      // Store user
+      const userStr = JSON.stringify(user);
+      localStorage.setItem('user', userStr);
+      const verifyUser = localStorage.getItem('user');
+      console.log('User setItem result - stored:', !!verifyUser, 'matches:', verifyUser === userStr);
+      
+      // Verify both are stored
+      const finalToken = localStorage.getItem('token');
+      const finalUser = localStorage.getItem('user');
+      console.log('Final verification - token:', !!finalToken, 'user:', !!finalUser);
+      
+      if (!finalToken || !finalUser) {
+        console.error('CRITICAL: localStorage.setItem failed! Token:', !!finalToken, 'User:', !!finalUser);
+        throw new Error('Failed to store auth data in localStorage');
+      }
+      
+      this.currentUserSubject.next(user);
+      this.justLoggedIn = true;
+      
+      // Clear the flag after a short delay to allow redirect to complete
+      setTimeout(() => {
+        this.justLoggedIn = false;
+      }, 2000);
+      
+      console.log('setAuthData completed successfully, currentUserSubject:', this.currentUserSubject.value);
+    } catch (error) {
+      console.error('CRITICAL ERROR in setAuthData:', error);
+      throw error;
+    }
   }
 
   private loadUserFromStorage(): void {
@@ -120,14 +206,111 @@ export class AuthService {
     const userStr = localStorage.getItem('user');
     
     if (token && userStr) {
+      // Check if token is expired before loading user
+      if (this.isTokenExpired(token)) {
+        console.log('Token expired, clearing auth data');
+        this.clearAuthData();
+        return;
+      }
+      
       try {
         const user = JSON.parse(userStr) as User;
         this.currentUserSubject.next(user);
+        
+        // Validate token with backend on app startup (but don't block)
+        // Only validate if we're not in the middle of a login flow
+        // Delay validation by 2 seconds to allow login redirect to complete
+        setTimeout(() => {
+          // Only validate if we haven't just logged in
+          if (!this.justLoggedIn) {
+            this.validateTokenOnStartup();
+          }
+        }, 2000);
       } catch (error) {
         console.error('Error parsing user data from localStorage:', error);
         this.clearAuthData();
       }
     }
+  }
+
+  /**
+   * Check if JWT token is expired by decoding the token
+   * JWT tokens have 3 parts: header.payload.signature
+   * The payload contains the expiration time (exp) claim
+   */
+  private isTokenExpired(token: string): boolean {
+    try {
+      // Decode the token (we only need the payload, no verification needed for expiration check)
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.error('Invalid token format - expected 3 parts, got:', parts.length);
+        return true;
+      }
+      
+      const payload = JSON.parse(atob(parts[1]));
+      console.log('Token payload:', payload);
+      
+      // Check if token has expiration claim
+      if (!payload.exp) {
+        // No expiration claim - consider it expired for security
+        console.log('Token has no exp claim, considering expired');
+        return true;
+      }
+      
+      // exp is in seconds, Date.now() is in milliseconds
+      const expirationTime = payload.exp * 1000;
+      const currentTime = Date.now();
+      const timeUntilExpiry = expirationTime - currentTime;
+      
+      // Add 1 minute buffer to account for clock skew (reduced from 5 minutes)
+      // This prevents tokens from being marked as expired when they still have time left
+      const bufferTime = 1 * 60 * 1000; // 1 minute
+      
+      const isExpired = currentTime >= (expirationTime - bufferTime);
+      
+      console.log('Token expiration check:', {
+        expirationTime: new Date(expirationTime).toISOString(),
+        currentTime: new Date(currentTime).toISOString(),
+        timeUntilExpiry: Math.round(timeUntilExpiry / 1000) + ' seconds',
+        bufferTime: Math.round(bufferTime / 1000) + ' seconds',
+        isExpired: isExpired
+      });
+      
+      return isExpired;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      // If we can't decode the token, consider it expired
+      return true;
+    }
+  }
+
+  /**
+   * Validate token with backend on app startup
+   * This ensures the token is still valid on the server side
+   */
+  private validateTokenOnStartup(): void {
+    // Don't validate if we just logged in (token is fresh)
+    if (this.justLoggedIn) {
+      console.log('Skipping token validation - user just logged in');
+      return;
+    }
+    
+    this.validateToken().subscribe({
+      next: (response) => {
+        if (!response.valid) {
+          console.log('Token validation failed, clearing auth data');
+          this.clearAuthData();
+        }
+        // If valid, user data is already loaded, no action needed
+      },
+      error: (error) => {
+        console.error('Token validation error:', error);
+        // Only clear if it's not a fresh login
+        if (!this.justLoggedIn) {
+          this.clearAuthData();
+        }
+      }
+    });
   }
 
   private clearAuthData(): void {

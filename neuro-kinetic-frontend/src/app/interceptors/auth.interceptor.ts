@@ -33,13 +33,21 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         // Handle 401 Unauthorized - token expired or invalid
         if (error.status === 401) {
-          // Clear token and user data
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          const currentUrl = this.router.url;
+          const isLoginPage = currentUrl === '/login' || currentUrl.startsWith('/login');
+          const isNotificationsEndpoint = request.url.includes('/notifications');
           
-          // Redirect to login if not already there
-          if (this.router.url !== '/login') {
-            this.router.navigate(['/login']);
+          // Don't redirect if:
+          // 1. We're already on the login page
+          // 2. It's a notifications endpoint (they might be polling before login)
+          // 3. It's a signup/register endpoint
+          if (!isLoginPage && !isNotificationsEndpoint && !request.url.includes('/register') && !request.url.includes('/signup')) {
+            // Clear token and user data only if we have a token (user was logged in)
+            if (token) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              this.router.navigate(['/login']);
+            }
           }
         }
 

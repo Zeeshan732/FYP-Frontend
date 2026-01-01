@@ -79,9 +79,17 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.isAdmin = user?.role === 'Admin';
       this.isResearcher = user?.role === 'Researcher' || user?.role === 'MedicalProfessional';
       this.roleLabel = user?.role || '';
-      if (user) {
+      if (user && this.authService.isAuthenticated()) {
+        this.showNotifications = true;
         this.notificationsService.startRealtime();
-        this.notificationsService.loadNotifications().subscribe();
+        this.notificationsService.loadNotifications().subscribe({
+          error: (err) => {
+            // Silently handle errors - notifications will retry
+            if (err.status !== 401) {
+              console.error('Failed to load notifications', err);
+            }
+          }
+        });
       } else {
         this.showNotifications = false;
         this.notifications = [];

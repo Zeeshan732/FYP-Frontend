@@ -467,7 +467,7 @@ export class ApiService {
 
   // ========== ACCOUNT REQUESTS (ADMIN) ==========
   getAccountRequests(params: {
-    status?: 'Pending' | 'Approved' | 'Rejected';
+    status?: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
     pageNumber?: number;
     pageSize?: number;
     search?: string;

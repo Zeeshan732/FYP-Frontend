@@ -75,9 +75,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // Subscribe to user changes
     this.userSubscription = this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
-      if (user) {
+      if (user && this.authService.isAuthenticated()) {
         this.notificationsService.startRealtime();
-        this.notificationsService.loadNotifications().subscribe();
+        this.notificationsService.loadNotifications().subscribe({
+          error: (err) => {
+            // Silently handle errors - notifications will retry
+            if (err.status !== 401) {
+              console.error('Failed to load notifications', err);
+            }
+          }
+        });
       } else {
         this.unreadCount = 0;
         this.notificationsService.stopRealtime();

@@ -5,6 +5,7 @@ import { LandingComponent } from './pages/landing/landing.component';
 import { ServicesComponent } from './pages/services/services.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { LoginComponent } from './pages/login/login.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { TechnologyDemoComponent } from './pages/technology-demo/technology-demo.component';
 import { TechnologyComponent } from './pages/technology/technology.component';
 import { ResearchComponent } from './pages/research/research.component';
@@ -30,6 +31,7 @@ const routes: Routes = [
   { path: 'services', component: ServicesComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
       { path: 'technology', component: TechnologyComponent },
       { path: 'technology-demo', component: TechnologyDemoComponent },
   { path: 'research', component: ResearchComponent },
