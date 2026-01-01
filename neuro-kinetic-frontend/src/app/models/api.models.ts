@@ -5,9 +5,11 @@ export interface User {
   firstName: string;
   lastName: string;
   role: 'Public' | 'Researcher' | 'MedicalProfessional' | 'Admin';
-  status?: 'Pending' | 'Approved' | 'Rejected';
+  status?: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
+  isActive?: boolean; // NEW: indicates if account is active
   institution?: string;
   researchFocus?: string;
+  createdAt?: string;
 }
 
 // Auth Response
@@ -24,13 +26,13 @@ export interface AccountRequest {
   email: string;
   firstName: string;
   lastName: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
   comment?: string;
   createdAt?: string;
 }
 
 export interface UpdateUserStatusRequest {
-  status: 'Approved' | 'Rejected' | 'Pending';
+  status: 'Approved' | 'Rejected' | 'Pending' | 'Inactive';
   comment?: string;
 }
 
@@ -175,6 +177,7 @@ export interface ErrorResponse {
 // Validation Response
 export interface ValidationResponse {
   valid: boolean;
+  message?: string; // Optional message from backend
 }
 
 // File Upload Response

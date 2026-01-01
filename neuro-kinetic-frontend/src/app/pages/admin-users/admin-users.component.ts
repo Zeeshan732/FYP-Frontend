@@ -39,7 +39,8 @@ export class AdminUsersComponent implements OnInit {
     { label: 'All Statuses', value: '' },
     { label: 'Pending', value: 'Pending' },
     { label: 'Approved', value: 'Approved' },
-    { label: 'Rejected', value: 'Rejected' }
+    { label: 'Rejected', value: 'Rejected' },
+    { label: 'Inactive', value: 'Inactive' }
   ];
 
   constructor(
@@ -146,7 +147,14 @@ export class AdminUsersComponent implements OnInit {
     }
   }
 
-  getStatusBadgeColor(status?: string): string {
+  getStatusBadgeColor(status?: string, isActive?: boolean): string {
+    // Check if user is inactive (either status is Inactive or isActive is false)
+    const isInactive = status === 'Inactive' || (isActive === false);
+    
+    if (isInactive) {
+      return 'bg-gray-500/20 border-gray-500 text-gray-400';
+    }
+    
     switch (status) {
       case 'Approved':
         return 'bg-green-500/20 border-green-500 text-green-400';
@@ -157,6 +165,12 @@ export class AdminUsersComponent implements OnInit {
       default:
         return 'bg-gray-500/20 border-gray-500 text-gray-400';
     }
+  }
+  
+  getStatusLabel(status?: string, isActive?: boolean): string {
+    // Check if user is inactive (either status is Inactive or isActive is false)
+    const isInactive = status === 'Inactive' || (isActive === false);
+    return isInactive ? 'Inactive' : (status || 'N/A');
   }
 
   hasActiveFilters(): boolean {
@@ -170,6 +184,56 @@ export class AdminUsersComponent implements OnInit {
       default:
         return role;
     }
+  }
+
+  // Toggle user active/inactive status
+  togglingUsers: Set<number> = new Set(); // Track which users are currently being toggled
+
+  isUserActive(user: User): boolean {
+    // User is active if status is Approved AND isActive is true (or not set)
+    return user.status === 'Approved' && (user.isActive !== false);
+  }
+
+  isUserInactive(user: User): boolean {
+    // User is inactive if status is Inactive OR isActive is false
+    return user.status === 'Inactive' || user.isActive === false;
+  }
+
+  toggleUserStatus(user: User) {
+    if (this.togglingUsers.has(user.id)) return; // Prevent double-clicks
+
+    const isCurrentlyActive = this.isUserActive(user);
+    const newStatus: 'Approved' | 'Inactive' = isCurrentlyActive ? 'Inactive' : 'Approved';
+
+    this.togglingUsers.add(user.id);
+
+    this.apiService.updateAccountStatus(user.id, {
+      status: newStatus,
+      comment: undefined
+    }).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Status Updated',
+          detail: `User ${user.email} is now ${newStatus === 'Inactive' ? 'inactive' : 'active'}`
+        });
+        this.togglingUsers.delete(user.id);
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error('Error toggling user status:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: error.error?.message || 'Failed to update user status. Please try again.'
+        });
+        this.togglingUsers.delete(user.id);
+      }
+    });
+  }
+
+  isToggling(userId: number): boolean {
+    return this.togglingUsers.has(userId);
   }
 
   // Helper for template

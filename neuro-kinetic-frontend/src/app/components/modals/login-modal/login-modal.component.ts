@@ -16,6 +16,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   error = '';
   info = '';
   loading = false;
+  showContactAdmin = false;
   private subscription: Subscription = new Subscription();
 
   constructor(
@@ -35,6 +36,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           this.error = '';
           this.info = '';
           this.loading = false;
+          this.showContactAdmin = false;
         }
       })
     );
@@ -51,6 +53,16 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   openSignupModal() {
     this.modalService.closeLoginModal();
     this.modalService.openSignupModal();
+  }
+
+  openForgotPassword() {
+    this.modalService.closeLoginModal();
+    this.router.navigate(['/forgot-password']);
+  }
+
+  openContactPage() {
+    this.modalService.closeLoginModal();
+    this.router.navigate(['/contact']);
   }
 
   onBackdropClick(event: Event) {
@@ -85,12 +97,23 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         }
 
         this.closeModal();
-        // Redirect based on user role
-        if (response.user?.role === 'Admin') {
-          this.router.navigate(['/admin-dashboard']);
-        } else {
-          this.router.navigate(['/home']);
-        }
+        
+        // Small delay to ensure auth data is fully set before redirect
+        setTimeout(() => {
+          // Double-check authentication before redirect
+          if (this.authService.isAuthenticated()) {
+            // Redirect based on user role
+            if (response.user?.role === 'Admin') {
+              this.router.navigate(['/admin-dashboard']);
+            } else {
+              this.router.navigate(['/patient-test']);
+            }
+          } else {
+            console.error('Authentication check failed after login');
+            this.error = 'Login successful but authentication check failed. Please try again.';
+            this.modalService.openLoginModal(); // Reopen modal to show error
+          }
+        }, 100);
       },
       error: (error) => {
         this.loading = false;
@@ -102,7 +125,10 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           this.error = 'Unable to connect to the server. Please ensure the backend is running.';
         } else if (error.status === 401) {
           this.error = error.error?.message || 'Invalid email or password. Please try again.';
-          if (this.error?.toLowerCase().includes('pending')) {
+          if (this.error?.toLowerCase().includes('inactive')) {
+            this.error = 'Your account is inactive. Please contact admin.';
+            this.showContactAdmin = true;
+          } else if (this.error?.toLowerCase().includes('pending')) {
             this.error = 'Your account is under review.';
           } else if (this.error?.toLowerCase().includes('rejected')) {
             this.error = 'Your account request was rejected.';
@@ -111,7 +137,10 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           this.error = 'API endpoint not found. Please check the API configuration.';
         } else if (error.error?.message) {
           const message = error.error.message as string;
-          if (message.toLowerCase().includes('pending')) {
+          if (message.toLowerCase().includes('inactive')) {
+            this.error = 'Your account is inactive. Please contact admin.';
+            this.showContactAdmin = true;
+          } else if (message.toLowerCase().includes('pending')) {
             this.error = 'Your account is under review.';
           } else if (message.toLowerCase().includes('rejected')) {
             this.error = 'Your account request was rejected.';

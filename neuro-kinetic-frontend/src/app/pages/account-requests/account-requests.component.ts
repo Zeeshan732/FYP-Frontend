@@ -14,7 +14,7 @@ export class AccountRequestsComponent implements OnInit, OnDestroy {
   requests: AccountRequest[] = [];
   loading = false;
   error = '';
-  statusFilter: 'Pending' | 'Approved' | 'Rejected' | '' = 'Pending';
+  statusFilter: 'Pending' | 'Approved' | 'Rejected' | 'Inactive' | '' = 'Pending';
   searchTerm = '';
   pageNumber = 1;
   pageSize = 10;
@@ -28,7 +28,8 @@ export class AccountRequestsComponent implements OnInit, OnDestroy {
     { label: 'All', value: '' },
     { label: 'Pending', value: 'Pending' },
     { label: 'Approved', value: 'Approved' },
-    { label: 'Rejected', value: 'Rejected' }
+    { label: 'Rejected', value: 'Rejected' },
+    { label: 'Inactive', value: 'Inactive' }
   ];
   Math = Math;
   private search$ = new Subject<string>();
@@ -94,7 +95,7 @@ export class AccountRequestsComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateStatus(request: AccountRequest, status: 'Approved' | 'Rejected' | 'Pending', comment?: string) {
+  updateStatus(request: AccountRequest, status: 'Approved' | 'Rejected' | 'Pending' | 'Inactive', comment?: string) {
     this.loading = true;
     this.apiService.updateAccountStatus(request.id, { status, comment }).subscribe({
       next: () => {
@@ -139,7 +140,7 @@ export class AccountRequestsComponent implements OnInit, OnDestroy {
     this.processing = false;
   }
 
-  submitStatus(status: 'Approved' | 'Rejected' | 'Pending') {
+  submitStatus(status: 'Approved' | 'Rejected' | 'Pending' | 'Inactive') {
     if (!this.selectedUser) return;
     this.processing = true;
     this.apiService.updateAccountStatus(this.selectedUser.id, {

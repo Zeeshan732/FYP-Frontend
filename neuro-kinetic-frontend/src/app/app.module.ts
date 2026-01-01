@@ -28,6 +28,7 @@ import { LandingComponent } from './pages/landing/landing.component';
 import { ServicesComponent } from './pages/services/services.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { LoginComponent } from './pages/login/login.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { SignupComponent } from './pages/signup/signup.component';
 import { NavigationComponent } from './components/navigation/navigation.component';
 import { FooterComponent } from './components/footer/footer.component';
@@ -60,6 +61,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     ServicesComponent,
     ContactComponent,
     LoginComponent,
+    ForgotPasswordComponent,
     SignupComponent,
     NavigationComponent,
     FooterComponent,

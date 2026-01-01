@@ -1,4 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-landing',
@@ -13,11 +15,27 @@ export class LandingComponent implements OnInit {
   selectedRoleText = 'Select your role';
   selectedInterestText = 'Select your interest';
 
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
   ngOnInit() {
+    // If user is authenticated (with valid token), redirect to appropriate page
+    if (this.authService.isAuthenticated()) {
+      const user = this.authService.getCurrentUser();
+      if (user?.role === 'Admin') {
+        this.router.navigate(['/admin-dashboard']);
+      } else {
+        this.router.navigate(['/patient-test']);
+      }
+      return;
+    }
+    
     this.observeElements();
   }
 
-  @HostListener('window:scroll', ['$event'])
+  @HostListener('window:scroll')
   onScroll() {
     this.observeElements();
   }

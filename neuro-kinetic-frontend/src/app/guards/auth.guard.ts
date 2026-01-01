@@ -9,10 +9,14 @@ export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router, private urlSerializer: UrlSerializer) {}
 
   canActivate(): boolean | UrlTree {
-    if (this.authService.isAuthenticated()) {
+    const isAuth = this.authService.isAuthenticated();
+    console.log('AuthGuard check - isAuthenticated:', isAuth);
+    
+    if (isAuth) {
       return true;
     }
 
+    console.log('AuthGuard - redirecting to login');
     const tree = this.router.parseUrl('/login');
     tree.queryParams = { redirect: 'true' };
     return tree;
