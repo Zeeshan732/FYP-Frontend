@@ -15,76 +15,120 @@
     </div> -->
 
     <!-- Filters and Controls -->
-    <div class="max-w-[1600px] mx-auto mb-8">
-      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 sm:p-5 md:p-6">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4 items-end">
-          <!-- Status Filter -->
-          <div class="flex-1">
-            <label class="block text-sm font-semibold text-gray-300 mb-2">Filter by Status</label>
-            <select
-              [(ngModel)]="filterStatus"
-              (change)="onFilterChange()"
-              class="w-full px-3 sm:px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white backdrop-blur-sm text-sm sm:text-base"
-            >
-              <option value="">All Status</option>
-              <option value="Completed">Completed</option>
-              <option value="Pending">Pending</option>
-              <option value="Failed">Failed</option>
-            </select>
-          </div>
+    <div class="max-w-[1600px] mx-auto mb-6 relative">
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-1">
+          <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+            Test Records
+          </span>
+          <span class="text-xs text-gray-500">
+            Use the filter icon to refine results
+          </span>
+        </div>
 
-          <!-- Result Filter -->
-          <div class="flex-1">
-            <label class="block text-sm font-semibold text-gray-300 mb-2">Filter by Result</label>
-            <select
-              [(ngModel)]="filterResult"
-              (change)="onFilterChange()"
-              class="w-full px-3 sm:px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white backdrop-blur-sm text-sm sm:text-base"
-            >
-              <option value="">All Results</option>
-              <option value="Positive">Positive</option>
-              <option value="Negative">Negative</option>
-              <option value="Uncertain">Uncertain</option>
-            </select>
-          </div>
+        <div class="flex items-center gap-2">
+          <!-- Filter icon button -->
+          <button
+            type="button"
+            (click)="toggleFilterMenu()"
+            class="inline-flex items-center justify-center h-10 w-10 rounded-full border border-emerald-500/60 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200 transition-colors"
+            title="Filter records"
+          >
+            <i class="pi pi-filter text-sm"></i>
+          </button>
 
-          <!-- Sort Controls -->
-          <div class="flex gap-2">
-            <select
-              [(ngModel)]="sortBy"
-              (change)="onSortChange(sortBy)"
-              class="px-3 sm:px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white backdrop-blur-sm text-sm sm:text-base"
-            >
-              <option value="testDate">Sort by Date</option>
-              <option value="accuracy">Sort by Accuracy</option>
-              <option value="testResult">Sort by Result</option>
-            </select>
+          <!-- Take new test -->
+          <button
+            (click)="takeNewTest()"
+            class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl transition-colors font-semibold text-sm whitespace-nowrap"
+          >
+            Take New Test
+          </button>
+        </div>
+      </div>
+
+      <!-- Small filter menu (icon dropdown) -->
+      <div
+        *ngIf="showFilterMenu"
+        class="absolute right-0 mt-3 z-30 w-full sm:w-[420px]"
+      >
+        <div class="bg-slate-900/95 border border-white/15 rounded-xl shadow-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+              Filters
+            </span>
             <button
-              (click)="onSortChange(sortBy)"
-              class="px-3 sm:px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm sm:text-base"
-              [title]="sortOrder === 'asc' ? 'Ascending' : 'Descending'"
+              type="button"
+              (click)="clearFilters()"
+              class="text-xs text-emerald-300 hover:text-emerald-200 underline underline-offset-2"
             >
-              {{ sortOrder === 'asc' ? '↑' : '↓' }}
+              Clear all
             </button>
           </div>
 
-          <!-- Clear Filter -->
-          <button
-            *ngIf="hasActiveFilters()"
-            (click)="clearFilters()"
-            class="px-3 sm:px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-gray-300 hover:text-white rounded-lg transition-colors text-sm"
-          >
-            Clear Filters
-          </button>
-          <div *ngIf="!hasActiveFilters()" class="hidden md:block"></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Status -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 mb-1">
+                Status
+              </label>
+              <p-dropdown
+                [(ngModel)]="filterStatus"
+                [options]="statusFilterOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full dark-dropdown"
+                placeholder="All Status">
+              </p-dropdown>
+            </div>
 
-          <!-- Take New Test Button (moved here) -->
-          <div class="flex justify-end md:ml-auto">
-            <button 
-              (click)="takeNewTest()"
-              class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg transition-colors font-semibold text-sm sm:text-base whitespace-nowrap"
+            <!-- Result -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 mb-1">
+                Result
+              </label>
+              <p-dropdown
+                [(ngModel)]="filterResult"
+                [options]="resultFilterOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full dark-dropdown"
+                placeholder="All Results">
+              </p-dropdown>
+            </div>
+          </div>
+
+          <!-- Sort -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-400 mb-1">
+              Sort
+            </label>
+            <div class="flex">
+              <p-dropdown
+                [(ngModel)]="sortBy"
+                [options]="sortOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full dark-dropdown"
+                placeholder="Sort by Date">
+              </p-dropdown>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              (click)="toggleFilterMenu()"
+              class="px-3 py-2 rounded-lg border border-white/20 text-gray-300 hover:bg-white/10 text-sm"
             >
-              Take New Test
+              Cancel
+            </button>
+            <button
+              type="button"
+              (click)="applyFilters()"
+              class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold"
+            >
+              Apply
             </button>
           </div>
         </div>
@@ -113,23 +157,48 @@
               <tr>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
                     (click)="onSortChange('userName')">
-                  User Name
+                  <div class="flex items-center gap-2">
+                    <span>User Name</span>
+                    <span *ngIf="isColumnSorted('userName')" class="text-emerald-300 font-bold">
+                      {{ getSortIcon('userName') }}
+                    </span>
+                  </div>
                 </th>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
                     (click)="onSortChange('testDate')">
-                  Test Date
+                  <div class="flex items-center gap-2">
+                    <span>Test Date</span>
+                    <span *ngIf="isColumnSorted('testDate')" class="text-emerald-300 font-bold">
+                      {{ getSortIcon('testDate') }}
+                    </span>
+                  </div>
                 </th>
                 <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
                     (click)="onSortChange('testResult')">
-                  Result
+                  <div class="flex items-center justify-center gap-2">
+                    <span>Result</span>
+                    <span *ngIf="isColumnSorted('testResult')" class="text-emerald-300 font-bold">
+                      {{ getSortIcon('testResult') }}
+                    </span>
+                  </div>
                 </th>
                 <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
                     (click)="onSortChange('accuracy')">
-                  Accuracy
+                  <div class="flex items-center justify-center gap-2">
+                    <span>Accuracy</span>
+                    <span *ngIf="isColumnSorted('accuracy')" class="text-emerald-300 font-bold">
+                      {{ getSortIcon('accuracy') }}
+                    </span>
+                  </div>
                 </th>
                 <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
                     (click)="onSortChange('status')">
-                  Status
+                  <div class="flex items-center justify-center gap-2">
+                    <span>Status</span>
+                    <span *ngIf="isColumnSorted('status')" class="text-emerald-300 font-bold">
+                      {{ getSortIcon('status') }}
+                    </span>
+                  </div>
                 </th>
                 <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-400">Actions</th>
               </tr>
@@ -150,23 +219,29 @@
                   </span>
                 </td>
                 <td class="px-6 py-4 text-center">
-                  <div class="flex gap-2 justify-center items-center">
+                  <div class="actions-cell inline-flex items-center">
                     <p-button 
                       icon="pi pi-eye"
                       (onClick)="viewRecord(record.id)"
-                      [outlined]="true"
                       severity="success"
-                      [rounded]="true"
+                      styleClass="p-button-rounded p-button-text p-button-plain p-button-sm"
                       pTooltip="View Details"
                       tooltipPosition="top">
                     </p-button>
+                    <!-- <p-button 
+                      icon="pi pi-compress"
+                      (onClick)="openComparisonDialog(record.id)"
+                      severity="help"
+                      styleClass="p-button-rounded p-button-text p-button-plain p-button-sm"
+                      pTooltip="Compare"
+                      tooltipPosition="top">
+                    </p-button> -->
                     <p-button 
                       *ngIf="isAdmin"
                       icon="pi pi-pencil"
                       (onClick)="editRecord(record.id)"
-                      [outlined]="true"
                       severity="info"
-                      [rounded]="true"
+                      styleClass="p-button-rounded p-button-text p-button-plain p-button-sm"
                       pTooltip="Edit Record"
                       tooltipPosition="top">
                     </p-button>
@@ -174,9 +249,8 @@
                       *ngIf="isAdmin"
                       icon="pi pi-trash"
                       (onClick)="openDeleteDialog(record.id)"
-                      [outlined]="true"
                       severity="danger"
-                      [rounded]="true"
+                      styleClass="p-button-rounded p-button-text p-button-plain p-button-sm"
                       pTooltip="Delete Record"
                       tooltipPosition="top">
                     </p-button>
@@ -268,6 +342,162 @@
       <div class="flex justify-end gap-3">
         <p-button icon="pi pi-times" (onClick)="cancelDelete()" styleClass="p-button-secondary p-button-icon-only dialog-action" [rounded]="true" pTooltip="Cancel" tooltipPosition="top" aria-label="Cancel"></p-button>
         <p-button icon="pi pi-check" severity="danger" [loading]="deleting" (onClick)="confirmDelete()" styleClass="p-button-icon-only dialog-action" [rounded]="true" pTooltip="Confirm" tooltipPosition="top" aria-label="Confirm"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Trend Analysis Dialog -->
+  <p-dialog
+    [(visible)]="showTrends"
+    [modal]="true"
+    [draggable]="false"
+    [dismissableMask]="true"
+    [breakpoints]="{ '960px': '90vw', '640px': '95vw' }"
+    [style]="{ width: '800px', maxHeight: '90vh' }"
+    styleClass="trend-dialog">
+    <ng-template pTemplate="header">
+      <div class="flex items-center gap-3">
+        <span class="pi pi-chart-line text-blue-400 text-xl"></span>
+        <span class="text-lg font-semibold">Trend Analysis</span>
+      </div>
+    </ng-template>
+    <div *ngIf="loadingTrends" class="text-center py-8">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
+      <p class="text-gray-300">Loading trend data...</p>
+    </div>
+    <div *ngIf="!loadingTrends && trendData" class="space-y-6">
+      <!-- Summary -->
+      <div class="bg-white/5 rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-emerald-400 mb-3">Summary</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p class="text-sm text-gray-400">Total Tests</p>
+            <p class="text-xl font-bold text-white">{{ trendData.summary.totalTests }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400">Completed</p>
+            <p class="text-xl font-bold text-white">{{ trendData.summary.completedTests }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400">Avg Accuracy</p>
+            <p class="text-xl font-bold text-white">{{ trendData.summary.averageAccuracy.toFixed(1) }}%</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400">Trend</p>
+            <p class="text-xl font-bold text-white">{{ trendData.summary.overallTrend || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trend Data -->
+      <div class="bg-white/5 rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-emerald-400 mb-3">Test History</h3>
+        <div class="space-y-2 max-h-96 overflow-y-auto">
+          <div *ngFor="let trend of trendData.trends" class="bg-white/5 rounded p-3 flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm text-gray-300">{{ trend.date | date:'short' }}</p>
+              <p class="text-xs text-gray-400">Accuracy: {{ trend.accuracy }}%</p>
+            </div>
+            <div class="flex gap-2 items-center">
+              <span *ngIf="trend.riskLevel" [class]="'px-2 py-1 rounded text-xs ' + getRiskLevelColor(trend.riskLevel)">
+                {{ trend.riskLevel }}
+              </span>
+              <span [class]="'px-2 py-1 rounded text-xs ' + getResultBadgeColor(trend.prediction || 'Uncertain')">
+                {{ trend.prediction || 'N/A' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end">
+        <p-button label="Close" (onClick)="closeTrends()" styleClass="p-button-secondary"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Comparison Dialog -->
+  <p-dialog
+    [(visible)]="showComparison"
+    [modal]="true"
+    [draggable]="false"
+    [dismissableMask]="true"
+    [breakpoints]="{ '960px': '90vw', '640px': '95vw' }"
+    [style]="{ width: '900px', maxHeight: '90vh' }"
+    styleClass="comparison-dialog">
+    <ng-template pTemplate="header">
+      <div class="flex items-center gap-3">
+        <span class="pi pi-compress text-purple-400 text-xl"></span>
+        <span class="text-lg font-semibold">Compare Test Records</span>
+      </div>
+    </ng-template>
+    <div *ngIf="loadingComparison" class="text-center py-8">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+      <p class="text-gray-300">Loading comparison...</p>
+    </div>
+    <div *ngIf="!loadingComparison && !comparisonData" class="space-y-4">
+      <p class="text-gray-300">Select two records from the table to compare.</p>
+      <div class="bg-white/5 rounded-lg p-4">
+        <p class="text-sm text-gray-400 mb-2">Selected Records:</p>
+        <div class="flex gap-2">
+          <span *ngIf="selectedRecord1" class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded">Record #{{ selectedRecord1 }}</span>
+          <span *ngIf="selectedRecord2" class="px-3 py-1 bg-green-500/20 text-green-300 rounded">Record #{{ selectedRecord2 }}</span>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!loadingComparison && comparisonData" class="space-y-6">
+      <!-- Differences Summary -->
+      <div class="bg-white/5 rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-purple-400 mb-3">Key Differences</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-400">Days Between</p>
+            <p class="text-xl font-bold text-white">{{ comparisonData.differences.daysBetween }} days</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400">Accuracy Change</p>
+            <p class="text-xl font-bold" [class.text-red-400]="comparisonData.differences.accuracyChange < 0" [class.text-green-400]="comparisonData.differences.accuracyChange >= 0">
+              {{ comparisonData.differences.accuracyChange > 0 ? '+' : '' }}{{ comparisonData.differences.accuracyChange.toFixed(1) }}%
+            </p>
+          </div>
+        </div>
+        <div *ngIf="comparisonData.differences.riskLevelChanged" class="mt-3">
+          <p class="text-sm text-gray-400">Risk Level Change</p>
+          <p class="text-lg font-semibold text-yellow-400">{{ comparisonData.differences.riskLevelChange }}</p>
+        </div>
+        <div *ngIf="comparisonData.differences.predictionChanged" class="mt-3">
+          <p class="text-sm text-gray-400">Prediction Change</p>
+          <p class="text-lg font-semibold text-yellow-400">{{ comparisonData.differences.predictionChange }}</p>
+        </div>
+      </div>
+
+      <!-- Side by Side Comparison -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white/5 rounded-lg p-4">
+          <h4 class="font-semibold text-blue-400 mb-3">Record 1</h4>
+          <div class="space-y-2 text-sm">
+            <p><span class="text-gray-400">Date:</span> <span class="text-white">{{ comparisonData.record1.testDate | date:'short' }}</span></p>
+            <p><span class="text-gray-400">Result:</span> <span [class]="'px-2 py-1 rounded text-xs ' + getResultBadgeColor(comparisonData.record1.testResult)">{{ comparisonData.record1.testResult }}</span></p>
+            <p><span class="text-gray-400">Accuracy:</span> <span class="text-white">{{ comparisonData.record1.accuracy }}%</span></p>
+            <p><span class="text-gray-400">Status:</span> <span class="text-white">{{ comparisonData.record1.status }}</span></p>
+          </div>
+        </div>
+        <div class="bg-white/5 rounded-lg p-4">
+          <h4 class="font-semibold text-green-400 mb-3">Record 2</h4>
+          <div class="space-y-2 text-sm">
+            <p><span class="text-gray-400">Date:</span> <span class="text-white">{{ comparisonData.record2.testDate | date:'short' }}</span></p>
+            <p><span class="text-gray-400">Result:</span> <span [class]="'px-2 py-1 rounded text-xs ' + getResultBadgeColor(comparisonData.record2.testResult)">{{ comparisonData.record2.testResult }}</span></p>
+            <p><span class="text-gray-400">Accuracy:</span> <span class="text-white">{{ comparisonData.record2.accuracy }}%</span></p>
+            <p><span class="text-gray-400">Status:</span> <span class="text-white">{{ comparisonData.record2.status }}</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end gap-2">
+        <p-button label="Close" (onClick)="closeComparison()" styleClass="p-button-secondary"></p-button>
+        <p-button *ngIf="selectedRecord1 && !selectedRecord2" label="Compare Selected" (onClick)="selectRecordForComparison(selectedRecord1)" styleClass="p-button-primary"></p-button>
       </div>
     </ng-template>
   </p-dialog>
