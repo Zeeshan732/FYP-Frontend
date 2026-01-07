@@ -47,6 +47,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { AccountRequestsComponent } from './pages/account-requests/account-requests.component';
 import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
+import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
@@ -79,7 +80,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     HeaderComponent,
     AccountRequestsComponent,
     AdminUsersComponent,
-    NotificationsComponent
+    NotificationsComponent,
+    VoiceInputComponent
   ],
   imports: [
     BrowserModule,

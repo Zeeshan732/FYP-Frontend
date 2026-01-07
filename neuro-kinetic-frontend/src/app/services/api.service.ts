@@ -21,7 +21,12 @@ import {
   AccountRequest,
   UpdateUserStatusRequest,
   NotificationItem,
-  User
+  User,
+  DisclaimerResponse,
+  ResultExplanationDto,
+  TrendAnalysisDto,
+  ComparisonDto,
+  FeatureExplanationDto
 } from '../models/api.models';
 
 @Injectable({
@@ -245,7 +250,7 @@ export class ApiService {
     return this.http.post<AnalysisResult>(`${this.apiUrl}/analysis/submit`, data);
   }
 
-  // Legacy method - kept for backward compatibility
+  // Process analysis - calls /api/analysis/process endpoint
   processAnalysis(data: {
     sessionId: string;
     hasVoiceData?: boolean;
@@ -255,21 +260,16 @@ export class ApiService {
     waveformDataJson?: string;
     skeletonDataJson?: string;
   }): Observable<AnalysisResult> {
-    // Convert legacy format to new format if needed
-    const analysisRequest: AnalysisRequest = {
-      filePath: data.voiceDataJson || data.gaitDataJson || '',
-      analysisType: data.hasVoiceData ? 'Voice' : 'Gait',
+    // Direct call to /api/analysis/process as per backend API
+    return this.http.post<AnalysisResult>(`${this.apiUrl}/analysis/process`, {
       sessionId: data.sessionId,
-      metadata: {
-        hasVoiceData: data.hasVoiceData,
-        hasGaitData: data.hasGaitData,
-        voiceDataJson: data.voiceDataJson,
-        gaitDataJson: data.gaitDataJson,
-        waveformDataJson: data.waveformDataJson,
-        skeletonDataJson: data.skeletonDataJson
-      }
-    };
-    return this.submitAnalysis(analysisRequest);
+      hasVoiceData: data.hasVoiceData,
+      hasGaitData: data.hasGaitData,
+      voiceDataJson: data.voiceDataJson,
+      gaitDataJson: data.gaitDataJson,
+      waveformDataJson: data.waveformDataJson,
+      skeletonDataJson: data.skeletonDataJson
+    });
   }
 
   getAnalysisResult(id: number): Observable<AnalysisResult> {
@@ -571,6 +571,104 @@ export class ApiService {
 
   markNotificationRead(id: number): Observable<NotificationItem> {
     return this.http.patch<NotificationItem>(`${this.apiUrl}/notifications/${id}/read`, {});
+  }
+
+  // ========== NEW ENDPOINTS - SPRINT 1-5 ==========
+
+  // ========== CLINICAL DISCLAIMER ==========
+
+  /**
+   * Get clinical disclaimer text
+   * @returns Observable of DisclaimerResponse
+   */
+  getDisclaimer(): Observable<DisclaimerResponse> {
+    return this.http.get<DisclaimerResponse>(`${this.apiUrl}/clinical/disclaimer`);
+  }
+
+  // ========== RESULT EXPLANATION ==========
+
+  /**
+   * Get detailed explanation for analysis results
+   * @param sessionId - Analysis session ID
+   * @returns Observable of ResultExplanationDto
+   */
+  getResultExplanation(sessionId: string): Observable<ResultExplanationDto> {
+    return this.http.get<ResultExplanationDto>(
+      `${this.apiUrl}/analysis/session/${encodeURIComponent(sessionId)}/explanation`
+    );
+  }
+
+  // ========== REPORTS ==========
+
+  /**
+   * Download PDF report for a session
+   * @param sessionId - Analysis session ID
+   * @returns Observable of Blob (PDF file)
+   */
+  downloadPdfReport(sessionId: string): Observable<Blob> {
+    return this.http.get(
+      `${this.apiUrl}/reports/session/${encodeURIComponent(sessionId)}/pdf`,
+      { responseType: 'blob' }
+    );
+  }
+
+  /**
+   * Download CSV report for a session
+   * @param sessionId - Analysis session ID
+   * @returns Observable of Blob (CSV file)
+   */
+  downloadCsvReport(sessionId: string): Observable<Blob> {
+    return this.http.get(
+      `${this.apiUrl}/reports/session/${encodeURIComponent(sessionId)}/csv`,
+      { responseType: 'blob' }
+    );
+  }
+
+  // ========== TREND ANALYSIS ==========
+
+  /**
+   * Get trend analysis for a user's test records
+   * @param userId - User ID
+   * @returns Observable of TrendAnalysisDto
+   * @note Requires authentication. Users can only access their own data (unless Admin)
+   */
+  getUserTrends(userId: number): Observable<TrendAnalysisDto> {
+    return this.http.get<TrendAnalysisDto>(
+      `${this.apiUrl}/testrecords/user/${userId}/trends`
+    );
+  }
+
+  // ========== COMPARISON ==========
+
+  /**
+   * Compare two test records
+   * @param recordId1 - First test record ID
+   * @param recordId2 - Second test record ID
+   * @returns Observable of ComparisonDto
+   * @note Requires authentication
+   */
+  compareTestRecords(recordId1: number, recordId2: number): Observable<ComparisonDto> {
+    let httpParams = new HttpParams();
+    httpParams = httpParams.set('recordId1', recordId1.toString());
+    httpParams = httpParams.set('recordId2', recordId2.toString());
+
+    return this.http.get<ComparisonDto>(
+      `${this.apiUrl}/testrecords/compare`,
+      { params: httpParams }
+    );
+  }
+
+  // ========== FEATURE EXPLANATION ==========
+
+  /**
+   * Get feature explanations for an analysis session
+   * @param sessionId - Analysis session ID
+   * @returns Observable of FeatureExplanationDto
+   */
+  getFeatureExplanation(sessionId: string): Observable<FeatureExplanationDto> {
+    return this.http.get<FeatureExplanationDto>(
+      `${this.apiUrl}/features/session/${encodeURIComponent(sessionId)}/explanation`
+    );
   }
 
 }

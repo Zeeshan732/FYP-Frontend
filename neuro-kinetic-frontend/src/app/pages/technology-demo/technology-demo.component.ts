@@ -118,13 +118,14 @@ export class TechnologyDemoComponent implements OnInit {
           
           this.apiService.submitAnalysis(analysisRequest).subscribe({
             next: (result: AnalysisResult) => {
+              const confidenceLevel = result.confidenceLevel || 'Medium';
               this.voiceAnalysisResults = {
-                confidence: result.confidenceLevel === 'High' ? 85 : result.confidenceLevel === 'Medium' ? 70 : 55,
-                pitchStability: this.mapConfidenceToMetric(result.confidenceLevel, 85),
-                rhythmConsistency: this.mapConfidenceToMetric(result.confidenceLevel, 80),
-                volumeControl: this.mapConfidenceToMetric(result.confidenceLevel, 75),
-                tremorDetection: this.mapConfidenceToMetric(result.confidenceLevel, 15),
-                recommendations: this.getRecommendations(result.confidenceLevel, 'voice'),
+                confidence: confidenceLevel === 'High' ? 85 : confidenceLevel === 'Medium' ? 70 : 55,
+                pitchStability: this.mapConfidenceToMetric(confidenceLevel, 85),
+                rhythmConsistency: this.mapConfidenceToMetric(confidenceLevel, 80),
+                volumeControl: this.mapConfidenceToMetric(confidenceLevel, 75),
+                tremorDetection: this.mapConfidenceToMetric(confidenceLevel, 15),
+                recommendations: this.getRecommendations(confidenceLevel, 'voice'),
                 result: result
               };
               this.voiceProcessing = false;
@@ -180,13 +181,14 @@ export class TechnologyDemoComponent implements OnInit {
           
           this.apiService.submitAnalysis(analysisRequest).subscribe({
             next: (result: AnalysisResult) => {
+              const confidenceLevel = result.confidenceLevel || 'Medium';
               this.gaitAnalysisResults = {
-                overallScore: result.confidenceLevel === 'High' ? 88 : result.confidenceLevel === 'Medium' ? 75 : 62,
-                stepLength: this.mapConfidenceToMetric(result.confidenceLevel, 85),
-                cadence: this.mapConfidenceToMetric(result.confidenceLevel, 90),
-                balance: this.mapConfidenceToMetric(result.confidenceLevel, 85),
-                swingPhase: this.mapConfidenceToMetric(result.confidenceLevel, 88),
-                recommendations: this.getRecommendations(result.confidenceLevel, 'gait'),
+                overallScore: confidenceLevel === 'High' ? 88 : confidenceLevel === 'Medium' ? 75 : 62,
+                stepLength: this.mapConfidenceToMetric(confidenceLevel, 85),
+                cadence: this.mapConfidenceToMetric(confidenceLevel, 90),
+                balance: this.mapConfidenceToMetric(confidenceLevel, 85),
+                swingPhase: this.mapConfidenceToMetric(confidenceLevel, 88),
+                recommendations: this.getRecommendations(confidenceLevel, 'gait'),
                 result: result
               };
               this.gaitProcessing = false;

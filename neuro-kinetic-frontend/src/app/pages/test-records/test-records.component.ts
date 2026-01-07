@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-import { UserTestRecord, PagedResult } from '../../models/api.models';
+import { 
+  UserTestRecord, 
+  PagedResult, 
+  TrendAnalysisDto,
+  ComparisonDto
+} from '../../models/api.models';
 import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -29,6 +34,40 @@ export class TestRecordsComponent implements OnInit {
   sortBy: string = 'testDate';
   sortOrder: 'asc' | 'desc' = 'desc';
 
+  // Dropdown options
+  statusFilterOptions = [
+    { label: 'All Status', value: '' },
+    { label: 'Completed', value: 'Completed' },
+    { label: 'Pending', value: 'Pending' },
+    { label: 'Failed', value: 'Failed' }
+  ];
+
+  resultFilterOptions = [
+    { label: 'All Results', value: '' },
+    { label: 'Positive', value: 'Positive' },
+    { label: 'Negative', value: 'Negative' },
+    { label: 'Uncertain', value: 'Uncertain' }
+  ];
+
+  sortOptions = [
+    { label: 'Sort by Date', value: 'testDate' },
+    { label: 'Sort by Accuracy', value: 'accuracy' },
+    { label: 'Sort by Result', value: 'testResult' }
+  ];
+
+  // Compact filter menu (opened from filter icon)
+  showFilterMenu = false;
+
+  toggleFilterMenu() {
+    this.showFilterMenu = !this.showFilterMenu;
+  }
+
+  applyFilters() {
+    this.currentPage = 1;
+    this.showFilterMenu = false;
+    this.loadRecords();
+  }
+
   // User info
   currentUser: any = null;
   isAdmin = false;
@@ -42,6 +81,18 @@ export class TestRecordsComponent implements OnInit {
   showDeleteDialog: boolean = false;
   deleteRecordId: number | null = null;
   deleting: boolean = false;
+
+  // Trend analysis
+  trendData: TrendAnalysisDto | null = null;
+  loadingTrends = false;
+  showTrends = false;
+
+  // Comparison
+  comparisonData: ComparisonDto | null = null;
+  loadingComparison = false;
+  showComparison = false;
+  selectedRecord1: number | null = null;
+  selectedRecord2: number | null = null;
 
   constructor(
     private apiService: ApiService,
@@ -114,6 +165,17 @@ export class TestRecordsComponent implements OnInit {
       this.sortOrder = 'asc';
     }
     this.loadRecords();
+  }
+
+  getSortIcon(columnName: string): string {
+    if (this.sortBy === columnName) {
+      return this.sortOrder === 'asc' ? '↑' : '↓';
+    }
+    return '';
+  }
+
+  isColumnSorted(columnName: string): boolean {
+    return this.sortBy === columnName;
   }
 
   clearFilters() {
@@ -278,5 +340,123 @@ export class TestRecordsComponent implements OnInit {
 
   // Helper for template
   Math = Math;
+
+  // ========== TREND ANALYSIS ==========
+
+  loadTrends() {
+    if (!this.currentUser?.id) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'User ID not available for trend analysis.'
+      });
+      return;
+    }
+
+    this.loadingTrends = true;
+    this.apiService.getUserTrends(this.currentUser.id).subscribe({
+      next: (trends) => {
+        this.trendData = trends;
+        this.loadingTrends = false;
+        this.showTrends = true;
+      },
+      error: (error) => {
+        console.error('Error loading trends:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load trend analysis. Please try again.'
+        });
+        this.loadingTrends = false;
+      }
+    });
+  }
+
+  closeTrends() {
+    this.showTrends = false;
+    this.trendData = null;
+  }
+
+  // ========== COMPARISON ==========
+
+  openComparisonDialog(recordId1: number, recordId2?: number) {
+    this.selectedRecord1 = recordId1;
+    this.selectedRecord2 = recordId2 || null;
+    this.showComparison = true;
+    
+    if (recordId2) {
+      this.compareRecords(recordId1, recordId2);
+    }
+  }
+
+  compareRecords(recordId1: number, recordId2: number) {
+    if (!recordId1 || !recordId2) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please select two records to compare.'
+      });
+      return;
+    }
+
+    this.loadingComparison = true;
+    this.apiService.compareTestRecords(recordId1, recordId2).subscribe({
+      next: (comparison) => {
+        this.comparisonData = comparison;
+        this.loadingComparison = false;
+      },
+      error: (error) => {
+        console.error('Error comparing records:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.status === 404 
+            ? 'One or both records not found.' 
+            : 'Failed to compare records. Please try again.'
+        });
+        this.loadingComparison = false;
+      }
+    });
+  }
+
+  closeComparison() {
+    this.showComparison = false;
+    this.comparisonData = null;
+    this.selectedRecord1 = null;
+    this.selectedRecord2 = null;
+  }
+
+  selectRecordForComparison(recordId: number) {
+    if (!this.selectedRecord1) {
+      this.selectedRecord1 = recordId;
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Info',
+        detail: 'First record selected. Please select a second record to compare.'
+      });
+    } else if (this.selectedRecord1 === recordId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please select a different record to compare.'
+      });
+    } else {
+      this.selectedRecord2 = recordId;
+      this.compareRecords(this.selectedRecord1, recordId);
+    }
+  }
+
+  getRiskLevelColor(riskLevel?: string): string {
+    switch (riskLevel) {
+      case 'High':
+        return 'bg-red-500/20 border-red-500 text-red-400';
+      case 'Moderate':
+        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+      case 'Low':
+        return 'bg-green-500/20 border-green-500 text-green-400';
+      default:
+        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+    }
+  }
 }
 

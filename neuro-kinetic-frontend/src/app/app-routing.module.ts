@@ -21,6 +21,7 @@ import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard
 import { AccountRequestsComponent } from './pages/account-requests/account-requests.component';
 import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
+import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -40,6 +41,7 @@ const routes: Routes = [
   { path: 'metrics', component: MetricsDashboardComponent },
   { path: 'cross-validation', component: CrossValidationComponent },
   { path: 'patient-test', component: PatientTestComponent, canActivate: [AuthGuard] },
+  { path: 'voice-input', component: VoiceInputComponent, canActivate: [AuthGuard] },
   { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },
   { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
   { path: 'account-requests', component: AccountRequestsComponent, canActivate: [AdminGuard] },

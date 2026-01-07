@@ -128,11 +128,20 @@ export interface AnalysisRequest {
 export interface AnalysisResult {
   id: number;
   sessionId?: string;
-  analysisType: 'Voice' | 'Gait';
-  predictionScore: number;
-  predictedClass: 'Positive' | 'Negative' | 'Uncertain';
-  confidenceLevel: 'High' | 'Medium' | 'Low';
+  analysisType: 'Voice' | 'Gait' | 'MultiModal';
+  predictionScore?: number;
+  confidenceScore?: number;
+  predictedClass?: 'Positive' | 'Negative' | 'Uncertain' | 'ParkinsonPositive' | 'Healthy';
+  confidenceLevel?: 'High' | 'Medium' | 'Low';
+  riskLevel?: 'Low' | 'Moderate' | 'High'; // NEW: Risk level from analysis
+  riskPercent?: number; // NEW: 0-100 percentage (e.g., 50, 60, 75)
+  modelVersion?: string; // NEW: Model version used for analysis
   details?: string;
+  voiceFeaturesJson?: string;
+  gaitFeaturesJson?: string;
+  waveformDataJson?: string;
+  skeletonDataJson?: string;
+  isSimulation?: boolean;
   createdAt: string;
 }
 
@@ -338,5 +347,95 @@ export interface TestResultDistribution {
   positive: number;
   negative: number;
   uncertain: number;
+}
+
+// ========== NEW ENDPOINTS - SPRINT 1-5 ==========
+
+// Clinical Disclaimer
+export interface DisclaimerResponse {
+  text: string;
+  showOnResults: boolean;
+  showOnDashboard: boolean;
+}
+
+// Result Explanation
+export interface ResultExplanationDto {
+  summary: string;
+  detailedExplanation: string;
+  riskAssessment: string;
+  recommendations: string;
+  confidenceInterpretation: string;
+}
+
+// Trend Analysis
+export interface TrendAnalysisDto {
+  userId: number;
+  userName: string;
+  trends: UserTestTrendDataPoint[];
+  summary: TrendSummary;
+}
+
+export interface UserTestTrendDataPoint {
+  date: string; // ISO 8601 format
+  testRecordId: number;
+  riskLevel?: 'Low' | 'Moderate' | 'High';
+  confidence?: number; // 0-1 decimal
+  prediction?: 'Healthy' | 'ParkinsonPositive' | 'Uncertain';
+  accuracy: number; // 0-100
+  status: 'Completed' | 'Pending' | 'Failed';
+}
+
+export interface TrendSummary {
+  totalTests: number;
+  completedTests: number;
+  overallTrend?: 'Improving' | 'Stable' | 'Declining';
+  averageConfidence?: number; // 0-1 decimal
+  averageAccuracy: number; // 0-100
+  firstTestDate?: string; // ISO 8601
+  lastTestDate?: string; // ISO 8601
+}
+
+// Comparison
+export interface ComparisonDto {
+  record1: UserTestRecordDto;
+  record2: UserTestRecordDto;
+  differences: ComparisonDifferences;
+}
+
+export interface UserTestRecordDto {
+  id: number;
+  userId?: number;
+  userName: string;
+  testDate: string; // ISO 8601
+  testResult: 'Positive' | 'Negative' | 'Uncertain';
+  accuracy: number; // 0-100
+  status: 'Completed' | 'Pending' | 'Failed';
+  voiceRecordingUrl?: string;
+  analysisNotes?: string;
+  createdAt: string; // ISO 8601
+}
+
+export interface ComparisonDifferences {
+  daysBetween: number;
+  riskLevelChanged: boolean;
+  riskLevelChange?: string; // e.g., "Low → Moderate"
+  confidenceChange?: number; // Decimal change
+  predictionChanged: boolean;
+  predictionChange?: string; // e.g., "Healthy → Uncertain"
+  accuracyChange: number; // Percentage change
+  statusChange: string; // e.g., "Pending → Completed"
+}
+
+// Feature Explanation
+export interface FeatureExplanationDto {
+  features: FeatureExplanationItem[];
+  summary: string;
+}
+
+export interface FeatureExplanationItem {
+  featureName: string;
+  value?: string;
+  explanation: string;
+  significance: string;
 }
 

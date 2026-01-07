@@ -45,9 +45,10 @@ export class TestRecordDialogComponent implements OnInit, OnChanges {
     this.recordForm = this.fb.group({
       userName: [{ value: recordData.userName || '', disabled: true }],
       testDate: [{ value: recordData.testDate ? new Date(recordData.testDate) : new Date(), disabled: true }],
-      testResult: [recordData.testResult || 'Uncertain', Validators.required],
-      accuracy: [recordData.accuracy || 0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      status: [recordData.status || 'Pending', Validators.required],
+      // In view mode, make these fields read-only as well
+      testResult: [{ value: recordData.testResult || 'Uncertain', disabled: !this.isEditMode }, Validators.required],
+      accuracy: [{ value: recordData.accuracy || 0, disabled: !this.isEditMode }, [Validators.required, Validators.min(0), Validators.max(100)]],
+      status: [{ value: recordData.status || 'Pending', disabled: !this.isEditMode }, Validators.required],
       voiceRecordingUrl: [{ value: recordData.voiceRecordingUrl || '', disabled: !this.isEditMode }],
       analysisNotes: [recordData.analysisNotes || '']
     });

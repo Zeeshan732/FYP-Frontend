@@ -135,26 +135,57 @@
     </div>
 
     <!-- Test Results -->
-    <div *ngIf="testCompleted && testResult" class="max-w-3xl mx-auto">
+    <div *ngIf="testCompleted && testResult" class="max-w-4xl mx-auto space-y-6">
+      <!-- Disclaimer -->
+      <div *ngIf="disclaimer && disclaimer.showOnResults" class="bg-yellow-500/10 border border-yellow-500/40 rounded-lg p-4">
+        <p class="text-yellow-200 text-sm">{{ disclaimer.text }}</p>
+      </div>
+
+      <!-- Main Results Card -->
       <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
         <h2 class="text-2xl font-bold text-emerald-400 mb-6 text-center">Test Results</h2>
         
         <div class="space-y-6">
-          <!-- Result Badge -->
+          <!-- Prediction Badge (Updated) -->
           <div class="text-center">
-            <div [class]="'inline-block px-6 py-3 rounded-lg border text-lg font-semibold ' + getResultBadgeColor(testResult.testResult)">
-              {{ testResult.testResult }}
+            <div [class]="'inline-block px-6 py-3 rounded-lg border text-lg font-semibold ' + getPredictionBadgeColorValue()">
+              {{ getDisplayPrediction() }}
             </div>
           </div>
 
-          <!-- Accuracy -->
-          <div class="bg-white/5 rounded-lg p-6 text-center">
+          <!-- Risk Percentage (NEW - Primary Display) -->
+          <div *ngIf="analysisResult?.riskPercent !== undefined || analysisResult?.confidenceScore !== undefined" class="bg-white/5 rounded-lg p-6 text-center">
+            <p class="text-gray-300 mb-2">Risk Assessment</p>
+            <p [class]="'text-4xl font-bold ' + getRiskPercentClassValue()">
+              {{ getRiskPercentDisplay() | number:'1.0-1' }}%
+            </p>
+            <p *ngIf="analysisResult && analysisResult.riskLevel" class="text-sm text-gray-400 mt-2">
+              {{ analysisResult.riskLevel }} Risk Level
+            </p>
+          </div>
+
+          <!-- Accuracy (Fallback if no riskPercent) -->
+          <div *ngIf="!analysisResult?.riskPercent && !analysisResult?.confidenceScore" class="bg-white/5 rounded-lg p-6 text-center">
             <p class="text-gray-300 mb-2">Confidence Score</p>
             <p class="text-4xl font-bold text-emerald-400">{{ testResult.accuracy }}%</p>
           </div>
 
+          <!-- Risk Level Badge -->
+          <div *ngIf="analysisResult && analysisResult.riskLevel" class="text-center">
+            <p class="text-sm text-gray-400 mb-2">Risk Level</p>
+            <div [class]="'inline-block px-6 py-3 rounded-lg border text-lg font-semibold ' + getRiskLevelColor(analysisResult.riskLevel)">
+              {{ analysisResult.riskLevel }}
+            </div>
+          </div>
+
+          <!-- Confidence Score (Secondary Display) -->
+          <div *ngIf="analysisResult && analysisResult.confidenceScore !== undefined && analysisResult.riskPercent !== undefined" class="bg-white/5 rounded-lg p-4 text-center">
+            <p class="text-sm text-gray-400 mb-1">Model Confidence</p>
+            <p class="text-2xl font-semibold text-emerald-400">{{ getConfidenceScoreDisplay() | number:'1.0-1' }}%</p>
+          </div>
+
           <!-- Test Details -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div class="bg-white/5 rounded-lg p-4">
               <p class="text-sm text-gray-400 mb-1">Test Date</p>
               <p class="text-white font-semibold">{{ testResult.testDate | date:'short' }}</p>
@@ -163,12 +194,45 @@
               <p class="text-sm text-gray-400 mb-1">Status</p>
               <p class="text-white font-semibold">{{ testResult.status }}</p>
             </div>
+            <div *ngIf="analysisResult && analysisResult.modelVersion" class="bg-white/5 rounded-lg p-4">
+              <p class="text-sm text-gray-400 mb-1">Model Version</p>
+              <p class="text-white font-semibold">{{ analysisResult.modelVersion }}</p>
+            </div>
+          </div>
+
+          <!-- Simulation/Model Badge -->
+          <div *ngIf="analysisResult" class="text-center">
+            <div *ngIf="analysisResult.isSimulation" class="inline-block px-4 py-2 bg-yellow-500/20 border border-yellow-500 text-yellow-300 rounded-lg text-sm">
+              ⚠️ Simulation Mode
+            </div>
+            <div *ngIf="!analysisResult.isSimulation && analysisResult.modelVersion" class="inline-block px-4 py-2 bg-emerald-500/20 border border-emerald-500 text-emerald-300 rounded-lg text-sm">
+              ✅ ML Model v{{ analysisResult.modelVersion }}
+            </div>
           </div>
 
           <!-- Notes -->
           <div *ngIf="testResult.analysisNotes" class="bg-white/5 rounded-lg p-4">
             <p class="text-sm text-gray-400 mb-2">Analysis Notes</p>
             <p class="text-gray-300">{{ testResult.analysisNotes }}</p>
+          </div>
+
+          <!-- Download Reports -->
+          <div *ngIf="currentSessionId" class="bg-white/5 rounded-lg p-4">
+            <p class="text-sm text-gray-400 mb-3">Download Reports</p>
+            <div class="flex gap-3">
+              <button 
+                (click)="downloadPdfReport()"
+                class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors font-semibold text-sm"
+              >
+                📄 Download PDF
+              </button>
+              <button 
+                (click)="downloadCsvReport()"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-semibold text-sm"
+              >
+                📊 Download CSV
+              </button>
+            </div>
           </div>
 
           <!-- Actions -->
@@ -185,6 +249,51 @@
             >
               View My Tests
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Explanation -->
+      <div *ngIf="resultExplanation" class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
+        <h3 class="text-xl font-bold text-emerald-400 mb-4">Detailed Explanation</h3>
+        <div class="space-y-4">
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Summary</p>
+            <p class="text-gray-300">{{ resultExplanation.summary }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Detailed Analysis</p>
+            <p class="text-gray-300">{{ resultExplanation.detailedExplanation }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Risk Assessment</p>
+            <p class="text-gray-300">{{ resultExplanation.riskAssessment }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Recommendations</p>
+            <p class="text-gray-300">{{ resultExplanation.recommendations }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Confidence Interpretation</p>
+            <p class="text-gray-300">{{ resultExplanation.confidenceInterpretation }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Explanation -->
+      <div *ngIf="featureExplanation" class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
+        <h3 class="text-xl font-bold text-emerald-400 mb-4">Feature Analysis</h3>
+        <div class="space-y-4">
+          <div *ngIf="featureExplanation.summary" class="mb-4">
+            <p class="text-gray-300">{{ featureExplanation.summary }}</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngFor="let feature of featureExplanation.features" class="bg-white/5 rounded-lg p-4">
+              <h4 class="text-emerald-400 font-semibold mb-2">{{ feature.featureName }}</h4>
+              <p *ngIf="feature.value" class="text-sm text-gray-400 mb-2">Value: {{ feature.value }}</p>
+              <p class="text-sm text-gray-300 mb-2">{{ feature.explanation }}</p>
+              <p class="text-sm text-yellow-300 italic">{{ feature.significance }}</p>
+            </div>
           </div>
         </div>
       </div>
