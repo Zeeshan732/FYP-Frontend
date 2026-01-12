@@ -1,19 +1,24 @@
-import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, ViewChild, ElementRef, ChangeDetectorRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserTestRecord } from '../../models/api.models';
+import { UserTestRecord, AnalysisResult } from '../../models/api.models';
+import { ApiService } from '../../services/api.service';
+import { Chart } from 'chart.js';
 
 @Component({
   selector: 'app-test-record-dialog',
   templateUrl: './test-record-dialog.component.html',
   styleUrls: ['./test-record-dialog.component.scss']
 })
-export class TestRecordDialogComponent implements OnInit, OnChanges {
+export class TestRecordDialogComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() visible: boolean = false;
   @Input() record: UserTestRecord | null = null;
   @Input() isEditMode: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<UserTestRecord>();
   @Output() cancel = new EventEmitter<void>();
+
+  @ViewChild('voiceFeaturesChart') voiceFeaturesChartRef?: ElementRef<HTMLCanvasElement>;
+  private voiceFeaturesChart: Chart | null = null;
 
   recordForm!: FormGroup;
   testResultOptions = [
@@ -27,7 +32,17 @@ export class TestRecordDialogComponent implements OnInit, OnChanges {
     { label: 'Failed', value: 'Failed' }
   ];
 
-  constructor(private fb: FormBuilder) {}
+  // Voice features
+  voiceFeatures: { [key: string]: number } | null = null;
+  objectKeys = Object.keys;
+  loadingFeatures = false;
+  analysisResult: AnalysisResult | null = null;
+
+  constructor(
+    private fb: FormBuilder,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.initializeForm();
@@ -36,6 +51,25 @@ export class TestRecordDialogComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['record'] && this.record) {
       this.initializeForm();
+      // Load voice features when record changes
+      if (this.record && !this.isEditMode) {
+        this.loadVoiceFeatures();
+      }
+    }
+    if (changes['visible'] && changes['visible'].currentValue && this.record && !this.isEditMode) {
+      // Load features when dialog opens
+      this.loadVoiceFeatures();
+    }
+  }
+
+  ngAfterViewInit() {
+    // Chart will be created when voiceFeatures are loaded
+  }
+
+  ngOnDestroy() {
+    if (this.voiceFeaturesChart) {
+      this.voiceFeaturesChart.destroy();
+      this.voiceFeaturesChart = null;
     }
   }
 
@@ -75,6 +109,200 @@ export class TestRecordDialogComponent implements OnInit, OnChanges {
 
   onClose() {
     this.visibleChange.emit(false);
+  }
+
+  /**
+   * Extract sessionId from analysisNotes or voiceRecordingUrl
+   */
+  private extractSessionId(): string | null {
+    if (!this.record) return null;
+
+    // Try to extract from analysisNotes (format: "Analysis completed. Risk: X% (Y). Session: test-...")
+    if (this.record.analysisNotes) {
+      const sessionMatch = this.record.analysisNotes.match(/Session:\s*(test-[^\s]+)/i) ||
+                          this.record.analysisNotes.match(/(test-\d+-\w+)/);
+      if (sessionMatch) {
+        return sessionMatch[1];
+      }
+    }
+
+    // Try to extract from voiceRecordingUrl (if it contains session ID)
+    if (this.record.voiceRecordingUrl) {
+      const urlMatch = this.record.voiceRecordingUrl.match(/(test-\d+-\w+)/);
+      if (urlMatch) {
+        return urlMatch[1];
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Load voice features from analysis result
+   */
+  private loadVoiceFeatures() {
+    if (!this.record || this.record.status !== 'Completed') {
+      return;
+    }
+
+    this.loadingFeatures = true;
+
+    // Try to get analysis by sessionId first
+    const sessionId = this.extractSessionId();
+    if (sessionId) {
+      this.apiService.getAnalysisBySessionId(sessionId).subscribe({
+        next: (result: AnalysisResult) => {
+          this.handleAnalysisResult(result);
+        },
+        error: (error) => {
+          console.warn('Failed to get analysis by sessionId, trying by record ID...', error);
+          // Fallback: try to get by test record ID
+          this.tryGetAnalysisByRecordId();
+        }
+      });
+    } else {
+      // Try to get by test record ID directly
+      this.tryGetAnalysisByRecordId();
+    }
+  }
+
+  /**
+   * Try to get analysis result by test record ID
+   */
+  private tryGetAnalysisByRecordId() {
+    if (!this.record) return;
+
+    // Try to get analysis by record ID (if backend supports it)
+    // Note: This assumes the analysis ID might match the record ID or be related
+    this.apiService.getAnalysisResult(this.record.id).subscribe({
+      next: (result: AnalysisResult) => {
+        this.handleAnalysisResult(result);
+      },
+      error: (error) => {
+        console.warn('Could not load analysis result for test record:', error);
+        this.voiceFeatures = null;
+        this.loadingFeatures = false;
+      }
+    });
+  }
+
+  /**
+   * Handle analysis result and parse voice features
+   */
+  private handleAnalysisResult(result: AnalysisResult) {
+    this.analysisResult = result;
+    
+    // Parse voice features
+    if (result && result.voiceFeaturesJson) {
+      try {
+        this.voiceFeatures = JSON.parse(result.voiceFeaturesJson);
+        this.cdr.detectChanges();
+        
+        // Create chart after view is updated
+        setTimeout(() => {
+          this.updateVoiceFeaturesChart();
+        }, 100);
+      } catch (parseError) {
+        console.error('Error parsing voiceFeaturesJson:', parseError);
+        this.voiceFeatures = null;
+      }
+    } else {
+      this.voiceFeatures = null;
+    }
+    
+    this.loadingFeatures = false;
+  }
+
+  /**
+   * Update or create voice features chart
+   */
+  private updateVoiceFeaturesChart(): void {
+    if (!this.voiceFeatures) {
+      return;
+    }
+
+    if (!this.voiceFeaturesChartRef) {
+      setTimeout(() => this.updateVoiceFeaturesChart(), 100);
+      return;
+    }
+
+    const entries = Object.entries(this.voiceFeatures);
+    const labels = entries.map(([key]) => this.formatFeatureName(key));
+    const data = entries.map(([, value]) => Number(value));
+
+    const ctx = this.voiceFeaturesChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    if (this.voiceFeaturesChart) {
+      this.voiceFeaturesChart.data.labels = labels;
+      this.voiceFeaturesChart.data.datasets[0].data = data;
+      this.voiceFeaturesChart.update();
+      return;
+    }
+
+    try {
+      this.voiceFeaturesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Voice Feature Value',
+              data,
+              backgroundColor: '#22c55e',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: '#e5e7eb',
+                font: { size: 10 },
+                maxRotation: 45,
+                minRotation: 45
+              },
+              grid: { display: false }
+            },
+            y: {
+              ticks: {
+                color: '#9ca3af',
+                font: { size: 10 }
+              },
+              grid: { color: 'rgba(148,163,184,0.15)' }
+            }
+          }
+        }
+      });
+    } catch (chartError) {
+      console.error('Error creating chart:', chartError);
+    }
+  }
+
+  /**
+   * Format feature name for display
+   */
+  formatFeatureName(key: string): string {
+    const names: { [key: string]: string } = {
+      'jitter_local_percent': 'Jitter (Local %)',
+      'jitter_local_abs': 'Jitter (Absolute)',
+      'jitter_rap': 'Jitter (RAP)',
+      'jitter_ppq5': 'Jitter (PPQ5)',
+      'shimmer_local': 'Shimmer (Local)',
+      'shimmer_local_db': 'Shimmer (dB)',
+      'nhr': 'Noise-to-Harmonics Ratio',
+      'hnr': 'Harmonics-to-Noise Ratio',
+      'rpde': 'RPDE',
+      'dfa': 'DFA',
+      'ppe': 'PPE'
+    };
+    return names[key] || key;
   }
 }
 

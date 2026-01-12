@@ -1,16 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FileUploadService } from '../../services/file-upload.service';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { AnalysisResult, UserTestRecord, UserTestRecordRequest } from '../../models/api.models';
+import { Chart } from 'chart.js';
 
 @Component({
   selector: 'app-voice-input',
   templateUrl: './voice-input.component.html',
   styleUrls: ['./voice-input.component.scss']
 })
-export class VoiceInputComponent implements OnInit, OnDestroy {
+export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
   // Input mode
   inputMode: 'upload' | 'record' = 'upload';
   
@@ -40,6 +41,12 @@ export class VoiceInputComponent implements OnInit, OnDestroy {
   confidence?: number;
   modelVersion?: string;
   isSimulation?: boolean;
+
+  // Parsed voice feature values from voiceFeaturesJson
+  voiceFeatures: { [key: string]: number } | null = null;
+  objectKeys = Object.keys;
+  @ViewChild('voiceFeaturesChart') voiceFeaturesChartRef?: ElementRef<HTMLCanvasElement>;
+  private voiceFeaturesChart: Chart | null = null;
   
   // Error handling
   error: string = '';
@@ -73,6 +80,16 @@ export class VoiceInputComponent implements OnInit, OnDestroy {
     }
     if (this.recordingTimer) {
       clearInterval(this.recordingTimer);
+    }
+    if (this.voiceFeaturesChart) {
+      this.voiceFeaturesChart.destroy();
+      this.voiceFeaturesChart = null;
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (this.voiceFeatures) {
+      this.updateVoiceFeaturesChart();
     }
   }
 
@@ -137,9 +154,31 @@ export class VoiceInputComponent implements OnInit, OnDestroy {
       this.isProcessing = true;
       this.error = '';
 
+      // ⭐ Convert WebM files to WAV before uploading
+      let fileToUpload = this.selectedFile;
+      
+      if (this.selectedFile.type.includes('webm') || this.selectedFile.name.toLowerCase().endsWith('.webm')) {
+        console.log('🔄 Converting uploaded WebM file to WAV format...');
+        try {
+          const fileBlob = new Blob([this.selectedFile], { type: this.selectedFile.type });
+          const wavBlob = await this.convertWebMToWAV(fileBlob);
+          console.log('✅ Conversion complete. WAV size:', wavBlob.size, 'bytes');
+          
+          fileToUpload = new File(
+            [wavBlob],
+            this.selectedFile.name.replace(/\.webm$/i, '.wav'),
+            { type: 'audio/wav' }
+          );
+        } catch (conversionError) {
+          console.error('❌ WebM to WAV conversion failed:', conversionError);
+          console.warn('⚠️ Uploading as original WebM format');
+          // Continue with original file if conversion fails
+        }
+      }
+
       // Step 1: Upload file
       const uploadResponse = await this.fileUploadService.uploadFile(
-        this.selectedFile,
+        fileToUpload,
         'voice',
         this.sessionId
       ).toPromise();
@@ -334,6 +373,98 @@ export class VoiceInputComponent implements OnInit, OnDestroy {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
+  /**
+   * Convert WebM/Blob audio to WAV format using Web Audio API
+   * @param audioBlob - The recorded audio blob (WebM format)
+   * @returns Promise<Blob> - WAV format blob
+   */
+  async convertWebMToWAV(audioBlob: Blob): Promise<Blob> {
+    // Check if Web Audio API is supported
+    if (!window.AudioContext && !(window as any).webkitAudioContext) {
+      throw new Error('Web Audio API is not supported in this browser. Please use a modern browser.');
+    }
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target?.result as ArrayBuffer;
+          
+          // Decode audio data
+          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          
+          // Convert to WAV
+          const wavBlob = this.audioBufferToWav(audioBuffer);
+          resolve(wavBlob);
+        } catch (error) {
+          console.error('Error converting WebM to WAV:', error);
+          reject(error);
+        }
+      };
+      
+      reader.onerror = (error) => {
+        console.error('Error reading audio file:', error);
+        reject(error);
+      };
+      
+      reader.readAsArrayBuffer(audioBlob);
+    });
+  }
+
+  /**
+   * Convert AudioBuffer to WAV Blob
+   * @param audioBuffer - Decoded audio buffer
+   * @returns Blob - WAV format blob
+   */
+  private audioBufferToWav(audioBuffer: AudioBuffer): Blob {
+    const numChannels = audioBuffer.numberOfChannels;
+    const sampleRate = audioBuffer.sampleRate;
+    const format = 1; // PCM
+    const bitDepth = 16;
+    
+    const bytesPerSample = bitDepth / 8;
+    const blockAlign = numChannels * bytesPerSample;
+    
+    const length = audioBuffer.length;
+    const buffer = new ArrayBuffer(44 + length * numChannels * bytesPerSample);
+    const view = new DataView(buffer);
+    
+    // WAV header
+    const writeString = (offset: number, string: string) => {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    };
+    
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + length * numChannels * bytesPerSample, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true); // fmt chunk size
+    view.setUint16(20, format, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitDepth, true);
+    writeString(36, 'data');
+    view.setUint32(40, length * numChannels * bytesPerSample, true);
+    
+    // Convert audio data
+    let offset = 44;
+    for (let i = 0; i < length; i++) {
+      for (let channel = 0; channel < numChannels; channel++) {
+        const sample = Math.max(-1, Math.min(1, audioBuffer.getChannelData(channel)[i]));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+        offset += 2;
+      }
+    }
+    
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
   // Upload recorded audio
   async uploadRecordedAudio(): Promise<void> {
     if (!this.recordedAudio) {
@@ -346,12 +477,21 @@ export class VoiceInputComponent implements OnInit, OnDestroy {
       this.isProcessing = true;
       this.error = '';
 
-      // Convert blob to File
-      const audioFile = new File(
-        [this.recordedAudio], 
-        `recording-${Date.now()}.wav`, 
-        { type: 'audio/wav' }
-      );
+      // ⭐ Convert WebM to WAV before uploading
+      console.log('🔄 Converting WebM to WAV format...');
+      let audioFile: File;
+      
+      try {
+        const wavBlob = await this.convertWebMToWAV(this.recordedAudio);
+        console.log('✅ Conversion complete. WAV size:', wavBlob.size, 'bytes');
+        audioFile = new File([wavBlob], `recording-${Date.now()}.wav`, { type: 'audio/wav' });
+      } catch (conversionError) {
+        console.error('❌ WebM to WAV conversion failed:', conversionError);
+        // Fallback: upload as original format if conversion fails
+        console.warn('⚠️ Falling back to original format');
+        const mimeType = this.getSupportedMimeType() || 'audio/webm';
+        audioFile = new File([this.recordedAudio], `recording-${Date.now()}.${mimeType.includes('webm') ? 'webm' : 'wav'}`, { type: mimeType });
+      }
 
       // Step 1: Upload file
       const uploadResponse = await this.fileUploadService.uploadFile(
@@ -419,6 +559,22 @@ export class VoiceInputComponent implements OnInit, OnDestroy {
     this.modelVersion = response.modelVersion;
     this.isSimulation = response.isSimulation;
 
+    // Parse raw voice feature JSON if available
+    if (response && response.voiceFeaturesJson) {
+      try {
+        this.voiceFeatures = JSON.parse(response.voiceFeaturesJson);
+      } catch (error) {
+        console.error('Error parsing voiceFeaturesJson:', error);
+        this.voiceFeatures = null;
+      }
+    } else {
+      this.voiceFeatures = null;
+    }
+
+    if (this.voiceFeatures) {
+      this.updateVoiceFeaturesChart();
+    }
+
     // Clear any previous errors if analysis succeeded
     if (response.riskPercent !== null && response.riskPercent !== undefined) {
       // Only clear error if it's not a test record save error
@@ -485,6 +641,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy {
     this.confidence = undefined;
     this.modelVersion = undefined;
     this.isSimulation = undefined;
+    this.voiceFeatures = null;
     this.error = '';
     this.existingTestRecordId = null;  // Reset test record ID for new analysis
     this.generateSessionId();
@@ -493,6 +650,63 @@ export class VoiceInputComponent implements OnInit, OnDestroy {
   // Navigate to test records
   navigateToTestRecords(): void {
     this.router.navigate(['/test-records']);
+  }
+
+  private updateVoiceFeaturesChart(): void {
+    if (!this.voiceFeatures || !this.voiceFeaturesChartRef) {
+      return;
+    }
+
+    const entries = Object.entries(this.voiceFeatures);
+    const labels = entries.map(([key]) => key);
+    const data = entries.map(([, value]) => Number(value));
+
+    const ctx = this.voiceFeaturesChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    if (this.voiceFeaturesChart) {
+      this.voiceFeaturesChart.data.labels = labels;
+      this.voiceFeaturesChart.data.datasets[0].data = data;
+      this.voiceFeaturesChart.update();
+      return;
+    }
+
+    this.voiceFeaturesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Voice Feature Value',
+            data,
+            backgroundColor: '#22c55e',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#e5e7eb',
+              font: { size: 11 }
+            },
+            grid: { display: false }
+          },
+          y: {
+            ticks: {
+              color: '#9ca3af',
+              font: { size: 11 }
+            },
+            grid: { color: 'rgba(148,163,184,0.15)' }
+          }
+        }
+      }
+    });
   }
 
   // Create or update test record with analysis results
