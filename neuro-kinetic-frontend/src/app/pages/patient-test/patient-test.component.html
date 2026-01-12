@@ -25,7 +25,35 @@
     <div *ngIf="!testStarted && !testCompleted" class="max-w-3xl mx-auto">
       <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
         <h2 class="text-2xl font-bold text-emerald-400 mb-6">Before You Begin</h2>
-        <div class="space-y-4 text-gray-300 mb-8">
+        
+        <!-- Mode Toggle -->
+        <div class="flex gap-4 mb-8">
+          <button 
+            (click)="inputMode = 'record'; selectedFile = null; error = ''"
+            class="flex-1 px-6 py-3 rounded-lg border-2 transition-all font-semibold"
+            [ngClass]="{
+              'bg-emerald-600 border-emerald-500': inputMode === 'record',
+              'bg-white/10 border-white/20': inputMode !== 'record'
+            }"
+          >
+            <span class="mr-2">🎤</span>
+            Record Voice
+          </button>
+          <button 
+            (click)="inputMode = 'upload'; audioBlob = null; error = ''"
+            class="flex-1 px-6 py-3 rounded-lg border-2 transition-all font-semibold"
+            [ngClass]="{
+              'bg-emerald-600 border-emerald-500': inputMode === 'upload',
+              'bg-white/10 border-white/20': inputMode !== 'upload'
+            }"
+          >
+            <span class="mr-2">📁</span>
+            Upload File
+          </button>
+        </div>
+
+        <!-- Record Mode Instructions -->
+        <div *ngIf="inputMode === 'record'" class="space-y-4 text-gray-300 mb-8">
           <div class="flex items-start gap-3">
             <span class="text-emerald-400 font-bold">1.</span>
             <p>Find a quiet environment with minimal background noise.</p>
@@ -43,10 +71,61 @@
             <p>Speak clearly for 30-60 seconds. You can say numbers, letters, or read a passage.</p>
           </div>
         </div>
+
+        <!-- Upload Mode Instructions -->
+        <div *ngIf="inputMode === 'upload'" class="space-y-4 text-gray-300 mb-8">
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-400 font-bold">1.</span>
+            <p>Select an audio file from your device (WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS).</p>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-400 font-bold">2.</span>
+            <p>Maximum file size: {{ MAX_AUDIO_MB }} MB.</p>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-400 font-bold">3.</span>
+            <p>Click "Start Test" to upload and analyze your voice file.</p>
+          </div>
+        </div>
+
+        <!-- Upload Section (shown when in upload mode) -->
+        <div *ngIf="inputMode === 'upload'" class="mb-6">
+          <div class="upload-area mb-4">
+            <label for="voiceFileInput" class="upload-button flex flex-col items-center justify-center p-8 border-2 border-dashed border-white/30 rounded-lg bg-white/5 cursor-pointer transition-all hover:border-emerald-500 hover:bg-white/10">
+              <span class="text-4xl mb-3">📁</span>
+              <span class="text-lg font-semibold mb-2">Choose Voice File</span>
+              <small class="text-gray-400 text-sm">Supported: WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS</small>
+            </label>
+            <input 
+              type="file" 
+              id="voiceFileInput" 
+              accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg,.webm,.aac,.opus"
+              (change)="onFileSelected($event)"
+              class="hidden"
+            />
+          </div>
+          
+          <div *ngIf="selectedFile" class="file-info flex justify-between items-center p-4 bg-white/5 rounded-lg mb-4">
+            <div class="file-details flex items-center gap-4">
+              <span class="text-2xl">📄</span>
+              <div>
+                <strong class="block">{{ selectedFile.name }}</strong>
+                <span class="file-size text-gray-400 text-sm">{{ formatFileSize(selectedFile.size) }}</span>
+              </div>
+            </div>
+            <button 
+              (click)="removeFile()" 
+              class="remove-button px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-semibold"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
         
         <button 
           (click)="startTest()"
-          class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg transition-colors font-semibold text-lg shadow-lg hover:shadow-emerald-500/25"
+          [disabled]="inputMode === 'upload' && !selectedFile"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg transition-colors font-semibold text-lg shadow-lg hover:shadow-emerald-500/25 disabled:bg-gray-600 disabled:cursor-not-allowed"
         >
           Start Test
         </button>
@@ -56,10 +135,51 @@
     <!-- Recording Interface -->
     <div *ngIf="testStarted && !testCompleted" class="max-w-3xl mx-auto">
       <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
-        <h2 class="text-2xl font-bold text-emerald-400 mb-6 text-center">Voice Recording</h2>
+        <h2 class="text-2xl font-bold text-emerald-400 mb-6 text-center">
+          {{ inputMode === 'record' ? 'Voice Recording' : 'Upload Voice File' }}
+        </h2>
         
-        <!-- Recording Status -->
-        <div class="text-center mb-8">
+        <!-- Show upload section if in upload mode -->
+        <div *ngIf="inputMode === 'upload'" class="text-center mb-8">
+          <div *ngIf="selectedFile" class="mb-6">
+            <div class="w-32 h-32 mx-auto bg-emerald-600/20 rounded-full flex items-center justify-center mb-4">
+              <svg class="w-16 h-16 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p class="text-gray-300 mb-4">File ready: {{ selectedFile.name }}</p>
+            <p class="text-sm text-gray-400 mb-4">Size: {{ formatFileSize(selectedFile.size) }}</p>
+            
+            <div class="flex gap-4 justify-center">
+              <button 
+                (click)="testStarted = false"
+                class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+              >
+                Go Back
+              </button>
+              <button 
+                (click)="submitTest()"
+                [disabled]="isProcessing"
+                class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-semibold"
+              >
+                {{ isProcessing ? 'Processing...' : 'Submit Test' }}
+              </button>
+            </div>
+          </div>
+          
+          <div *ngIf="!selectedFile" class="mb-6">
+            <p class="text-gray-300 mb-4">Please select a file to upload.</p>
+            <button 
+              (click)="testStarted = false"
+              class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+        
+        <!-- Recording Status (only show in record mode) -->
+        <div *ngIf="inputMode === 'record'" class="text-center mb-8">
           <div *ngIf="!isRecording && !audioBlob" class="mb-6">
             <div class="w-32 h-32 mx-auto bg-emerald-600/20 rounded-full flex items-center justify-center mb-4">
               <svg class="w-16 h-16 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,6 +330,34 @@
             </div>
           </div>
 
+          <!-- Voice Feature Extraction (Chart + Table) -->
+          <div *ngIf="voiceFeatures" class="bg-white/5 rounded-lg p-4 mt-4">
+            <p class="text-sm font-semibold text-emerald-400 mb-3">Voice Feature Extraction</p>
+            
+            <!-- Chart View -->
+            <!-- <div class="h-64 mb-6">
+              <canvas #voiceFeaturesChart class="w-full h-full"></canvas>
+            </div> -->
+
+            <!-- Table View -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-white/10">
+                    <th class="px-4 py-2 text-left text-emerald-400 font-semibold">Feature</th>
+                    <th class="px-4 py-2 text-right text-emerald-400 font-semibold">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let key of objectKeys(voiceFeatures)" class="border-b border-white/5 hover:bg-white/5">
+                    <td class="px-4 py-2 text-gray-300">{{ formatFeatureName(key) }}</td>
+                    <td class="px-4 py-2 text-right text-emerald-300 font-mono">{{ voiceFeatures[key] | number: '1.2-2' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- Notes -->
           <div *ngIf="testResult.analysisNotes" class="bg-white/5 rounded-lg p-4">
             <p class="text-sm text-gray-400 mb-2">Analysis Notes</p>
@@ -300,4 +448,5 @@
     </div>
   </div>
 </section>
+
 

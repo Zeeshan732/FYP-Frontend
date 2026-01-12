@@ -4,7 +4,7 @@
   [closable]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width: '700px' }"
+  [style]="{ width: '900px', maxWidth: '90vw' }"
   [header]="isEditMode ? 'Edit Test Record' : 'View Test Record'"
   (onHide)="onClose()"
   styleClass="test-record-dialog">
@@ -194,6 +194,53 @@
             </textarea>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Voice Feature Extraction Section -->
+    <div class="form-section" *ngIf="!isEditMode && record?.status === 'Completed'">
+      <div class="section-header">
+        <svg class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+        </svg>
+        <h3 class="section-title">Voice Feature Extraction</h3>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loadingFeatures" class="text-center py-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-2"></div>
+        <p class="text-sm text-gray-400">Loading voice features...</p>
+      </div>
+
+      <!-- Voice Features Chart and Table -->
+      <div *ngIf="!loadingFeatures && voiceFeatures" class="space-y-4">
+        <!-- Chart View -->
+        <div class="h-48">
+          <canvas #voiceFeaturesChart class="w-full h-full"></canvas>
+        </div>
+
+        <!-- Table View -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="px-3 py-2 text-left text-emerald-400 font-semibold text-xs">Feature</th>
+                <th class="px-3 py-2 text-right text-emerald-400 font-semibold text-xs">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let key of objectKeys(voiceFeatures)" class="border-b border-white/5 hover:bg-white/5">
+                <td class="px-3 py-2 text-gray-300 text-xs">{{ formatFeatureName(key) }}</td>
+                <td class="px-3 py-2 text-right text-emerald-300 font-mono text-xs">{{ voiceFeatures[key] | number: '1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- No Features Available -->
+      <div *ngIf="!loadingFeatures && !voiceFeatures" class="text-center py-4">
+        <p class="text-sm text-gray-400">Voice feature data not available for this test record.</p>
       </div>
     </div>
   </form>

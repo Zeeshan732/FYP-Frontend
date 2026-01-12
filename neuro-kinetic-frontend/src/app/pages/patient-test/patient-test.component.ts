@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { FileUploadService } from '../../services/file-upload.service';
@@ -12,14 +12,19 @@ import {
   AnalysisResult
 } from '../../models/api.models';
 import { HttpEventType } from '@angular/common/http';
+import { Chart } from 'chart.js';
 
 @Component({
   selector: 'app-patient-test',
   templateUrl: './patient-test.component.html',
   styleUrls: ['./patient-test.component.scss']
 })
-export class PatientTestComponent implements OnInit, OnDestroy {
-  private readonly MAX_AUDIO_MB = 10;
+export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
+  readonly MAX_AUDIO_MB = 10;
+  // Input mode
+  inputMode: 'record' | 'upload' = 'record';
+  selectedFile: File | null = null;
+  
   // Recording state
   isRecording = false;
   isProcessing = false;
@@ -50,11 +55,20 @@ export class PatientTestComponent implements OnInit, OnDestroy {
   loadingFeatures = false;
   currentSessionId: string | null = null;
 
+  // Voice feature extraction (parsed from voiceFeaturesJson)
+  voiceFeatures: { [key: string]: number } | null = null;
+  objectKeys = Object.keys;
+
+  // Chart.js instances for voice features
+  @ViewChild('voiceFeaturesChart') voiceFeaturesChartRef?: ElementRef<HTMLCanvasElement>;
+  private voiceFeaturesChart: Chart | null = null;
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
     private fileUploadService: FileUploadService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -79,15 +93,37 @@ export class PatientTestComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Clean up chart instance
+    if (this.voiceFeaturesChart) {
+      this.voiceFeaturesChart.destroy();
+      this.voiceFeaturesChart = null;
+    }
     this.stopRecording();
     if (this.audioUrl) {
       URL.revokeObjectURL(this.audioUrl);
     }
   }
 
+  ngAfterViewInit(): void {
+    if (this.voiceFeatures) {
+      this.updateVoiceFeaturesChart();
+    }
+  }
+
   async startTest() {
+    // If upload mode, just start the test without requesting microphone
+    if (this.inputMode === 'upload') {
+      if (!this.selectedFile) {
+        this.error = 'Please select a voice file first.';
+        return;
+      }
+      this.testStarted = true;
+      this.error = '';
+      return;
+    }
+
+    // Record mode: request microphone permission
     try {
-      // Request microphone permission
       this.audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.testStarted = true;
       this.error = '';
@@ -155,7 +191,51 @@ export class PatientTestComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Handle file selection
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedExtensions = ['.wav', '.mp3', '.m4a', '.flac', '.ogg', '.webm', '.aac', '.opus'];
+      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+      
+      if (!allowedExtensions.includes(fileExtension)) {
+        this.error = 'Invalid file type. Please select an audio file (.wav, .mp3, .m4a, etc.)';
+        return;
+      }
+      
+      // Validate file size (10 MB max)
+      if (file.size > this.MAX_AUDIO_MB * 1024 * 1024) {
+        this.error = `File size exceeds ${this.MAX_AUDIO_MB} MB limit.`;
+        return;
+      }
+      
+      this.selectedFile = file;
+      this.error = '';
+    }
+  }
+
+  // Remove selected file
+  removeFile(): void {
+    this.selectedFile = null;
+    this.error = '';
+    const input = document.getElementById('voiceFileInput') as HTMLInputElement;
+    if (input) input.value = '';
+  }
+
+  // Format file size for display
+  formatFileSize(bytes: number): string {
+    return this.fileUploadService.formatFileSize(bytes);
+  }
+
   async submitTest() {
+    // Handle uploaded file
+    if (this.inputMode === 'upload' && this.selectedFile) {
+      await this.uploadAndProcessFile();
+      return;
+    }
+
+    // Handle recorded audio
     if (!this.audioBlob) {
       this.error = 'Please record a voice sample first.';
       return;
@@ -176,9 +256,22 @@ export class PatientTestComponent implements OnInit, OnDestroy {
       const sessionId = `test-${Date.now()}-${Math.random().toString(36).substring(7)}`;
       this.currentSessionId = sessionId;
 
-      // First, upload the audio file
-      const audioFile = new File([this.audioBlob], `voice-recording-${Date.now()}.webm`, { type: 'audio/webm' });
+      // ⭐ Convert WebM to WAV before uploading
+      console.log('🔄 Converting WebM to WAV format...');
+      let audioFile: File;
       
+      try {
+        const wavBlob = await this.convertWebMToWAV(this.audioBlob);
+        console.log('✅ Conversion complete. WAV size:', wavBlob.size, 'bytes');
+        audioFile = new File([wavBlob], `voice-recording-${Date.now()}.wav`, { type: 'audio/wav' });
+      } catch (conversionError) {
+        console.error('❌ WebM to WAV conversion failed:', conversionError);
+        // Fallback: upload as WebM if conversion fails
+        console.warn('⚠️ Falling back to WebM format');
+        audioFile = new File([this.audioBlob], `voice-recording-${Date.now()}.webm`, { type: 'audio/webm' });
+      }
+      
+      // Upload the audio file (now in WAV format)
       this.fileUploadService.uploadFileWithProgress(
         audioFile,
         'voice',
@@ -203,6 +296,8 @@ export class PatientTestComponent implements OnInit, OnDestroy {
             }).subscribe({
               next: (analysisResponse: AnalysisResult) => {
                 console.log('✅ Analysis complete:', analysisResponse);
+                console.log('🔍 voiceFeaturesJson present?', !!analysisResponse.voiceFeaturesJson);
+                console.log('🔍 voiceFeaturesJson value:', analysisResponse.voiceFeaturesJson);
 
                 // Step 2: Validate analysis response
                 if (!analysisResponse) {
@@ -221,6 +316,31 @@ export class PatientTestComponent implements OnInit, OnDestroy {
                 // Store analysis for UI
                 this.analysisResult = analysisResponse;
 
+                // Parse voice feature JSON directly from processAnalysis response
+                if (analysisResponse.voiceFeaturesJson) {
+                  try {
+                    console.log('📊 Parsing voiceFeaturesJson...');
+                    this.voiceFeatures = JSON.parse(analysisResponse.voiceFeaturesJson);
+                    console.log('✅ Parsed voiceFeatures:', this.voiceFeatures);
+                    console.log('📈 Feature count:', this.voiceFeatures ? Object.keys(this.voiceFeatures).length : 0);
+                    
+                    // Force change detection to ensure canvas is in DOM
+                    this.cdr.detectChanges();
+                    
+                    // Defer chart update to ensure canvas is rendered
+                    setTimeout(() => {
+                      this.updateVoiceFeaturesChart();
+                    }, 100);
+                  } catch (parseError) {
+                    console.error('❌ Error parsing voiceFeaturesJson from processAnalysis:', parseError);
+                    console.error('❌ Raw voiceFeaturesJson:', analysisResponse.voiceFeaturesJson);
+                    this.voiceFeatures = null;
+                  }
+                } else {
+                  console.warn('⚠️ voiceFeaturesJson is missing or null in response');
+                  this.voiceFeatures = null;
+                }
+
                 // ⭐ STEP 3: Create test record WITH analysis results
                 const testRecord: UserTestRecordRequest = {
                   userName: this.currentUser?.email || 'Anonymous',
@@ -229,7 +349,7 @@ export class PatientTestComponent implements OnInit, OnDestroy {
                   testResult: this.mapPredictedClass(analysisResponse.predictedClass),
                   accuracy: (analysisResponse.confidenceScore || 0) * 100,
                   voiceRecordingUrl: uploadResponse?.fileUrl || uploadResponse?.filePath,
-                  analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'})`
+                  analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`
                 };
 
                 this.apiService.createUserTestRecord(testRecord).subscribe({
@@ -327,6 +447,28 @@ export class PatientTestComponent implements OnInit, OnDestroy {
     this.apiService.getAnalysisBySessionId(sessionId).subscribe({
       next: (result) => {
         this.analysisResult = result;
+        // Parse raw voice feature JSON if available
+        if (result && result.voiceFeaturesJson) {
+          try {
+            this.voiceFeatures = JSON.parse(result.voiceFeaturesJson);
+          } catch (parseError) {
+            console.error('Error parsing voiceFeaturesJson:', parseError);
+            this.voiceFeatures = null;
+          }
+        } else {
+          this.voiceFeatures = null;
+        }
+
+        // Update chart when new features arrive
+        if (this.voiceFeatures) {
+          // Force change detection to ensure canvas is in DOM
+          this.cdr.detectChanges();
+          
+          // Defer chart update to ensure canvas is rendered
+          setTimeout(() => {
+            this.updateVoiceFeaturesChart();
+          }, 100);
+        }
         
         // If we have analysis result, update test result display
         if (result && result.predictedClass) {
@@ -345,6 +487,82 @@ export class PatientTestComponent implements OnInit, OnDestroy {
         // Don't show error, analysis result is optional
       }
     });
+  }
+
+  private updateVoiceFeaturesChart(): void {
+    if (!this.voiceFeatures) {
+      console.warn('⚠️ No voice features to display in chart');
+      return;
+    }
+
+    // If the canvas isn't in the view yet, retry after a short delay
+    if (!this.voiceFeaturesChartRef) {
+      console.warn('⚠️ Canvas not ready, retrying chart update...');
+      setTimeout(() => this.updateVoiceFeaturesChart(), 100);
+      return;
+    }
+
+    const entries = Object.entries(this.voiceFeatures);
+    const labels = entries.map(([key]) => this.formatFeatureName(key));
+    const data = entries.map(([, value]) => Number(value));
+
+    console.log('📊 Creating chart with', labels.length, 'features');
+
+    const ctx = this.voiceFeaturesChartRef.nativeElement.getContext('2d');
+    if (!ctx) {
+      console.error('❌ Could not get canvas context');
+      return;
+    }
+
+    if (this.voiceFeaturesChart) {
+      this.voiceFeaturesChart.data.labels = labels;
+      this.voiceFeaturesChart.data.datasets[0].data = data;
+      this.voiceFeaturesChart.update();
+      return;
+    }
+
+    try {
+      this.voiceFeaturesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Voice Feature Value',
+              data,
+              backgroundColor: '#22c55e',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: '#e5e7eb',
+                font: { size: 11 }
+              },
+              grid: { display: false }
+            },
+            y: {
+              ticks: {
+                color: '#9ca3af',
+                font: { size: 11 }
+              },
+              grid: { color: 'rgba(148,163,184,0.15)' }
+            }
+          }
+        }
+      });
+      console.log('✅ Chart created successfully');
+    } catch (chartError) {
+      console.error('❌ Error creating chart:', chartError);
+    }
   }
 
   private loadResultDetails() {
@@ -433,6 +651,153 @@ export class PatientTestComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Upload and process file
+  async uploadAndProcessFile(): Promise<void> {
+    if (!this.selectedFile) {
+      this.error = 'Please select a voice file first.';
+      return;
+    }
+
+    this.isProcessing = true;
+    this.error = '';
+
+    try {
+      // Generate session ID for this test
+      const sessionId = `test-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      this.currentSessionId = sessionId;
+
+      // Validate file
+      const validation = this.fileUploadService.validateFile(this.selectedFile, 'voice');
+      if (!validation.valid) {
+        this.error = validation.error || 'Invalid file.';
+        this.isProcessing = false;
+        return;
+      }
+
+      // Convert to WAV if needed (for WebM files)
+      let fileToUpload = this.selectedFile;
+      if (this.selectedFile.type === 'video/webm' || this.selectedFile.name.toLowerCase().endsWith('.webm')) {
+        try {
+          const arrayBuffer = await this.selectedFile.arrayBuffer();
+          const webmBlob = new Blob([arrayBuffer], { type: 'video/webm' });
+          const wavBlob = await this.convertWebMToWAV(webmBlob);
+          fileToUpload = new File([wavBlob], this.selectedFile.name.replace(/\.webm$/i, '.wav'), { type: 'audio/wav' });
+        } catch (conversionError) {
+          console.warn('WebM conversion failed, uploading original:', conversionError);
+        }
+      }
+
+      // Upload the audio file
+      this.fileUploadService.uploadFileWithProgress(
+        fileToUpload,
+        'voice',
+        sessionId,
+        'Parkinson\'s test voice recording'
+      ).subscribe({
+        next: (event) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const total = event.total || 1;
+            const progress = Math.round((100 * event.loaded) / total);
+            console.log(`Upload progress: ${progress}%`);
+          } else if (event.type === HttpEventType.Response) {
+            const uploadResponse = event.body;
+
+            // Process analysis immediately after upload
+            console.log('✅ File uploaded, processing analysis...');
+            this.apiService.processAnalysis({
+              sessionId: sessionId,
+              hasVoiceData: true,
+              hasGaitData: false
+            }).subscribe({
+              next: (analysisResponse: AnalysisResult) => {
+                console.log('✅ Analysis complete:', analysisResponse);
+
+                // Validate analysis response
+                if (!analysisResponse) {
+                  this.error = 'Analysis completed but no results were returned.';
+                  this.isProcessing = false;
+                  return;
+                }
+
+                if (analysisResponse.riskPercent == null && analysisResponse.riskPercent !== 0) {
+                  console.error('❌ Analysis failed - riskPercent is null');
+                  this.error = 'Analysis processing failed. Please try again.';
+                  this.isProcessing = false;
+                  return;
+                }
+
+                // Store analysis for UI
+                this.analysisResult = analysisResponse;
+
+                // Parse voice feature JSON
+                if (analysisResponse.voiceFeaturesJson) {
+                  try {
+                    console.log('📊 Parsing voiceFeaturesJson...');
+                    this.voiceFeatures = JSON.parse(analysisResponse.voiceFeaturesJson);
+                    console.log('✅ Parsed voiceFeatures:', this.voiceFeatures);
+                    
+                    this.cdr.detectChanges();
+                    setTimeout(() => {
+                      this.updateVoiceFeaturesChart();
+                    }, 100);
+                  } catch (parseError) {
+                    console.error('❌ Error parsing voiceFeaturesJson:', parseError);
+                    this.voiceFeatures = null;
+                  }
+                } else {
+                  this.voiceFeatures = null;
+                }
+
+                // Create test record WITH analysis results
+                const testRecord: UserTestRecordRequest = {
+                  userName: this.currentUser?.email || 'Anonymous',
+                  userId: this.currentUser?.id,
+                  status: 'Completed',
+                  testResult: this.mapPredictedClass(analysisResponse.predictedClass),
+                  accuracy: (analysisResponse.confidenceScore || 0) * 100,
+                  voiceRecordingUrl: uploadResponse?.fileUrl || uploadResponse?.filePath,
+                  analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`
+                };
+
+                this.apiService.createUserTestRecord(testRecord).subscribe({
+                  next: (record: UserTestRecord) => {
+                    this.testResult = record;
+                    this.testCompleted = true;
+                    this.isProcessing = false;
+
+                    // Load extra details
+                    if (this.currentSessionId) {
+                      this.loadResultDetails();
+                    }
+                  },
+                  error: (error) => {
+                    console.error('Error creating test record:', error);
+                    this.error = 'Analysis completed, but failed to save test record. Results are displayed below.';
+                    this.isProcessing = false;
+                  }
+                });
+              },
+              error: (error) => {
+                console.error('Error processing analysis:', error);
+                this.error = 'Failed to process analysis. Please try again.';
+                this.isProcessing = false;
+              }
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error uploading file:', error);
+          this.error = 'Failed to upload voice file. Please try again.';
+          this.isProcessing = false;
+        }
+      });
+    } catch (error: any) {
+      console.error('Error:', error);
+      this.error = error.error?.message || error.message || 'Failed to process voice file. Please try again.';
+      this.isProcessing = false;
+    }
+  }
+
   startNewTest() {
     this.testStarted = false;
     this.testCompleted = false;
@@ -442,10 +807,13 @@ export class PatientTestComponent implements OnInit, OnDestroy {
     this.featureExplanation = null;
     this.currentSessionId = null;
     this.audioBlob = null;
+    this.selectedFile = null;
     if (this.audioUrl) {
       URL.revokeObjectURL(this.audioUrl);
       this.audioUrl = null;
     }
+    const input = document.getElementById('voiceFileInput') as HTMLInputElement;
+    if (input) input.value = '';
     this.recordingTime = 0;
     this.error = '';
   }
@@ -483,6 +851,115 @@ export class PatientTestComponent implements OnInit, OnDestroy {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  /**
+   * Convert WebM/Blob audio to WAV format using Web Audio API
+   * @param audioBlob - The recorded audio blob (WebM format)
+   * @returns Promise<Blob> - WAV format blob
+   */
+  async convertWebMToWAV(audioBlob: Blob): Promise<Blob> {
+    // Check if Web Audio API is supported
+    if (!window.AudioContext && !(window as any).webkitAudioContext) {
+      throw new Error('Web Audio API is not supported in this browser. Please use a modern browser.');
+    }
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target?.result as ArrayBuffer;
+          
+          // Decode audio data
+          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          
+          // Convert to WAV
+          const wavBlob = this.audioBufferToWav(audioBuffer);
+          resolve(wavBlob);
+        } catch (error) {
+          console.error('Error converting WebM to WAV:', error);
+          reject(error);
+        }
+      };
+      
+      reader.onerror = (error) => {
+        console.error('Error reading audio file:', error);
+        reject(error);
+      };
+      
+      reader.readAsArrayBuffer(audioBlob);
+    });
+  }
+
+  /**
+   * Convert AudioBuffer to WAV Blob
+   * @param audioBuffer - Decoded audio buffer
+   * @returns Blob - WAV format blob
+   */
+  private audioBufferToWav(audioBuffer: AudioBuffer): Blob {
+    const numChannels = audioBuffer.numberOfChannels;
+    const sampleRate = audioBuffer.sampleRate;
+    const format = 1; // PCM
+    const bitDepth = 16;
+    
+    const bytesPerSample = bitDepth / 8;
+    const blockAlign = numChannels * bytesPerSample;
+    
+    const length = audioBuffer.length;
+    const buffer = new ArrayBuffer(44 + length * numChannels * bytesPerSample);
+    const view = new DataView(buffer);
+    
+    // WAV header
+    const writeString = (offset: number, string: string) => {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    };
+    
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + length * numChannels * bytesPerSample, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true); // fmt chunk size
+    view.setUint16(20, format, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitDepth, true);
+    writeString(36, 'data');
+    view.setUint32(40, length * numChannels * bytesPerSample, true);
+    
+    // Convert audio data
+    let offset = 44;
+    for (let i = 0; i < length; i++) {
+      for (let channel = 0; channel < numChannels; channel++) {
+        const sample = Math.max(-1, Math.min(1, audioBuffer.getChannelData(channel)[i]));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+        offset += 2;
+      }
+    }
+    
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
+  formatFeatureName(key: string): string {
+    const names: { [key: string]: string } = {
+      'jitter_local_percent': 'Jitter (Local %)',
+      'jitter_local_abs': 'Jitter (Absolute)',
+      'jitter_rap': 'Jitter (RAP)',
+      'jitter_ppq5': 'Jitter (PPQ5)',
+      'shimmer_local': 'Shimmer (Local)',
+      'shimmer_local_db': 'Shimmer (dB)',
+      'nhr': 'Noise-to-Harmonics Ratio',
+      'hnr': 'Harmonics-to-Noise Ratio',
+      'rpde': 'RPDE',
+      'dfa': 'DFA',
+      'ppe': 'PPE'
+    };
+    return names[key] || key;
   }
 
   getResultColor(result: string): string {
