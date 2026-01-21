@@ -30,6 +30,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   showPassword = false;
   showConfirmPassword = false;
   passwordStrength: 0 | 1 | 2 | 3 | 4 = 0;
+  loginFieldErrors: { email?: string; password?: string } = {};
   private subscription: Subscription = new Subscription();
 
   /** Must match API `RequestPasswordResetOTPAsync` expiry */
@@ -82,6 +83,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           this.showContactAdmin = false;
           this.modalView = 'login';
           this.showPassword = false;
+          this.loginFieldErrors = {};
           this.otpCountdownSec = null;
           this.otpExpired = false;
           this.clearOtpTimer();
@@ -334,12 +336,22 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    if (!this.email || !this.password) {
-      this.error = 'Please enter both email and password';
-      this.toastWarn('Missing information', this.error);
+    this.loginFieldErrors = {};
+    const email = this.email?.trim() || '';
+    const password = this.password || '';
+
+    if (!email) {
+      this.loginFieldErrors.email = 'Email is required.';
+    }
+    if (!password) {
+      this.loginFieldErrors.password = 'Password is required.';
+    }
+    if (this.loginFieldErrors.email || this.loginFieldErrors.password) {
+      this.error = '';
       return;
     }
 
+    this.email = email;
     this.error = '';
     this.info = '';
     this.loading = true;
