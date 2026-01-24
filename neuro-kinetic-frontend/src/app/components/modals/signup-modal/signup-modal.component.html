@@ -62,22 +62,26 @@
               <input
                 type="text"
                 [(ngModel)]="firstName"
+                (ngModelChange)="signupFieldErrors.firstName = undefined"
                 name="firstName"
                 autocomplete="given-name"
                 placeholder="Ali"
                 [disabled]="loading"
                 required>
+              <div class="ns-field-error" *ngIf="signupFieldErrors.firstName">{{ signupFieldErrors.firstName }}</div>
             </div>
             <div class="ns-field">
               <label>Last name</label>
               <input
                 type="text"
                 [(ngModel)]="lastName"
+                (ngModelChange)="signupFieldErrors.lastName = undefined"
                 name="lastName"
                 autocomplete="family-name"
                 placeholder="Ahmed"
                 [disabled]="loading"
                 required>
+              <div class="ns-field-error" *ngIf="signupFieldErrors.lastName">{{ signupFieldErrors.lastName }}</div>
             </div>
           </div>
 
@@ -87,12 +91,13 @@
               <input
                 type="email"
                 [(ngModel)]="email"
-                (ngModelChange)="onEmailChange()"
+                (ngModelChange)="onEmailChange(); signupFieldErrors.email = undefined"
                 name="email"
                 autocomplete="email"
                 placeholder="you@hospital.com"
                 [disabled]="loading"
                 required>
+              <div class="ns-field-error" *ngIf="signupFieldErrors.email">{{ signupFieldErrors.email }}</div>
             </div>
 
             <div class="ns-field">
@@ -102,6 +107,7 @@
                   [type]="showPassword ? 'text' : 'password'"
                   [(ngModel)]="password"
                   (input)="checkPasswordStrength(password)"
+                  (ngModelChange)="signupFieldErrors.password = undefined"
                   name="new-password"
                   autocomplete="new-password"
                   placeholder="Min. 8 characters"
@@ -127,6 +133,7 @@
                 <span class="seg" [class.weak]="passwordStrength >= 4 && strengthClass === 'weak'" [class.medium]="passwordStrength >= 4 && strengthClass === 'medium'" [class.strong]="passwordStrength >= 4 && strengthClass === 'strong'"></span>
               </div>
               <div class="ns-hint">Use 8+ characters with a mix of letters and numbers</div>
+              <div class="ns-field-error" *ngIf="signupFieldErrors.password">{{ signupFieldErrors.password }}</div>
             </div>
           </div>
 
@@ -136,20 +143,24 @@
               <input
                 type="text"
                 [(ngModel)]="clinicName"
+                (ngModelChange)="signupFieldErrors.clinicName = undefined"
                 name="clinicName"
                 placeholder="City Hospital"
                 [disabled]="loading"
                 required>
+              <div class="ns-field-error" *ngIf="signupFieldErrors.clinicName">{{ signupFieldErrors.clinicName }}</div>
             </div>
             <div class="ns-field">
               <label>License number</label>
               <input
                 type="text"
                 [(ngModel)]="licenseNumber"
+                (ngModelChange)="signupFieldErrors.licenseNumber = undefined"
                 name="licenseNumber"
                 placeholder="PMDC-123456"
                 [disabled]="loading"
                 required>
+              <div class="ns-field-error" *ngIf="signupFieldErrors.licenseNumber">{{ signupFieldErrors.licenseNumber }}</div>
             </div>
           </div>
 
@@ -164,13 +175,14 @@
           </div>
 
           <label class="ns-terms">
-            <input type="checkbox" [(ngModel)]="agreeTerms" name="agreeTerms" [disabled]="loading">
+            <input type="checkbox" [(ngModel)]="agreeTerms" (ngModelChange)="signupFieldErrors.agreeTerms = undefined" name="agreeTerms" [disabled]="loading">
             <span>
               By signing up you agree to our
               <a routerLink="/terms">Terms of Service</a> and
               <a routerLink="/privacy">Privacy Policy</a>
             </span>
           </label>
+          <div class="ns-field-error" *ngIf="signupFieldErrors.agreeTerms">{{ signupFieldErrors.agreeTerms }}</div>
 
           <button type="submit" class="ns-submit" [disabled]="loading">
             <span *ngIf="!loading">Create account</span>

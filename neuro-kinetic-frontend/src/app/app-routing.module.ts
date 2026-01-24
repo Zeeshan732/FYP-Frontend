@@ -31,6 +31,7 @@ import { AdminGuard } from './guards/admin.guard';
 const routes: Routes = [
   { path: '', redirectTo: '/landing', pathMatch: 'full' },
   { path: 'landing', component: LandingComponent },
+  { path: 'signup', component: LandingComponent, data: { openSignupModal: true } },
   { path: 'home', component: HomeComponent },
   { path: 'services', component: ServicesComponent },
   { path: 'contact', component: ContactComponent },

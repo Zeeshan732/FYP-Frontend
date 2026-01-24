@@ -63,6 +63,9 @@ export class LandingComponent implements OnInit {
     if (this.route.snapshot.data['openLoginModal']) {
       this.modalService.openLoginModal();
     }
+    if (this.route.snapshot.data['openSignupModal'] || this.route.snapshot.queryParamMap.has('invited')) {
+      this.modalService.openSignupModal();
+    }
     
     this.observeElements();
   }
