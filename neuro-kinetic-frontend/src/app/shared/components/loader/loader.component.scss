@@ -39,13 +39,14 @@
 
 .ldr-page-inner {
   width: 100%;
-  max-width: min(100%, 380px);
+  max-width: min(100%, min(92vw, 440px));
   margin-inline: auto;
   text-align: center;
   background: var(--ldr-surface-elevated);
   border: 1px solid var(--ldr-border);
   border-radius: var(--ldr-radius);
-  padding: clamp(1.25rem, 4.5vw, 2rem) clamp(1rem, 4vw, 1.75rem);
+  padding: clamp(1.25rem, 4.5vw, 2rem) clamp(1rem, 4vw, 1.75rem)
+    clamp(1.4rem, 5vw, 2.35rem);
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.35),
     0 0 0 1px rgba(255, 255, 255, 0.03) inset;
