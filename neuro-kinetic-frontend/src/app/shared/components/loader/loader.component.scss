@@ -347,13 +347,19 @@
 
 @media (min-width: 640px) {
   .ldr-page-inner {
-    max-width: 440px;
+    max-width: min(100%, 520px);
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   .ldr-page-inner {
-    max-width: 460px;
-    padding: 2rem 2rem 1.75rem;
+    max-width: min(100%, 580px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .ldr-page-inner {
+    max-width: min(100%, 640px);
+    padding: 2rem 2rem 2rem;
   }
 }
