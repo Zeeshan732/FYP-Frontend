@@ -167,12 +167,24 @@
 
 .ft-compress-panel {
   width: 100%;
-  max-width: 420px;
+  max-width: min(100%, 520px);
   margin: 0 auto;
   padding: 1.25rem 1.35rem;
   border-radius: 14px;
   border: 1px solid rgba(148, 163, 184, 0.25);
   background: rgba(15, 23, 42, 0.85);
+}
+
+@media (min-width: 768px) {
+  .ft-compress-panel {
+    max-width: min(100%, 580px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .ft-compress-panel {
+    max-width: min(100%, 640px);
+  }
 }
 
 .ft-compress-sizes {
