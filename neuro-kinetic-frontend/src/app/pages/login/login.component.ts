@@ -25,6 +25,11 @@ export class LoginComponent implements OnInit {
       if (params.get('redirect') === 'true') {
         this.info = 'Please sign in to access that page.';
       }
+
+      const errorParam = params.get('error');
+      if (errorParam) {
+        this.handleErrorParam(errorParam);
+      }
     });
   }
 
@@ -37,6 +42,60 @@ export class LoginComponent implements OnInit {
       } else {
         this.router.navigate(['/patient-test']);
       }
+    }
+  }
+
+  loginWithGoogle() {
+    console.log('Google login button clicked');
+    try {
+      this.authService.loginWithGoogle();
+    } catch (error) {
+      console.error('Error initiating Google login:', error);
+      this.error = 'Failed to initiate Google login. Please try again.';
+    }
+  }
+
+  loginWithFacebook() {
+    console.log('Facebook login button clicked');
+    try {
+      this.authService.loginWithFacebook();
+    } catch (error) {
+      console.error('Error initiating Facebook login:', error);
+      this.error = 'Failed to initiate Facebook login. Please try again.';
+    }
+  }
+
+  /**
+   * Handle error query param from OAuth/login redirects
+   */
+  private handleErrorParam(error: string) {
+    switch (error) {
+      case 'pending':
+        this.error = 'Your account is under review.';
+        break;
+      case 'rejected':
+        this.error = 'Your account request was rejected.';
+        break;
+      case 'inactive':
+        this.error = 'Your account is inactive. Please contact admin.';
+        this.showContactAdmin = true;
+        break;
+      case 'oauth_failed':
+        this.error = 'OAuth login failed. Please try again or use email/password.';
+        break;
+      case 'no_token':
+        this.error = 'Authentication token was not provided. Please try logging in again.';
+        break;
+      case 'oauth_decode_failed':
+      case 'oauth_validation_failed':
+        this.error = 'We could not verify your login. Please try again.';
+        break;
+      default:
+        // Do not override existing error if backend set one
+        if (!this.error) {
+          this.error = 'Login could not be completed. Please try again.';
+        }
+        break;
     }
   }
 

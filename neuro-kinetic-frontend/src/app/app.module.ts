@@ -48,6 +48,7 @@ import { AccountRequestsComponent } from './pages/account-requests/account-reque
 import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
+import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
@@ -75,6 +76,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     CrossValidationComponent,
     PatientTestComponent,
     TestRecordsComponent,
+    OAuthCallbackComponent,
     AdminDashboardComponent,
     TestRecordDialogComponent,
     HeaderComponent,
