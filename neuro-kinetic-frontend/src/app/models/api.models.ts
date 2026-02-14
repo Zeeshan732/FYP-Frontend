@@ -9,6 +9,8 @@ export interface User {
   isActive?: boolean; // NEW: indicates if account is active
   institution?: string;
   researchFocus?: string;
+  provider?: string; // OAuth provider (e.g., Google, Facebook)
+  providerId?: string; // Provider user id
   createdAt?: string;
 }
 
@@ -186,6 +188,7 @@ export interface ErrorResponse {
 // Validation Response
 export interface ValidationResponse {
   valid: boolean;
+  user?: User; // Optional user payload from validation
   message?: string; // Optional message from backend
 }
 

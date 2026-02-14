@@ -22,6 +22,7 @@ import { AccountRequestsComponent } from './pages/account-requests/account-reque
 import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
+import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -32,6 +33,7 @@ const routes: Routes = [
   { path: 'services', component: ServicesComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'auth/callback', component: OAuthCallbackComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
       { path: 'technology', component: TechnologyComponent },
       { path: 'technology-demo', component: TechnologyDemoComponent },

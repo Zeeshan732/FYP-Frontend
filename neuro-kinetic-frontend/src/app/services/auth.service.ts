@@ -93,6 +93,139 @@ export class AuthService {
     return this.http.get<ValidationResponse>(`${this.apiUrl}/auth/validate`);
   }
 
+  // ========== OAUTH AUTHENTICATION ==========
+
+  /**
+   * Initiate Google OAuth login
+   * Redirects user to Google OAuth page
+   */
+  loginWithGoogle(): void {
+    const url = `${this.apiUrl}/auth/google`;
+    console.log('Redirecting to Google OAuth:', url);
+    window.location.href = url;
+  }
+
+  /**
+   * Initiate Facebook OAuth login
+   * Redirects user to Facebook OAuth page
+   */
+  loginWithFacebook(): void {
+    const url = `${this.apiUrl}/auth/facebook`;
+    console.log('Redirecting to Facebook OAuth:', url);
+    window.location.href = url;
+  }
+
+  /**
+   * Handle OAuth callback
+   * Called when user returns from OAuth provider
+   * @param token JWT token from backend
+   * @param provider OAuth provider name (google, facebook)
+   */
+  handleOAuthCallback(token: string, provider: string): void {
+    console.log('OAuth callback received:', { provider, tokenLength: token?.length });
+    
+    if (!token) {
+      console.error('No token received from OAuth callback');
+      this.router.navigate(['/login'], { queryParams: { error: 'oauth_failed' } });
+      return;
+    }
+
+    // Decode token to extract user info
+    try {
+      const user = this.decodeTokenUser(token);
+      if (user) {
+        // Handle account status before storing token
+        const status = user.status;
+        if (status === 'Pending') {
+          console.warn('OAuth login: account is pending review');
+          this.clearAuthData();
+          this.router.navigate(['/login'], { queryParams: { error: 'pending' } });
+          return;
+        }
+        if (status === 'Rejected') {
+          console.warn('OAuth login: account request was rejected');
+          this.clearAuthData();
+          this.router.navigate(['/login'], { queryParams: { error: 'rejected' } });
+          return;
+        }
+        if (status === 'Inactive') {
+          console.warn('OAuth login: account is inactive');
+          this.clearAuthData();
+          this.router.navigate(['/login'], { queryParams: { error: 'inactive' } });
+          return;
+        }
+
+        // Set auth data with token and user
+        this.setAuthData(token, user);
+        
+        // Redirect based on user role (dashboard routes)
+        setTimeout(() => {
+          if (user.role === 'Admin') {
+            this.router.navigate(['/admin-dashboard']);
+          } else {
+            // Main dashboard for regular users
+            this.router.navigate(['/patient-test']);
+          }
+        }, 100);
+      } else {
+        console.error('Failed to decode user from token');
+        this.router.navigate(['/login'], { queryParams: { error: 'oauth_failed' } });
+      }
+    } catch (decodeError) {
+      console.error('Error decoding token:', decodeError);
+      // Try to validate token with backend as fallback
+      this.validateToken().subscribe({
+        next: (response) => {
+          if (response.valid) {
+            // Token is valid, try to get user from localStorage or make API call
+            // For now, redirect to login with error
+            this.router.navigate(['/login'], { queryParams: { error: 'oauth_decode_failed' } });
+          } else {
+            this.router.navigate(['/login'], { queryParams: { error: 'oauth_validation_failed' } });
+          }
+        },
+        error: (error) => {
+          console.error('Error validating token:', error);
+          this.router.navigate(['/login'], { queryParams: { error: 'oauth_failed' } });
+        }
+      });
+    }
+  }
+
+  /**
+   * Decode user info from JWT token
+   * @param token JWT token
+   * @returns User object or null
+   */
+  private decodeTokenUser(token: string): User | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        return null;
+      }
+      
+      const payload = JSON.parse(atob(parts[1]));
+      
+      // Extract user info from token claims
+      // Adjust these based on your JWT token structure
+      const user: User = {
+        id: payload.sub || payload.userId || payload.id || 0,
+        email: payload.email || '',
+        firstName: payload.firstName || payload.given_name || '',
+        lastName: payload.lastName || payload.family_name || '',
+        role: payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'Public',
+        status: payload.status || 'Approved',
+        provider: payload.provider,
+        providerId: payload.providerId
+      };
+      
+      return user;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  }
+
   // ========== USER MANAGEMENT ==========
 
   getCurrentUser(): User | null {
@@ -165,8 +298,9 @@ export class AuthService {
         return;
       }
       
-      // Store token
+      // Store token (both legacy key 'token' and explicit 'authToken')
       localStorage.setItem('token', token);
+      localStorage.setItem('authToken', token);
       const verifyToken = localStorage.getItem('token');
       console.log('Token setItem result - stored:', !!verifyToken, 'matches:', verifyToken === token);
       

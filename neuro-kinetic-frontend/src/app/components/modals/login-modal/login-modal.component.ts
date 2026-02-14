@@ -65,6 +65,26 @@ export class LoginModalComponent implements OnInit, OnDestroy {
     this.router.navigate(['/contact']);
   }
 
+  loginWithGoogle() {
+    console.log('Google login button clicked (modal)');
+    try {
+      this.authService.loginWithGoogle();
+    } catch (error) {
+      console.error('Error initiating Google login:', error);
+      this.error = 'Failed to initiate Google login. Please try again.';
+    }
+  }
+
+  loginWithFacebook() {
+    console.log('Facebook login button clicked (modal)');
+    try {
+      this.authService.loginWithFacebook();
+    } catch (error) {
+      console.error('Error initiating Facebook login:', error);
+      this.error = 'Failed to initiate Facebook login. Please try again.';
+    }
+  }
+
   onBackdropClick(event: Event) {
     if (event.target === event.currentTarget) {
       this.closeModal();
