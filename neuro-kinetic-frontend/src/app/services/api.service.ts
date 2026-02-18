@@ -26,7 +26,9 @@ import {
   ResultExplanationDto,
   TrendAnalysisDto,
   ComparisonDto,
-  FeatureExplanationDto
+  FeatureExplanationDto,
+  RagTestRequest,
+  RagTestResponse
 } from '../models/api.models';
 
 @Injectable({
@@ -278,6 +280,19 @@ export class ApiService {
 
   getAnalysisBySessionId(sessionId: string): Observable<AnalysisResult> {
     return this.http.get<AnalysisResult>(`${this.apiUrl}/analysis/session/${encodeURIComponent(sessionId)}`);
+  }
+
+  /**
+   * Clinical Decision Support (RAG): ask a question about screening results.
+   * POST /api/rag/test with { question, riskPercent, mode }.
+   * Returns 200 with either isRelevant: false + relevance_message, or full clinical response.
+   */
+  ragTest(request: RagTestRequest): Observable<RagTestResponse> {
+    return this.http.post<RagTestResponse>(`${this.apiUrl}/rag/test`, {
+      question: request.question,
+      riskPercent: request.riskPercent,
+      mode: request.mode ?? 'voice'
+    });
   }
 
   // ========== CROSS-VALIDATION ==========

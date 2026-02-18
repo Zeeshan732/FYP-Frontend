@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
 import { SidebarService } from './services/sidebar.service';
+import { ModalService, AskResultsDialogState } from './services/modal.service';
 
 @Component({
   selector: 'app-root',
@@ -15,13 +16,16 @@ export class AppComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   sidebarCollapsed = false;
   currentRoute: string = '';
+  askResultsDialogState: AskResultsDialogState = { visible: false, riskPercent: null, mode: 'voice' };
   private authSubscription?: Subscription;
   private sidebarSubscription?: Subscription;
   private routerSubscription?: Subscription;
+  private askResultsDialogSubscription?: Subscription;
 
   constructor(
     private authService: AuthService,
     private sidebarService: SidebarService,
+    private modalService: ModalService,
     private router: Router
   ) {}
 
@@ -29,7 +33,10 @@ export class AppComponent implements OnInit, OnDestroy {
     // Subscribe to authentication state
     this.authSubscription = this.authService.currentUser$.subscribe(user => {
       this.isAuthenticated = !!user;
+      this.toggleChatbaseVisibility(!!user);
     });
+    // Set initial Chatbase visibility from current auth state
+    this.toggleChatbaseVisibility(this.authService.isAuthenticated());
 
     // Subscribe to sidebar state
     this.sidebarSubscription = this.sidebarService.sidebarCollapsed$.subscribe(collapsed => {
@@ -45,9 +52,29 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Initial route check
     this.currentRoute = this.router.url;
+
+    this.askResultsDialogSubscription = this.modalService.askResultsDialog$.subscribe(state => {
+      this.askResultsDialogState = state;
+    });
+  }
+
+  onAskResultsDialogClose(): void {
+    this.modalService.closeAskResultsDialog();
+  }
+
+  private toggleChatbaseVisibility(show: boolean): void {
+    if (typeof document !== 'undefined' && document.body) {
+      if (show) {
+        document.body.classList.add('user-logged-in');
+      } else {
+        document.body.classList.remove('user-logged-in');
+      }
+    }
   }
 
   ngOnDestroy() {
+    this.toggleChatbaseVisibility(false);
+    this.askResultsDialogSubscription?.unsubscribe();
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }

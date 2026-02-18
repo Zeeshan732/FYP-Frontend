@@ -13,5 +13,8 @@ export const environment = {
   // Option 2: HTTP on port 5130
   // apiUrl: 'http://localhost:5130/api',
   // signalRUrl: 'http://localhost:5130/hubs/notifications',
+
+  /** Expected session (JWT) duration in minutes. Backend must issue tokens with this expiry (e.g. 10–15 min). */
+  sessionExpiryMinutes: 15,
 };
 

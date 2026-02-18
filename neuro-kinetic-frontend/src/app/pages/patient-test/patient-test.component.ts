@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { MessageService } from 'primeng/api';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { FileUploadService } from '../../services/file-upload.service';
+import { ModalService } from '../../services/modal.service';
 import { Router } from '@angular/router';
 import { 
   UserTestRecordRequest, 
@@ -59,6 +61,9 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   voiceFeatures: { [key: string]: number } | null = null;
   objectKeys = Object.keys;
 
+  // Clinical Decision Support (RAG) – opened via ModalService (sidebar or this page)
+  private ragDialogAlreadyShown = false;
+
   // Chart.js instances for voice features
   @ViewChild('voiceFeaturesChart') voiceFeaturesChartRef?: ElementRef<HTMLCanvasElement>;
   private voiceFeaturesChart: Chart | null = null;
@@ -67,6 +72,8 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     private apiService: ApiService,
     private authService: AuthService,
     private fileUploadService: FileUploadService,
+    private modalService: ModalService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -363,6 +370,9 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                       this.loadResultDetails();
                     }
 
+                    // Open "Ask about your results" popup once after a short delay
+                    this.openAskResultsDialogOnce();
+
                     // Stop audio stream
                     if (this.audioStream) {
                       this.audioStream.getTracks().forEach(track => track.stop());
@@ -375,10 +385,17 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   }
                 });
               },
-              error: (error) => {
-                console.error('Error processing analysis:', error);
-                this.error = 'Failed to process analysis. Please try again.';
+              error: (err) => {
+                console.error('Error processing analysis:', err);
+                const msg = err.error?.message || err.message || 'Analysis failed.';
+                this.error = msg;
                 this.isProcessing = false;
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Analysis failed',
+                  detail: msg,
+                  life: 8000
+                });
               }
             });
           }
@@ -447,6 +464,9 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     this.apiService.getAnalysisBySessionId(sessionId).subscribe({
       next: (result) => {
         this.analysisResult = result;
+        if (this.testCompleted && result?.riskPercent != null) {
+          this.openAskResultsDialogOnce();
+        }
         // Parse raw voice feature JSON if available
         if (result && result.voiceFeaturesJson) {
           try {
@@ -769,6 +789,8 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                     if (this.currentSessionId) {
                       this.loadResultDetails();
                     }
+
+                    this.openAskResultsDialogOnce();
                   },
                   error: (error) => {
                     console.error('Error creating test record:', error);
@@ -777,10 +799,17 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   }
                 });
               },
-              error: (error) => {
-                console.error('Error processing analysis:', error);
-                this.error = 'Failed to process analysis. Please try again.';
+              error: (err) => {
+                console.error('Error processing analysis:', err);
+                const msg = err.error?.message || err.message || 'Analysis failed.';
+                this.error = msg;
                 this.isProcessing = false;
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Analysis failed',
+                  detail: msg,
+                  life: 8000
+                });
               }
             });
           }
@@ -808,6 +837,7 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentSessionId = null;
     this.audioBlob = null;
     this.selectedFile = null;
+    this.ragDialogAlreadyShown = false;
     if (this.audioUrl) {
       URL.revokeObjectURL(this.audioUrl);
       this.audioUrl = null;
@@ -816,6 +846,27 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     if (input) input.value = '';
     this.recordingTime = 0;
     this.error = '';
+  }
+
+  /** Open "Ask about your results" dialog once after test result is shown. */
+  openAskResultsDialogOnce(): void {
+    if (this.ragDialogAlreadyShown || !this.canShowRag()) return;
+    this.ragDialogAlreadyShown = true;
+    const riskPercent = this.analysisResult?.riskPercent ?? this.getRiskPercentDisplay();
+    const mode = this.getRagScreeningMode();
+    setTimeout(() => {
+      this.modalService.openAskResultsDialog(riskPercent != null ? riskPercent : null, mode);
+      this.cdr.detectChanges();
+    }, 800);
+  }
+
+  /** Open RAG dialog with current result (from button or sidebar). */
+  openAskResultsDialog(): void {
+    const riskPercent = this.analysisResult?.riskPercent ?? this.getRiskPercentDisplay();
+    this.modalService.openAskResultsDialog(
+      riskPercent != null ? riskPercent : null,
+      this.getRagScreeningMode()
+    );
   }
 
   // Helper: Map backend predicted class to frontend format
@@ -1070,5 +1121,21 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     return 0;
   }
+
+  /** Whether we have riskPercent and screening mode to show "Ask about your results" */
+  canShowRag(): boolean {
+    const riskPercent = this.analysisResult?.riskPercent ?? this.getRiskPercentDisplay();
+    const hasRisk = riskPercent !== undefined && riskPercent !== null;
+    return !!(this.testCompleted && this.analysisResult && hasRisk);
+  }
+
+  /** Map analysisType to RAG mode (voice | gait | multimodal). */
+  getRagScreeningMode(): 'voice' | 'gait' | 'multimodal' {
+    const t = this.analysisResult?.analysisType;
+    if (t === 'Gait') return 'gait';
+    if (t === 'MultiModal') return 'multimodal';
+    return 'voice';
+  }
+
 }
 

@@ -1,0 +1,17 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '600px', maxWidth: '95vw' }"
+  header="Ask about your results"
+  (onHide)="onHide()"
+  (onShow)="onOpen()"
+  styleClass="ask-results-dialog">
+  <app-rag-chat
+    #ragChat
+    [riskPercent]="riskPercent"
+    [mode]="mode">
+  </app-rag-chat>
+</p-dialog>

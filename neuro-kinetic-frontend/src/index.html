@@ -8,8 +8,35 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <!-- Chart.js for admin dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Hide Chatbase widget when user is not logged in (Angular adds .user-logged-in to body) -->
+  <style>
+    body:not(.user-logged-in) [id*="chatbase"],
+    body:not(.user-logged-in) iframe[src*="chatbase.co"],
+    body:not(.user-logged-in) [class*="chatbase"] { display: none !important; visibility: hidden !important; }
+  </style>
 </head>
 <body>
   <app-root></app-root>
+
+  <!-- Chatbase Widget Integration -->
+  <script>
+    (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="PDSdjFjROqPSHtrG9CloV";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+  </script>
+  <script>
+    (function() {
+      function openWhenReady() {
+        try {
+          if (typeof window.chatbase === "function") {
+            window.chatbase("open");
+          }
+        } catch (e) {}
+      }
+      if (document.readyState === "complete") {
+        setTimeout(openWhenReady, 2000);
+      } else {
+        window.addEventListener("load", function() { setTimeout(openWhenReady, 2000); });
+      }
+    })();
+  </script>
 </body>
 </html>

@@ -7,14 +7,8 @@ import { ContactComponent } from './pages/contact/contact.component';
 import { LoginComponent } from './pages/login/login.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { TechnologyDemoComponent } from './pages/technology-demo/technology-demo.component';
-import { TechnologyComponent } from './pages/technology/technology.component';
-import { ResearchComponent } from './pages/research/research.component';
 import { ClinicalUseComponent } from './pages/clinical-use/clinical-use.component';
 import { CollaborationComponent } from './pages/collaboration/collaboration.component';
-import { PublicationsComponent } from './pages/publications/publications.component';
-import { PublicationDetailComponent } from './pages/publication-detail/publication-detail.component';
-import { MetricsDashboardComponent } from './pages/metrics-dashboard/metrics-dashboard.component';
-import { CrossValidationComponent } from './pages/cross-validation/cross-validation.component';
 import { PatientTestComponent } from './pages/patient-test/patient-test.component';
 import { TestRecordsComponent } from './pages/test-records/test-records.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
@@ -22,6 +16,7 @@ import { AccountRequestsComponent } from './pages/account-requests/account-reque
 import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
+import { LiveVoiceMonitorComponent } from './pages/live-voice-monitor/live-voice-monitor.component';
 import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
@@ -35,15 +30,10 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'auth/callback', component: OAuthCallbackComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-      { path: 'technology', component: TechnologyComponent },
-      { path: 'technology-demo', component: TechnologyDemoComponent },
-  { path: 'research', component: ResearchComponent },
-  { path: 'publications', component: PublicationsComponent },
-  { path: 'publications/:id', component: PublicationDetailComponent },
-  { path: 'metrics', component: MetricsDashboardComponent },
-  { path: 'cross-validation', component: CrossValidationComponent },
+  { path: 'technology-demo', component: TechnologyDemoComponent },
   { path: 'patient-test', component: PatientTestComponent, canActivate: [AuthGuard] },
   { path: 'voice-input', component: VoiceInputComponent, canActivate: [AuthGuard] },
+  { path: 'live-voice-monitor', component: LiveVoiceMonitorComponent, canActivate: [AuthGuard] },
   { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },
   { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
   { path: 'account-requests', component: AccountRequestsComponent, canActivate: [AdminGuard] },
