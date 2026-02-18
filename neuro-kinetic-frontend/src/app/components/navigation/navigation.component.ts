@@ -2,7 +2,6 @@ import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ModalService } from '../../services/modal.service';
 import { AuthService } from '../../services/auth.service';
 import { SidebarService } from '../../services/sidebar.service';
@@ -12,14 +11,7 @@ import { NotificationItem } from '../../models/api.models';
 @Component({
   selector: 'app-navigation',
   templateUrl: './navigation.component.html',
-  styleUrls: ['./navigation.component.scss'],
-  animations: [
-    trigger('slideToggle', [
-      state('expanded', style({ height: '*', opacity: 1 })),
-      state('collapsed', style({ height: '0px', opacity: 0, overflow: 'hidden' })),
-      transition('expanded <=> collapsed', animate('200ms ease-in-out'))
-    ])
-  ]
+  styleUrls: ['./navigation.component.scss']
 })
 export class NavigationComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
@@ -36,18 +28,12 @@ export class NavigationComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   isAuthenticated = false;
   isAdmin = false;
-  isResearcher = false;
   roleLabel = '';
   currentRoute: string = '';
   isLandingPage: boolean = false;
   showNotifications = false;
   notifications: NotificationItem[] = [];
   unreadCount = 0;
-  
-  // Section collapse states
-  myAccountExpanded = true;
-  researchExpanded = true;
-  adminExpanded = true;
   
   private userSubscription?: Subscription;
   private routerSubscription?: Subscription;
@@ -77,7 +63,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.currentUser = user;
       this.isAuthenticated = !!user;
       this.isAdmin = user?.role === 'Admin';
-      this.isResearcher = user?.role === 'Researcher' || user?.role === 'MedicalProfessional';
       this.roleLabel = user?.role || '';
       if (user && this.authService.isAuthenticated()) {
         this.showNotifications = true;
@@ -104,7 +89,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
     ).subscribe((event) => {
       this.currentRoute = event.urlAfterRedirects || event.url;
       this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/' || this.currentRoute === '/login' || this.currentRoute === '/signup';
-      this.updateSectionStates();
       this.closeMobileMenu();
       if (this.isMobile && this.mobileSidebarOpen) {
         this.closeMobileSidebar();
@@ -120,32 +104,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
     // Initial route check
     this.currentRoute = this.router.url;
     this.isLandingPage = this.currentRoute === '/landing' || this.currentRoute === '/' || this.currentRoute === '/login' || this.currentRoute === '/signup';
-    
-    // Auto-expand sections based on current route
-    this.updateSectionStates();
-  }
-  
-  updateSectionStates() {
-    // Auto-expand sections if current route matches items within them
-    const myAccountRoutes = ['/patient-test', '/test-records', '/notifications'];
-    const researchRoutes = ['/metrics', '/cross-validation'];
-    const adminRoutes = ['/admin-dashboard', '/account-requests', '/admin-users'];
-    
-    this.myAccountExpanded = myAccountRoutes.some(route => this.currentRoute.startsWith(route));
-    this.researchExpanded = researchRoutes.some(route => this.currentRoute.startsWith(route));
-    this.adminExpanded = adminRoutes.some(route => this.currentRoute.startsWith(route));
-  }
-  
-  toggleMyAccount() {
-    this.myAccountExpanded = !this.myAccountExpanded;
-  }
-  
-  toggleResearch() {
-    this.researchExpanded = !this.researchExpanded;
-  }
-  
-  toggleAdmin() {
-    this.adminExpanded = !this.adminExpanded;
   }
 
   @HostListener('window:resize')
@@ -172,8 +130,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
     this.notificationsService.stopRealtime();
   }
 
-  @HostListener('window:scroll', ['$event'])
-  onScroll() {
+  @HostListener('window:scroll')
+  onScroll(): void {
     // Hide/show navbar only when navbar is shown (not authenticated OR landing page)
     if (!this.isAuthenticated || this.isLandingPage) {
       const currentScrollY = window.scrollY;
@@ -227,6 +185,13 @@ export class NavigationComponent implements OnInit, OnDestroy {
   openSignupModal() {
     this.modalService.openSignupModal();
     this.closeMobileMenu();
+  }
+
+  openAskResultsDialog(): void {
+    this.modalService.openAskResultsDialog(null, 'voice');
+    if (this.mobileSidebarOpen) {
+      this.closeMobileSidebar();
+    }
   }
 
   logout() {

@@ -20,3 +20,9 @@
 <!-- Modal Components -->
 <app-login-modal></app-login-modal>
 <app-signup-modal></app-signup-modal>
+<app-ask-results-dialog
+  [visible]="askResultsDialogState.visible"
+  [riskPercent]="askResultsDialogState.riskPercent"
+  [mode]="askResultsDialogState.mode"
+  (visibleChange)="onAskResultsDialogClose()">
+</app-ask-results-dialog>

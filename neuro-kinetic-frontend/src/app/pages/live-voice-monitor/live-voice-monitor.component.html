@@ -1,0 +1,106 @@
+<div class="live-voice-monitor p-4 md:p-6 max-w-6xl mx-auto">
+  <!-- Header -->
+  <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">
+      Live Voice Clinical Monitor
+    </h1>
+    <div class="flex items-center gap-3">
+      <span *ngIf="connectionState !== 'Connected' && connectionState !== 'Reconnecting'" 
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-200 text-slate-700">
+        <span class="w-2 h-2 rounded-full bg-slate-500 mr-2"></span>
+        {{ connectionState }}
+      </span>
+      <span *ngIf="connectionState === 'Reconnecting'" 
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse mr-2"></span>
+        Reconnecting…
+      </span>
+      <span *ngIf="isRecording" 
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse mr-2 recording-dot"></span>
+        Recording
+      </span>
+      <span *ngIf="!isRecording && connectionState === 'Connected'" 
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-700">
+        <span class="w-2 h-2 rounded-full bg-slate-400 mr-2"></span>
+        Stopped
+      </span>
+    </div>
+  </header>
+
+  <p *ngIf="errorMessage" class="mb-4 p-3 rounded-lg bg-red-50 text-red-800 text-sm">
+    {{ errorMessage }}
+  </p>
+
+  <!-- Reconnection banner -->
+  <div *ngIf="connectionState === 'Reconnecting'" 
+       class="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-sm flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+    Connection lost. Attempting to reconnect…
+  </div>
+
+  <!-- Main grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Left: Risk metrics -->
+    <div class="lg:col-span-2 space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
+          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Current Risk %</p>
+          <p class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>{{ currentRisk != null ? (currentRisk.riskPercent | number:'1.1-1') : '—' }}</span>
+            <span *ngIf="currentRisk != null && trend === 'up'" class="text-red-500 text-2xl" aria-label="Risk rising">↑</span>
+            <span *ngIf="currentRisk != null && trend === 'down'" class="text-emerald-500 text-2xl" aria-label="Risk falling">↓</span>
+            <span *ngIf="currentRisk != null && trend === 'stable'" class="text-slate-400 text-xl" aria-label="Stable">—</span>
+          </p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
+          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Risk Level</p>
+          <p-tag [value]="riskLevelLabel" [severity]="riskLevelSeverity"></p-tag>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
+          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Confidence</p>
+          <p class="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+            {{ (currentRisk && currentRisk.confidence != null) ? (currentRisk.confidence | number:'1.0-2') : '—' }}
+          </p>
+          <p-progressBar [value]="(currentRisk?.confidence ?? 0) * 100" [showValue]="false"></p-progressBar>
+        </div>
+      </div>
+    </div>
+    <!-- Right: optional gauge placeholder / status -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5 flex items-center justify-center min-h-[120px]">
+      <p class="text-slate-500 dark:text-slate-400 text-sm text-center">
+        <span *ngIf="isRecording">Streaming audio to server</span>
+        <span *ngIf="!isRecording && connectionState === 'Connected'">Press Start to begin</span>
+        <span *ngIf="connectionState !== 'Connected' && connectionState !== 'Reconnecting'">Connect to start</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Risk over time chart -->
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 md:p-5 mb-6">
+    <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">Risk Over Time</h2>
+    <div class="h-64 md:h-80">
+      <canvas #riskChart></canvas>
+    </div>
+  </div>
+
+  <!-- Footer: Start / Stop -->
+  <footer class="flex flex-wrap items-center gap-3">
+    <button pButton 
+            type="button" 
+            label="Start" 
+            icon="pi pi-play" 
+            class="p-button-success"
+            [disabled]="!canStart"
+            (click)="startSession()">
+    </button>
+    <button pButton 
+            type="button" 
+            label="Stop" 
+            icon="pi pi-stop" 
+            class="p-button-danger"
+            [disabled]="!canStop"
+            (click)="stopSession()">
+    </button>
+  </footer>
+</div>

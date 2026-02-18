@@ -6,6 +6,9 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { User, AuthResponse, ValidationResponse } from '../models/api.models';
 
+/** Session (JWT) expiry is set by the backend when issuing the token. Frontend expects 10–15 minutes; backend must match. */
+export const SESSION_EXPIRY_MINUTES = 15;
+
 @Injectable({
   providedIn: 'root'
 })

@@ -1,0 +1,9 @@
+::ng-deep .ask-results-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+::ng-deep .ask-results-dialog .p-dialog-content {
+  padding: 1.25rem;
+}

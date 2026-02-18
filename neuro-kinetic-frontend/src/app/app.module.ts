@@ -15,13 +15,13 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
-import { TechnologyComponent } from './pages/technology/technology.component';
-import { ResearchComponent } from './pages/research/research.component';
 import { ClinicalUseComponent } from './pages/clinical-use/clinical-use.component';
 import { CollaborationComponent } from './pages/collaboration/collaboration.component';
 import { LandingComponent } from './pages/landing/landing.component';
@@ -35,28 +35,25 @@ import { FooterComponent } from './components/footer/footer.component';
 import { LoginModalComponent } from './components/modals/login-modal/login-modal.component';
 import { SignupModalComponent } from './components/modals/signup-modal/signup-modal.component';
 import { TechnologyDemoComponent } from './pages/technology-demo/technology-demo.component';
-import { PublicationsComponent } from './pages/publications/publications.component';
-import { PublicationDetailComponent } from './pages/publication-detail/publication-detail.component';
-import { MetricsDashboardComponent } from './pages/metrics-dashboard/metrics-dashboard.component';
-import { CrossValidationComponent } from './pages/cross-validation/cross-validation.component';
 import { PatientTestComponent } from './pages/patient-test/patient-test.component';
 import { TestRecordsComponent } from './pages/test-records/test-records.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { TestRecordDialogComponent } from './components/test-record-dialog/test-record-dialog.component';
+import { AskResultsDialogComponent } from './components/ask-results-dialog/ask-results-dialog.component';
+import { RagChatComponent } from './components/rag-chat/rag-chat.component';
 import { HeaderComponent } from './components/header/header.component';
 import { AccountRequestsComponent } from './pages/account-requests/account-requests.component';
 import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
 import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.component';
+import { LiveVoiceMonitorComponent } from './pages/live-voice-monitor/live-voice-monitor.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    TechnologyComponent,
-    ResearchComponent,
     ClinicalUseComponent,
     CollaborationComponent,
     LandingComponent,
@@ -70,20 +67,19 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     LoginModalComponent,
     SignupModalComponent,
     TechnologyDemoComponent,
-    PublicationsComponent,
-    PublicationDetailComponent,
-    MetricsDashboardComponent,
-    CrossValidationComponent,
     PatientTestComponent,
     TestRecordsComponent,
     OAuthCallbackComponent,
     AdminDashboardComponent,
     TestRecordDialogComponent,
+    AskResultsDialogComponent,
+    RagChatComponent,
     HeaderComponent,
     AccountRequestsComponent,
     AdminUsersComponent,
     NotificationsComponent,
-    VoiceInputComponent
+    VoiceInputComponent,
+    LiveVoiceMonitorComponent
   ],
   imports: [
     BrowserModule,
@@ -102,7 +98,9 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     DropdownModule,
     CalendarModule,
     InputTextareaModule,
-    TooltipModule
+    TooltipModule,
+    TagModule,
+    ProgressBarModule
   ],
   providers: [
     {

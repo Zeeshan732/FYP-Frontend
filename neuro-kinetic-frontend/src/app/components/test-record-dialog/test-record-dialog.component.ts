@@ -2,6 +2,7 @@ import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitte
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserTestRecord, AnalysisResult } from '../../models/api.models';
 import { ApiService } from '../../services/api.service';
+import { ModalService } from '../../services/modal.service';
 import { Chart } from 'chart.js';
 
 @Component({
@@ -38,9 +39,11 @@ export class TestRecordDialogComponent implements OnInit, OnChanges, AfterViewIn
   loadingFeatures = false;
   analysisResult: AnalysisResult | null = null;
 
+
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
+    private modalService: ModalService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -51,13 +54,11 @@ export class TestRecordDialogComponent implements OnInit, OnChanges, AfterViewIn
   ngOnChanges(changes: SimpleChanges) {
     if (changes['record'] && this.record) {
       this.initializeForm();
-      // Load voice features when record changes
       if (this.record && !this.isEditMode) {
         this.loadVoiceFeatures();
       }
     }
     if (changes['visible'] && changes['visible'].currentValue && this.record && !this.isEditMode) {
-      // Load features when dialog opens
       this.loadVoiceFeatures();
     }
   }
@@ -303,6 +304,26 @@ export class TestRecordDialogComponent implements OnInit, OnChanges, AfterViewIn
       'ppe': 'PPE'
     };
     return names[key] || key;
+  }
+
+  canShowRag(): boolean {
+    if (this.isEditMode || !this.analysisResult) return false;
+    const riskPercent = this.analysisResult.riskPercent;
+    return riskPercent !== undefined && riskPercent !== null;
+  }
+
+  getRagScreeningMode(): 'voice' | 'gait' | 'multimodal' {
+    const t = this.analysisResult?.analysisType;
+    if (t === 'Gait') return 'gait';
+    if (t === 'MultiModal') return 'multimodal';
+    return 'voice';
+  }
+
+  openAskResultsDialog(): void {
+    this.modalService.openAskResultsDialog(
+      this.analysisResult?.riskPercent ?? null,
+      this.getRagScreeningMode()
+    );
   }
 }
 

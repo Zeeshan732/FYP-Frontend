@@ -368,9 +368,7 @@ export interface ResultExplanationDto {
   riskAssessment: string;
   recommendations: string;
   confidenceInterpretation: string;
-}
-
-// Trend Analysis
+}// Trend Analysis
 export interface TrendAnalysisDto {
   userId: number;
   userName: string;
@@ -440,4 +438,76 @@ export interface FeatureExplanationItem {
   value?: string;
   explanation: string;
   significance: string;
+}
+
+// ========== Clinical Decision Support (RAG) ==========
+
+/** Request body for POST /api/rag/test */
+export interface RagTestRequest {
+  question: string;
+  riskPercent: number;
+  mode?: 'voice' | 'gait' | 'multimodal';
+}
+
+/** Irrelevant question response (isRelevant === false) */
+export interface RagIrrelevantResponse {
+  isRelevant: false;
+  relevance_message: string;
+}
+
+/** Risk summary block from RAG */
+export interface RagRiskSummary {
+  risk_level: string;
+  risk_percent: number;
+  screening_mode: string;
+  summary_text: string;
+}
+
+/** Clinical analysis block */
+export interface RagClinicalAnalysis {
+  interpretation: string;
+  key_findings: string[];
+  context: string;
+}
+
+/** Recommendation block */
+export interface RagRecommendation {
+  next_steps: string[];
+  follow_up: string;
+  priority: string;
+}
+
+/** Doctor referral block */
+export interface RagDoctorReferral {
+  recommended_specialist: string;
+  reason: string;
+  suggested_timing: string;
+  city: string | null;
+}
+
+/** Lifestyle guidance block */
+export interface RagLifestyleGuidance {
+  general_advice: string[];
+  activity_suggestions: string[];
+  notes: string;
+}
+
+/** Relevant clinical response (isRelevant === true or omitted) */
+export interface RagRelevantResponse {
+  isRelevant?: true;
+  relevanceMessage?: string | null;
+  risk_summary: RagRiskSummary;
+  clinical_analysis: RagClinicalAnalysis;
+  recommendation: RagRecommendation;
+  doctor_referral: RagDoctorReferral;
+  lifestyle_guidance: RagLifestyleGuidance;
+  disclaimer: string;
+}
+
+/** RAG API response: either irrelevant (message only) or full clinical */
+export type RagTestResponse = RagIrrelevantResponse | RagRelevantResponse;
+
+/** Type guard: response is irrelevant */
+export function isRagIrrelevant(r: RagTestResponse): r is RagIrrelevantResponse {
+  return r.isRelevant === false;
 }

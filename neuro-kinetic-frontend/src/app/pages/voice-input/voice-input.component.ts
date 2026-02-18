@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { MessageService } from 'primeng/api';
 import { FileUploadService } from '../../services/file-upload.service';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
@@ -59,6 +60,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
     private fileUploadService: FileUploadService,
     private apiService: ApiService,
     private authService: AuthService,
+    private messageService: MessageService,
     private router: Router
   ) {}
 
@@ -225,7 +227,14 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
 
     } catch (error: any) {
       console.error('Error:', error);
-      this.error = error.error?.message || error.message || 'Failed to process voice file. Please try again.';
+      const msg = error.error?.message || error.message || 'Failed to process voice file. Please try again.';
+      this.error = msg;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: msg,
+        life: 8000
+      });
     } finally {
       this.isUploading = false;
       this.isProcessing = false;
@@ -542,7 +551,14 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
 
     } catch (error: any) {
       console.error('Error:', error);
-      this.error = error.error?.message || error.message || 'Failed to process recording. Please try again.';
+      const msg = error.error?.message || error.message || 'Failed to process recording. Please try again.';
+      this.error = msg;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: msg,
+        life: 8000
+      });
     } finally {
       this.isUploading = false;
       this.isProcessing = false;
