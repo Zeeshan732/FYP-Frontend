@@ -49,7 +49,7 @@
           <p class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <span>{{ currentRisk != null ? (currentRisk.riskPercent | number:'1.1-1') : '—' }}</span>
             <span *ngIf="currentRisk != null && trend === 'up'" class="text-red-500 text-2xl" aria-label="Risk rising">↑</span>
-            <span *ngIf="currentRisk != null && trend === 'down'" class="text-emerald-500 text-2xl" aria-label="Risk falling">↓</span>
+            <span *ngIf="currentRisk != null && trend === 'down'" class="text-app-primary text-2xl" aria-label="Risk falling">↓</span>
             <span *ngIf="currentRisk != null && trend === 'stable'" class="text-slate-400 text-xl" aria-label="Stable">—</span>
           </p>
         </div>

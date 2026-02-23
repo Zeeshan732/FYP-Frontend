@@ -28,7 +28,9 @@ import {
   ComparisonDto,
   FeatureExplanationDto,
   RagTestRequest,
-  RagTestResponse
+  RagTestResponse,
+  VoicePredictRequest,
+  VoicePredictResponse
 } from '../models/api.models';
 
 @Injectable({
@@ -293,6 +295,15 @@ export class ApiService {
       riskPercent: request.riskPercent,
       mode: request.mode ?? 'voice'
     });
+  }
+
+  /**
+   * POST /api/voice/predict with 10 voice features.
+   * Content-Type: application/json; Authorization Bearer token added by AuthInterceptor when present.
+   * On 200 returns FastAPI JSON (e.g. prediction, probability, class). On 500 body may contain { message: "..." }.
+   */
+  voicePredict(request: VoicePredictRequest): Observable<VoicePredictResponse> {
+    return this.http.post<VoicePredictResponse>(`${this.apiUrl}/voice/predict`, request);
   }
 
   // ========== CROSS-VALIDATION ==========

@@ -2,99 +2,105 @@
 <app-navigation></app-navigation>
 
 <!-- Patient Test Section -->
-<section class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white pt-24 pb-20">
+<section class="min-h-screen patient-test-hero text-app-text-primary pt-24 pb-20">
   <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
     <!-- Header -->
     <div class="text-center mb-12">
-      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-6xl font-bold mb-4 bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-app-primary via-app-primary-hover to-app-primary bg-clip-text text-transparent tracking-tight">
         NeuroSync Test
       </h1>
-      <p class="text-lg sm:text-xl lg:text-2xl text-gray-300 max-w-4xl mx-auto px-4">
+      <p class="text-lg sm:text-xl text-app-text-muted max-w-2xl mx-auto">
         Record your voice to analyze neurological patterns. The test takes approximately 30-60 seconds.
       </p>
     </div>
 
     <!-- Error Message -->
     <div *ngIf="error" class="max-w-3xl mx-auto mb-6">
-      <div class="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg text-sm">
+      <div class="app-card bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm shadow-sm">
         {{ error }}
       </div>
     </div>
 
     <!-- Test Introduction -->
     <div *ngIf="!testStarted && !testCompleted" class="max-w-3xl mx-auto">
-      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
-        <h2 class="text-2xl font-bold text-emerald-400 mb-6">Before You Begin</h2>
+      <div class="patient-test-card bg-white rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
+        <div class="patient-test-card-accent h-1 w-full bg-gradient-to-r from-app-primary to-app-primary-hover"></div>
+        <div class="p-8 sm:p-10">
+          <h2 class="text-xl font-bold text-app-text-primary mb-1 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-app-primary/10 flex items-center justify-center text-app-primary text-sm font-extrabold">1</span>
+            Before You Begin
+          </h2>
+          <p class="text-app-text-muted text-sm mb-6">Choose how you’d like to provide your voice sample.</p>
         
-        <!-- Mode Toggle -->
-        <div class="flex gap-4 mb-8">
-          <button 
-            (click)="inputMode = 'record'; selectedFile = null; error = ''"
-            class="flex-1 px-6 py-3 rounded-lg border-2 transition-all font-semibold"
-            [ngClass]="{
-              'bg-emerald-600 border-emerald-500': inputMode === 'record',
-              'bg-white/10 border-white/20': inputMode !== 'record'
-            }"
-          >
-            <span class="mr-2">🎤</span>
-            Record Voice
-          </button>
-          <button 
-            (click)="inputMode = 'upload'; audioBlob = null; error = ''"
-            class="flex-1 px-6 py-3 rounded-lg border-2 transition-all font-semibold"
-            [ngClass]="{
-              'bg-emerald-600 border-emerald-500': inputMode === 'upload',
-              'bg-white/10 border-white/20': inputMode !== 'upload'
-            }"
-          >
-            <span class="mr-2">📁</span>
-            Upload File
-          </button>
-        </div>
+          <!-- Mode Toggle -->
+          <div class="flex gap-3 sm:gap-4 mb-8">
+            <button 
+              (click)="inputMode = 'record'; selectedFile = null; error = ''"
+              class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
+              [ngClass]="{
+                'bg-app-primary border-app-primary text-white shadow-md shadow-app-primary/25': inputMode === 'record',
+                'bg-gray-50 border-app-border text-app-text-primary hover:border-app-primary/50 hover:bg-app-primary/5': inputMode !== 'record'
+              }"
+            >
+              <span class="text-lg">🎤</span>
+              Record Voice
+            </button>
+            <button 
+              (click)="inputMode = 'upload'; audioBlob = null; error = ''"
+              class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
+              [ngClass]="{
+                'bg-app-primary border-app-primary text-white shadow-md shadow-app-primary/25': inputMode === 'upload',
+                'bg-gray-50 border-app-border text-app-text-primary hover:border-app-primary/50 hover:bg-app-primary/5': inputMode !== 'upload'
+              }"
+            >
+              <span class="text-lg">📁</span>
+              Upload File
+            </button>
+          </div>
 
-        <!-- Record Mode Instructions -->
-        <div *ngIf="inputMode === 'record'" class="space-y-4 text-gray-300 mb-8">
-          <div class="flex items-start gap-3">
-            <span class="text-emerald-400 font-bold">1.</span>
-            <p>Find a quiet environment with minimal background noise.</p>
+          <!-- Record Mode Instructions -->
+          <div *ngIf="inputMode === 'record'" class="patient-test-steps space-y-4 mb-8">
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">1</span>
+              <p class="text-app-text-primary pt-0.5">Find a quiet environment with minimal background noise.</p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">2</span>
+              <p class="text-app-text-primary pt-0.5">Make sure your microphone is working properly.</p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">3</span>
+              <p class="text-app-text-primary pt-0.5">Click "Start Test" and allow microphone access when prompted.</p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">4</span>
+              <p class="text-app-text-primary pt-0.5">Speak clearly for 30-60 seconds. You can say numbers, letters, or read a passage.</p>
+            </div>
           </div>
-          <div class="flex items-start gap-3">
-            <span class="text-emerald-400 font-bold">2.</span>
-            <p>Make sure your microphone is working properly.</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="text-emerald-400 font-bold">3.</span>
-            <p>Click "Start Test" and allow microphone access when prompted.</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="text-emerald-400 font-bold">4.</span>
-            <p>Speak clearly for 30-60 seconds. You can say numbers, letters, or read a passage.</p>
-          </div>
-        </div>
 
-        <!-- Upload Mode Instructions -->
-        <div *ngIf="inputMode === 'upload'" class="space-y-4 text-gray-300 mb-8">
-          <div class="flex items-start gap-3">
-            <span class="text-emerald-400 font-bold">1.</span>
-            <p>Select an audio file from your device (WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS).</p>
+          <!-- Upload Mode Instructions -->
+          <div *ngIf="inputMode === 'upload'" class="patient-test-steps space-y-4 mb-8">
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">1</span>
+              <p class="text-app-text-primary pt-0.5">Select an audio file from your device (WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS).</p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">2</span>
+              <p class="text-app-text-primary pt-0.5">Maximum file size: {{ MAX_AUDIO_MB }} MB.</p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">3</span>
+              <p class="text-app-text-primary pt-0.5">Click "Start Test" to upload and analyze your voice file.</p>
+            </div>
           </div>
-          <div class="flex items-start gap-3">
-            <span class="text-emerald-400 font-bold">2.</span>
-            <p>Maximum file size: {{ MAX_AUDIO_MB }} MB.</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="text-emerald-400 font-bold">3.</span>
-            <p>Click "Start Test" to upload and analyze your voice file.</p>
-          </div>
-        </div>
 
         <!-- Upload Section (shown when in upload mode) -->
         <div *ngIf="inputMode === 'upload'" class="mb-6">
           <div class="upload-area mb-4">
-            <label for="voiceFileInput" class="upload-button flex flex-col items-center justify-center p-8 border-2 border-dashed border-white/30 rounded-lg bg-white/5 cursor-pointer transition-all hover:border-emerald-500 hover:bg-white/10">
+            <label for="voiceFileInput" class="upload-button flex flex-col items-center justify-center p-8 border-2 border-dashed border-app-border rounded-xl bg-gray-50 cursor-pointer transition-all duration-200 hover:border-app-primary hover:bg-app-primary/5">
               <span class="text-4xl mb-3">📁</span>
-              <span class="text-lg font-semibold mb-2">Choose Voice File</span>
-              <small class="text-gray-400 text-sm">Supported: WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS</small>
+              <span class="text-lg font-semibold mb-2 text-app-text-primary">Choose Voice File</span>
+              <small class="text-app-text-muted text-sm">Supported: WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS</small>
             </label>
             <input 
               type="file" 
@@ -105,17 +111,17 @@
             />
           </div>
           
-          <div *ngIf="selectedFile" class="file-info flex justify-between items-center p-4 bg-white/5 rounded-lg mb-4">
+          <div *ngIf="selectedFile" class="file-info flex justify-between items-center p-4 bg-gray-50 border border-app-border rounded-xl mb-4">
             <div class="file-details flex items-center gap-4">
               <span class="text-2xl">📄</span>
               <div>
                 <strong class="block">{{ selectedFile.name }}</strong>
-                <span class="file-size text-gray-400 text-sm">{{ formatFileSize(selectedFile.size) }}</span>
+                <span class="file-size text-app-text-muted text-sm">{{ formatFileSize(selectedFile.size) }}</span>
               </div>
             </div>
             <button 
               (click)="removeFile()" 
-              class="remove-button px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-semibold"
+              class="remove-button px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors text-sm font-semibold"
             >
               Remove
             </button>
@@ -125,42 +131,45 @@
         <button 
           (click)="startTest()"
           [disabled]="inputMode === 'upload' && !selectedFile"
-          class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg transition-colors font-semibold text-lg shadow-lg hover:shadow-emerald-500/25 disabled:bg-gray-600 disabled:cursor-not-allowed"
+          class="w-full bg-app-primary hover:bg-app-primary-hover text-white px-8 py-4 rounded-xl transition-all duration-200 font-semibold text-lg shadow-md shadow-app-primary/20 hover:shadow-lg hover:shadow-app-primary/25 disabled:bg-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
         >
           Start Test
         </button>
+        </div>
       </div>
     </div>
 
     <!-- Recording Interface -->
     <div *ngIf="testStarted && !testCompleted" class="max-w-3xl mx-auto">
-      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
-        <h2 class="text-2xl font-bold text-emerald-400 mb-6 text-center">
+      <div class="patient-test-card app-card bg-white rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
+        <div class="patient-test-card-accent h-1 w-full bg-gradient-to-r from-app-primary to-app-primary-hover"></div>
+        <div class="p-8">
+        <h2 class="text-2xl font-bold text-app-primary mb-6 text-center">
           {{ inputMode === 'record' ? 'Voice Recording' : 'Upload Voice File' }}
         </h2>
         
         <!-- Show upload section if in upload mode -->
         <div *ngIf="inputMode === 'upload'" class="text-center mb-8">
           <div *ngIf="selectedFile" class="mb-6">
-            <div class="w-32 h-32 mx-auto bg-emerald-600/20 rounded-full flex items-center justify-center mb-4">
-              <svg class="w-16 h-16 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-32 h-32 mx-auto bg-app-primary/20 rounded-full flex items-center justify-center mb-4">
+              <svg class="w-16 h-16 text-app-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p class="text-gray-300 mb-4">File ready: {{ selectedFile.name }}</p>
-            <p class="text-sm text-gray-400 mb-4">Size: {{ formatFileSize(selectedFile.size) }}</p>
+            <p class="text-app-text-primary mb-4">File ready: {{ selectedFile.name }}</p>
+            <p class="text-sm text-app-text-muted mb-4">Size: {{ formatFileSize(selectedFile.size) }}</p>
             
             <div class="flex gap-4 justify-center">
               <button 
                 (click)="testStarted = false"
-                class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+                class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"
               >
                 Go Back
               </button>
               <button 
                 (click)="submitTest()"
                 [disabled]="isProcessing"
-                class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-semibold"
+                class="bg-app-primary hover:bg-app-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl transition-colors font-semibold"
               >
                 {{ isProcessing ? 'Processing...' : 'Submit Test' }}
               </button>
@@ -168,28 +177,28 @@
           </div>
           
           <div *ngIf="!selectedFile" class="mb-6">
-            <p class="text-gray-300 mb-4">Please select a file to upload.</p>
+            <p class="text-app-text-primary mb-4">Please select a file to upload.</p>
             <button 
               (click)="testStarted = false"
-              class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+              class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"
             >
               Go Back
             </button>
           </div>
         </div>
-        
+
         <!-- Recording Status (only show in record mode) -->
         <div *ngIf="inputMode === 'record'" class="text-center mb-8">
           <div *ngIf="!isRecording && !audioBlob" class="mb-6">
-            <div class="w-32 h-32 mx-auto bg-emerald-600/20 rounded-full flex items-center justify-center mb-4">
-              <svg class="w-16 h-16 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-32 h-32 mx-auto bg-app-primary/20 rounded-full flex items-center justify-center mb-4">
+              <svg class="w-16 h-16 text-app-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
               </svg>
             </div>
-            <p class="text-gray-300 mb-4">Ready to record</p>
+            <p class="text-app-text-primary mb-4">Ready to record</p>
             <button 
               (click)="startRecording()"
-              class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg transition-colors font-semibold"
+              class="bg-app-primary hover:bg-app-primary-hover text-white px-8 py-3 rounded-xl transition-colors font-semibold"
             >
               Start Recording
             </button>
@@ -197,16 +206,14 @@
 
           <!-- Active Recording -->
           <div *ngIf="isRecording" class="mb-6">
-            <div class="w-32 h-32 mx-auto bg-red-600/20 rounded-full flex items-center justify-center mb-4 animate-pulse">
-              <svg class="w-16 h-16 text-red-400" fill="currentColor" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"/>
-              </svg>
+            <div class="waveform-wrap rounded-xl border-2 border-app-primary/30 bg-slate-50/95 overflow-hidden mb-4">
+              <canvas #waveformCanvas class="w-full block" height="100" style="height: 100px;"></canvas>
             </div>
             <p class="text-3xl font-bold text-red-400 mb-2">{{ formatTime(recordingTime) }}</p>
-            <p class="text-gray-300 mb-4">Recording in progress...</p>
+            <p class="text-app-text-primary mb-4">Recording in progress...</p>
             <button 
               (click)="stopRecording()"
-              class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg transition-colors font-semibold"
+              class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl transition-colors font-semibold"
             >
               Stop Recording
             </button>
@@ -214,13 +221,13 @@
 
           <!-- Recording Complete -->
           <div *ngIf="audioBlob && !isRecording" class="mb-6">
-            <div class="w-32 h-32 mx-auto bg-emerald-600/20 rounded-full flex items-center justify-center mb-4">
-              <svg class="w-16 h-16 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-32 h-32 mx-auto bg-app-primary/20 rounded-full flex items-center justify-center mb-4">
+              <svg class="w-16 h-16 text-app-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p class="text-gray-300 mb-4">Recording complete!</p>
-            <p class="text-sm text-gray-400 mb-4">Duration: {{ formatTime(recordingTime) }}</p>
+            <p class="text-app-text-primary mb-4">Recording complete!</p>
+            <p class="text-sm text-app-text-muted mb-4">Duration: {{ formatTime(recordingTime) }}</p>
             
             <!-- Audio Preview -->
             <div *ngIf="audioUrl" class="mb-6">
@@ -230,14 +237,14 @@
             <div class="flex gap-4 justify-center">
               <button 
                 (click)="startRecording()"
-                class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+                class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"
               >
                 Record Again
               </button>
               <button 
                 (click)="submitTest()"
                 [disabled]="isProcessing"
-                class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-semibold"
+                class="bg-app-primary hover:bg-app-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl transition-colors font-semibold"
               >
                 {{ isProcessing ? 'Processing...' : 'Submit Test' }}
               </button>
@@ -246,10 +253,11 @@
 
           <!-- Processing -->
           <div *ngIf="isProcessing" class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-400 mx-auto mb-4"></div>
-            <p class="text-gray-300">Analyzing your voice recording...</p>
-            <p class="text-sm text-gray-400 mt-2">This may take a few moments</p>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-app-primary mx-auto mb-4"></div>
+            <p class="text-app-text-primary">Analyzing your voice recording...</p>
+            <p class="text-sm text-app-text-muted mt-2">This may take a few moments</p>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -257,82 +265,84 @@
     <!-- Test Results -->
     <div *ngIf="testCompleted && testResult" class="max-w-4xl mx-auto space-y-6">
       <!-- Disclaimer -->
-      <div *ngIf="disclaimer && disclaimer.showOnResults" class="bg-yellow-500/10 border border-yellow-500/40 rounded-lg p-4">
+      <div *ngIf="disclaimer && disclaimer.showOnResults" class="app-card bg-yellow-500/10 border border-yellow-500/40 rounded-2xl p-4">
         <p class="text-yellow-200 text-sm">{{ disclaimer.text }}</p>
       </div>
 
       <!-- Main Results Card -->
-      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
-        <h2 class="text-2xl font-bold text-emerald-400 mb-6 text-center">Test Results</h2>
+      <div class="patient-test-card app-card bg-white rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
+        <div class="patient-test-card-accent h-1 w-full bg-gradient-to-r from-app-primary to-app-primary-hover"></div>
+        <div class="p-8">
+        <h2 class="text-2xl font-bold text-app-primary mb-6 text-center">Test Results</h2>
         
         <div class="space-y-6">
           <!-- Prediction Badge (Updated) -->
           <div class="text-center">
-            <div [class]="'inline-block px-6 py-3 rounded-lg border text-lg font-semibold ' + getPredictionBadgeColorValue()">
+            <div [class]="'inline-block px-6 py-3 rounded-2xl border text-lg font-semibold ' + getPredictionBadgeColorValue()">
               {{ getDisplayPrediction() }}
             </div>
           </div>
 
           <!-- Risk Percentage (NEW - Primary Display) -->
-          <div *ngIf="analysisResult?.riskPercent !== undefined || analysisResult?.confidenceScore !== undefined" class="bg-white/5 rounded-lg p-6 text-center">
-            <p class="text-gray-300 mb-2">Risk Assessment</p>
+          <div *ngIf="analysisResult?.riskPercent !== undefined || analysisResult?.confidenceScore !== undefined" class="app-card bg-white rounded-2xl border border-app-border p-6 text-center">
+            <p class="text-app-text-primary mb-2">Risk Assessment</p>
             <p [class]="'text-4xl font-bold ' + getRiskPercentClassValue()">
               {{ getRiskPercentDisplay() | number:'1.0-1' }}%
             </p>
-            <p *ngIf="analysisResult && analysisResult.riskLevel" class="text-sm text-gray-400 mt-2">
+            <p *ngIf="analysisResult && analysisResult.riskLevel" class="text-sm text-app-text-muted mt-2">
               {{ analysisResult.riskLevel }} Risk Level
             </p>
           </div>
 
           <!-- Accuracy (Fallback if no riskPercent) -->
-          <div *ngIf="!analysisResult?.riskPercent && !analysisResult?.confidenceScore" class="bg-white/5 rounded-lg p-6 text-center">
-            <p class="text-gray-300 mb-2">Confidence Score</p>
-            <p class="text-4xl font-bold text-emerald-400">{{ testResult.accuracy }}%</p>
+          <div *ngIf="!analysisResult?.riskPercent && !analysisResult?.confidenceScore" class="app-card bg-white rounded-2xl border border-app-border p-6 text-center">
+            <p class="text-app-text-primary mb-2">Confidence Score</p>
+            <p class="text-4xl font-bold text-app-primary">{{ testResult.accuracy }}%</p>
           </div>
 
           <!-- Risk Level Badge -->
           <div *ngIf="analysisResult && analysisResult.riskLevel" class="text-center">
-            <p class="text-sm text-gray-400 mb-2">Risk Level</p>
-            <div [class]="'inline-block px-6 py-3 rounded-lg border text-lg font-semibold ' + getRiskLevelColor(analysisResult.riskLevel)">
+            <p class="text-sm text-app-text-muted mb-2">Risk Level</p>
+            <div [class]="'inline-block px-6 py-3 rounded-2xl border text-lg font-semibold ' + getRiskLevelColor(analysisResult.riskLevel)">
               {{ analysisResult.riskLevel }}
             </div>
           </div>
 
           <!-- Confidence Score (Secondary Display) -->
-          <div *ngIf="analysisResult && analysisResult.confidenceScore !== undefined && analysisResult.riskPercent !== undefined" class="bg-white/5 rounded-lg p-4 text-center">
-            <p class="text-sm text-gray-400 mb-1">Model Confidence</p>
-            <p class="text-2xl font-semibold text-emerald-400">{{ getConfidenceScoreDisplay() | number:'1.0-1' }}%</p>
+          <div *ngIf="analysisResult && analysisResult.confidenceScore !== undefined && analysisResult.riskPercent !== undefined" class="app-card bg-white rounded-2xl border border-app-border p-4 text-center">
+            <p class="text-sm text-app-text-muted mb-1">Model Confidence</p>
+            <p class="text-2xl font-semibold text-app-primary">{{ getConfidenceScoreDisplay() | number:'1.0-1' }}%</p>
           </div>
 
           <!-- Test Details -->
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div class="bg-white/5 rounded-lg p-4">
-              <p class="text-sm text-gray-400 mb-1">Test Date</p>
-              <p class="text-white font-semibold">{{ testResult.testDate | date:'short' }}</p>
+            <div class="app-card bg-white rounded-2xl border border-app-border p-4">
+              <p class="text-sm text-app-text-muted mb-1">Test Date</p>
+              <p class="text-app-text-primary font-semibold">{{ testResult.testDate | date:'short' }}</p>
             </div>
-            <div class="bg-white/5 rounded-lg p-4">
-              <p class="text-sm text-gray-400 mb-1">Status</p>
-              <p class="text-white font-semibold">{{ testResult.status }}</p>
+            <div class="app-card bg-white rounded-2xl border border-app-border p-4">
+              <p class="text-sm text-app-text-muted mb-1">Status</p>
+              <p class="text-app-text-primary font-semibold">{{ testResult.status }}</p>
             </div>
-            <div *ngIf="analysisResult && analysisResult.modelVersion" class="bg-white/5 rounded-lg p-4">
-              <p class="text-sm text-gray-400 mb-1">Model Version</p>
-              <p class="text-white font-semibold">{{ analysisResult.modelVersion }}</p>
+            <div *ngIf="analysisResult && analysisResult.modelVersion" class="app-card bg-white rounded-2xl border border-app-border p-4">
+              <p class="text-sm text-app-text-muted mb-1">Model Version</p>
+              <p class="text-app-text-primary font-semibold">{{ analysisResult.modelVersion }}</p>
             </div>
           </div>
 
           <!-- Simulation/Model Badge -->
           <div *ngIf="analysisResult" class="text-center">
-            <div *ngIf="analysisResult.isSimulation" class="inline-block px-4 py-2 bg-yellow-500/20 border border-yellow-500 text-yellow-300 rounded-lg text-sm">
+            <div *ngIf="analysisResult.isSimulation" class="inline-block px-4 py-2 bg-yellow-500/20 border border-yellow-500 text-yellow-300 rounded-2xl text-sm">
               ⚠️ Simulation Mode
             </div>
-            <div *ngIf="!analysisResult.isSimulation && analysisResult.modelVersion" class="inline-block px-4 py-2 bg-emerald-500/20 border border-emerald-500 text-emerald-300 rounded-lg text-sm">
+            <div *ngIf="!analysisResult.isSimulation && analysisResult.modelVersion" class="inline-block px-4 py-2 bg-app-primary/20 border border-app-primary text-app-primary rounded-2xl text-sm">
               ✅ ML Model v{{ analysisResult.modelVersion }}
             </div>
           </div>
 
           <!-- Voice Feature Extraction (Chart + Table) -->
-          <div *ngIf="voiceFeatures" class="bg-white/5 rounded-lg p-4 mt-4">
-            <p class="text-sm font-semibold text-emerald-400 mb-3">Voice Feature Extraction</p>
+          <div *ngIf="voiceFeatures" class="app-card bg-white rounded-2xl border border-app-border p-4 mt-4">
+            <p class="text-sm font-semibold text-app-primary mb-3">Voice Feature Extraction</p>
             
             <!-- Chart View -->
             <!-- <div class="h-64 mb-6">
@@ -344,14 +354,14 @@
               <table class="w-full text-sm">
                 <thead>
                   <tr class="border-b border-white/10">
-                    <th class="px-4 py-2 text-left text-emerald-400 font-semibold">Feature</th>
-                    <th class="px-4 py-2 text-right text-emerald-400 font-semibold">Value</th>
+                    <th class="px-4 py-2 text-left text-app-primary font-semibold">Feature</th>
+                    <th class="px-4 py-2 text-right text-app-primary font-semibold">Value</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let key of objectKeys(voiceFeatures)" class="border-b border-white/5 hover:bg-white/5">
-                    <td class="px-4 py-2 text-gray-300">{{ formatFeatureName(key) }}</td>
-                    <td class="px-4 py-2 text-right text-emerald-300 font-mono">{{ voiceFeatures[key] | number: '1.2-2' }}</td>
+                  <tr *ngFor="let key of objectKeys(voiceFeatures)" class="border-b border-white/5 hover:bg-white">
+                    <td class="px-4 py-2 text-app-text-primary">{{ formatFeatureName(key) }}</td>
+                    <td class="px-4 py-2 text-right text-app-primary font-mono">{{ voiceFeatures[key] | number: '1.2-2' }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -359,24 +369,24 @@
           </div>
 
           <!-- Notes -->
-          <div *ngIf="testResult.analysisNotes" class="bg-white/5 rounded-lg p-4">
-            <p class="text-sm text-gray-400 mb-2">Analysis Notes</p>
-            <p class="text-gray-300">{{ testResult.analysisNotes }}</p>
+          <div *ngIf="testResult.analysisNotes" class="app-card bg-white rounded-2xl border border-app-border p-4">
+            <p class="text-sm text-app-text-muted mb-2">Analysis Notes</p>
+            <p class="text-app-text-primary">{{ testResult.analysisNotes }}</p>
           </div>
 
           <!-- Download Reports -->
-          <div *ngIf="currentSessionId" class="bg-white/5 rounded-lg p-4">
-            <p class="text-sm text-gray-400 mb-3">Download Reports</p>
+          <div *ngIf="currentSessionId" class="app-card bg-white rounded-2xl border border-app-border p-4">
+            <p class="text-sm text-app-text-muted mb-3">Download Reports</p>
             <div class="flex gap-3">
               <button 
                 (click)="downloadPdfReport()"
-                class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors font-semibold text-sm"
+                class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl transition-colors font-semibold text-sm"
               >
                 📄 Download PDF
               </button>
               <button 
                 (click)="downloadCsvReport()"
-                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-semibold text-sm"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-colors font-semibold text-sm"
               >
                 📊 Download CSV
               </button>
@@ -387,17 +397,18 @@
           <div class="flex gap-4 justify-center pt-4">
             <button 
               (click)="startNewTest()"
-              class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+              class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"
             >
               Take Another Test
             </button>
             <button 
               (click)="viewMyTests()"
-              class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+              class="bg-app-primary hover:bg-app-primary-hover text-white px-6 py-3 rounded-xl transition-colors font-semibold"
             >
               View My Tests
             </button>
           </div>
+        </div>
         </div>
       </div>
 
@@ -406,7 +417,7 @@
         <button
           type="button"
           (click)="openAskResultsDialog()"
-          class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors">
+          class="inline-flex items-center gap-2 bg-app-primary hover:bg-app-primary-hover text-white px-5 py-2.5 rounded-xl font-semibold transition-colors">
           <span>Ask about your results</span>
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -415,47 +426,53 @@
       </div>
 
       <!-- Result Explanation -->
-      <div *ngIf="resultExplanation" class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
-        <h3 class="text-xl font-bold text-emerald-400 mb-4">Detailed Explanation</h3>
+      <div *ngIf="resultExplanation" class="patient-test-card app-card bg-white rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
+        <div class="patient-test-card-accent h-1 w-full bg-gradient-to-r from-app-primary to-app-primary-hover"></div>
+        <div class="p-8">
+        <h3 class="text-xl font-bold text-app-primary mb-4">Detailed Explanation</h3>
         <div class="space-y-4">
           <div>
-            <p class="text-sm text-gray-400 mb-1">Summary</p>
-            <p class="text-gray-300">{{ resultExplanation.summary }}</p>
+            <p class="text-sm text-app-text-muted mb-1">Summary</p>
+            <p class="text-app-text-primary">{{ resultExplanation.summary }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-400 mb-1">Detailed Analysis</p>
-            <p class="text-gray-300">{{ resultExplanation.detailedExplanation }}</p>
+            <p class="text-sm text-app-text-muted mb-1">Detailed Analysis</p>
+            <p class="text-app-text-primary">{{ resultExplanation.detailedExplanation }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-400 mb-1">Risk Assessment</p>
-            <p class="text-gray-300">{{ resultExplanation.riskAssessment }}</p>
+            <p class="text-sm text-app-text-muted mb-1">Risk Assessment</p>
+            <p class="text-app-text-primary">{{ resultExplanation.riskAssessment }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-400 mb-1">Recommendations</p>
-            <p class="text-gray-300">{{ resultExplanation.recommendations }}</p>
+            <p class="text-sm text-app-text-muted mb-1">Recommendations</p>
+            <p class="text-app-text-primary">{{ resultExplanation.recommendations }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-400 mb-1">Confidence Interpretation</p>
-            <p class="text-gray-300">{{ resultExplanation.confidenceInterpretation }}</p>
+            <p class="text-sm text-app-text-muted mb-1">Confidence Interpretation</p>
+            <p class="text-app-text-primary">{{ resultExplanation.confidenceInterpretation }}</p>
           </div>
+        </div>
         </div>
       </div>
 
       <!-- Feature Explanation -->
-      <div *ngIf="featureExplanation" class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
-        <h3 class="text-xl font-bold text-emerald-400 mb-4">Feature Analysis</h3>
+      <div *ngIf="featureExplanation" class="patient-test-card app-card bg-white rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
+        <div class="patient-test-card-accent h-1 w-full bg-gradient-to-r from-app-primary to-app-primary-hover"></div>
+        <div class="p-8">
+        <h3 class="text-xl font-bold text-app-primary mb-4">Feature Analysis</h3>
         <div class="space-y-4">
           <div *ngIf="featureExplanation.summary" class="mb-4">
-            <p class="text-gray-300">{{ featureExplanation.summary }}</p>
+            <p class="text-app-text-primary">{{ featureExplanation.summary }}</p>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div *ngFor="let feature of featureExplanation.features" class="bg-white/5 rounded-lg p-4">
-              <h4 class="text-emerald-400 font-semibold mb-2">{{ feature.featureName }}</h4>
-              <p *ngIf="feature.value" class="text-sm text-gray-400 mb-2">Value: {{ feature.value }}</p>
-              <p class="text-sm text-gray-300 mb-2">{{ feature.explanation }}</p>
+            <div *ngFor="let feature of featureExplanation.features" class="app-card bg-white rounded-2xl border border-app-border p-4">
+              <h4 class="text-app-primary font-semibold mb-2">{{ feature.featureName }}</h4>
+              <p *ngIf="feature.value" class="text-sm text-app-text-muted mb-2">Value: {{ feature.value }}</p>
+              <p class="text-sm text-app-text-primary mb-2">{{ feature.explanation }}</p>
               <p class="text-sm text-yellow-300 italic">{{ feature.significance }}</p>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

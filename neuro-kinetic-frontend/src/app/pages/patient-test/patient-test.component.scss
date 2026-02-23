@@ -1,3 +1,32 @@
-// Additional styles if needed
+// Take Test page – more attractive layout and depth
 
+.patient-test-hero {
+  background: linear-gradient(180deg, #f0f7f4 0%, #f8f8f8 100%);
+}
 
+.patient-test-card {
+  transition: box-shadow 0.2s ease;
+  &:hover {
+    box-shadow: 0 20px 25px -5px rgba(56, 133, 110, 0.08), 0 8px 10px -6px rgba(56, 133, 110, 0.05);
+  }
+}
+
+.patient-test-card-accent {
+  flex-shrink: 0;
+}
+
+.patient-test-mode-btn {
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.patient-test-step-num {
+  line-height: 1;
+}
+
+.patient-test-steps {
+  p {
+    line-height: 1.5;
+  }
+}

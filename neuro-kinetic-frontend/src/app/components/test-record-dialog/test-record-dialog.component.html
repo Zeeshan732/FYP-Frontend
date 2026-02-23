@@ -198,7 +198,7 @@
     </div>
 
     <!-- Voice Feature Extraction Section -->
-    <div class="form-section" *ngIf="!isEditMode && record?.status === 'Completed'">
+    <div class="form-section form-section--tight" *ngIf="!isEditMode && record?.status === 'Completed'">
       <div class="section-header">
         <svg class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
@@ -208,14 +208,14 @@
 
       <!-- Loading State -->
       <div *ngIf="loadingFeatures" class="text-center py-4">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-2"></div>
-        <p class="text-sm text-gray-400">Loading voice features...</p>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-app-primary mx-auto mb-2"></div>
+        <p class="text-sm text-app-text-muted">Loading voice features...</p>
       </div>
 
       <!-- Voice Features Chart and Table -->
-      <div *ngIf="!loadingFeatures && voiceFeatures" class="space-y-4">
+      <div *ngIf="!loadingFeatures && voiceFeatures" class="voice-features-content">
         <!-- Chart View -->
-        <div class="h-48">
+        <div class="voice-features-chart">
           <canvas #voiceFeaturesChart class="w-full h-full"></canvas>
         </div>
 
@@ -223,15 +223,15 @@
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="border-b border-white/10">
-                <th class="px-3 py-2 text-left text-emerald-400 font-semibold text-xs">Feature</th>
-                <th class="px-3 py-2 text-right text-emerald-400 font-semibold text-xs">Value</th>
+              <tr class="border-b border-app-border">
+                <th class="px-3 py-2 text-left text-app-primary font-semibold text-xs">Feature</th>
+                <th class="px-3 py-2 text-right text-app-primary font-semibold text-xs">Value</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let key of objectKeys(voiceFeatures)" class="border-b border-white/5 hover:bg-white/5">
-                <td class="px-3 py-2 text-gray-300 text-xs">{{ formatFeatureName(key) }}</td>
-                <td class="px-3 py-2 text-right text-emerald-300 font-mono text-xs">{{ voiceFeatures[key] | number: '1.2-2' }}</td>
+              <tr *ngFor="let key of objectKeys(voiceFeatures)" class="border-b border-app-border hover:bg-app-surface-muted">
+                <td class="px-3 py-2 text-app-text-primary text-xs">{{ formatFeatureName(key) }}</td>
+                <td class="px-3 py-2 text-right text-app-primary font-mono text-xs">{{ voiceFeatures[key] | number: '1.2-2' }}</td>
               </tr>
             </tbody>
           </table>
@@ -240,7 +240,7 @@
 
       <!-- No Features Available -->
       <div *ngIf="!loadingFeatures && !voiceFeatures" class="text-center py-4">
-        <p class="text-sm text-gray-400">Voice feature data not available for this test record.</p>
+        <p class="text-sm text-app-text-muted">Voice feature data not available for this test record.</p>
       </div>
     </div>
 
@@ -252,11 +252,11 @@
         </svg>
         <h3 class="section-title">Ask about your results</h3>
       </div>
-      <p class="text-sm text-gray-400 mb-3">Get structured guidance about this screening result.</p>
+      <p class="text-sm text-app-text-muted mb-3">Get structured guidance about this screening result.</p>
       <button
         type="button"
         (click)="openAskResultsDialog()"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">
+        class="inline-flex items-center gap-2 px-4 py-2 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg text-sm font-medium transition-colors">
         Ask about your results
       </button>
     </div>

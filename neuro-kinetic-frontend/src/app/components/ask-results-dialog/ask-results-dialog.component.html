@@ -4,14 +4,17 @@
   [closable]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width: '600px', maxWidth: '95vw' }"
-  header="Ask about your results"
+  [style]="{ width: '420px', maxWidth: '95vw' }"
+  [contentStyle]="{ overflow: 'visible' }"
+  header="Consultation"
   (onHide)="onHide()"
-  (onShow)="onOpen()"
-  styleClass="ask-results-dialog">
-  <app-rag-chat
-    #ragChat
-    [riskPercent]="riskPercent"
-    [mode]="mode">
-  </app-rag-chat>
+  styleClass="consultation-redirect-dialog">
+  <div class="redirect-body">
+    <p class="redirect-message">Would you like to get consultation about your screening results?</p>
+    <p class="redirect-hint">Ask questions about your risk level and receive structured guidance from our clinical support tool.</p>
+  </div>
+  <div class="redirect-actions">
+    <button type="button" class="action-btn action-btn-secondary" (click)="onHide()">Cancel</button>
+    <button type="button" class="action-btn action-btn-primary" (click)="goToConsultation()">Go to consultation</button>
+  </div>
 </p-dialog>

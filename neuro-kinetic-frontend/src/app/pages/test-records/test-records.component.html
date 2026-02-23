@@ -2,11 +2,11 @@
 <app-navigation></app-navigation>
 
 <!-- Test Records Section -->
-<section class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white pb-20">
+<section class="min-h-screen bg-app-surface-muted text-app-text-primary pb-20">
   <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
     <!-- Header -->
     <!-- <div class="text-center mb-12">
-      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-6xl font-bold mb-4 bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-6xl font-bold mb-4 bg-gradient-to-r from-app-primary to-app-primary-hover bg-clip-text text-transparent">
         Test Records
       </h1>
       <p class="text-lg sm:text-xl lg:text-2xl text-gray-300 max-w-4xl mx-auto px-4">
@@ -18,10 +18,10 @@
     <div class="max-w-[1600px] mx-auto mb-6 relative">
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <span class="text-xs font-semibold uppercase tracking-wide text-app-text-muted">
             Test Records
           </span>
-          <span class="text-xs text-gray-500">
+          <span class="text-xs text-app-text-muted">
             Use the filter icon to refine results
           </span>
         </div>
@@ -31,7 +31,7 @@
           <button
             type="button"
             (click)="toggleFilterMenu()"
-            class="inline-flex items-center justify-center h-10 w-10 rounded-full border border-emerald-500/60 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200 transition-colors"
+            class="inline-flex items-center justify-center h-10 w-10 rounded-full border border-app-primary/60 bg-app-primary/10 text-app-primary hover:bg-app-primary/20 transition-colors"
             title="Filter records"
           >
             <i class="pi pi-filter text-sm"></i>
@@ -40,7 +40,7 @@
           <!-- Take new test -->
           <button
             (click)="takeNewTest()"
-            class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl transition-colors font-semibold text-sm whitespace-nowrap"
+            class="inline-flex items-center justify-center bg-app-primary hover:bg-app-primary-hover text-white px-5 py-2.5 rounded-app-lg transition-colors font-semibold text-sm whitespace-nowrap"
           >
             Take New Test
           </button>
@@ -52,24 +52,24 @@
         *ngIf="showFilterMenu"
         class="absolute right-0 mt-3 z-30 w-full sm:w-[420px]"
       >
-        <div class="bg-slate-900/95 border border-white/15 rounded-xl shadow-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <div class="test-records-filter-panel app-card bg-white shadow-app p-5">
+          <div class="flex items-center justify-between border-b border-app-border pb-3 mb-4">
+            <span class="text-xs font-semibold uppercase tracking-wide text-app-text-muted">
               Filters
             </span>
             <button
               type="button"
               (click)="clearFilters()"
-              class="text-xs text-emerald-300 hover:text-emerald-200 underline underline-offset-2"
+              class="text-xs text-app-primary hover:opacity-80 underline underline-offset-2 font-medium"
             >
               Clear all
             </button>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Status -->
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-1">
+              <label class="block text-sm font-medium text-app-text-primary mb-2">
                 Status
               </label>
               <p-dropdown
@@ -77,14 +77,14 @@
                 [options]="statusFilterOptions"
                 optionLabel="label"
                 optionValue="value"
-                styleClass="w-full dark-dropdown"
+                styleClass="w-full test-records-filter-dropdown"
                 placeholder="All Status">
               </p-dropdown>
             </div>
 
             <!-- Result -->
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-1">
+              <label class="block text-sm font-medium text-app-text-primary mb-2">
                 Result
               </label>
               <p-dropdown
@@ -92,41 +92,39 @@
                 [options]="resultFilterOptions"
                 optionLabel="label"
                 optionValue="value"
-                styleClass="w-full dark-dropdown"
+                styleClass="w-full test-records-filter-dropdown"
                 placeholder="All Results">
               </p-dropdown>
             </div>
           </div>
 
           <!-- Sort -->
-          <div>
-            <label class="block text-xs font-semibold text-gray-400 mb-1">
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-app-text-primary mb-2">
               Sort
             </label>
-            <div class="flex">
-              <p-dropdown
-                [(ngModel)]="sortBy"
-                [options]="sortOptions"
-                optionLabel="label"
-                optionValue="value"
-                styleClass="w-full dark-dropdown"
-                placeholder="Sort by Date">
-              </p-dropdown>
-            </div>
+            <p-dropdown
+              [(ngModel)]="sortBy"
+              [options]="sortOptions"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full test-records-filter-dropdown"
+              placeholder="Sort by Date">
+            </p-dropdown>
           </div>
 
-          <div class="flex justify-end gap-2 pt-2">
+          <div class="flex justify-end gap-2 pt-5 mt-4 border-t border-app-border">
             <button
               type="button"
               (click)="toggleFilterMenu()"
-              class="px-3 py-2 rounded-lg border border-white/20 text-gray-300 hover:bg-white/10 text-sm"
+              class="px-4 py-2 border border-app-border text-app-text-primary hover:bg-app-surface-muted text-sm font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="button"
               (click)="applyFilters()"
-              class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold"
+              class="px-4 py-2 bg-app-primary hover:bg-app-primary-hover text-white text-sm font-semibold transition-colors"
             >
               Apply
             </button>
@@ -144,75 +142,85 @@
 
     <!-- Loading State -->
     <div *ngIf="loading" class="max-w-[1600px] mx-auto text-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-400 mx-auto mb-4"></div>
-      <p class="text-gray-300">Loading test records...</p>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-app-primary mx-auto mb-4"></div>
+      <p class="text-app-text-primary">Loading test records...</p>
     </div>
 
         <!-- Records Table -->
     <div *ngIf="!loading && records.length > 0" class="max-w-[1600px] mx-auto mb-8">
-      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg overflow-hidden">
+      <div class="bg-white border border-app-border rounded-lg overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
           <table class="w-full">
-            <thead class="bg-white/5 border-b border-white/10">
+            <thead class="bg-app-surface-muted border-b border-app-border">
               <tr>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
+                <th class="px-6 py-4 text-left text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('userName')">
                   <div class="flex items-center gap-2">
                     <span>User Name</span>
-                    <span *ngIf="isColumnSorted('userName')" class="text-emerald-300 font-bold">
+                    <span *ngIf="isColumnSorted('userName')" class="text-app-primary font-bold opacity-90">
                       {{ getSortIcon('userName') }}
                     </span>
                   </div>
                 </th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
+                <th class="px-6 py-4 text-left text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('testDate')">
                   <div class="flex items-center gap-2">
                     <span>Test Date</span>
-                    <span *ngIf="isColumnSorted('testDate')" class="text-emerald-300 font-bold">
+                    <span *ngIf="isColumnSorted('testDate')" class="text-app-primary font-bold opacity-90">
                       {{ getSortIcon('testDate') }}
                     </span>
                   </div>
                 </th>
-                <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
+                <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('testResult')">
                   <div class="flex items-center justify-center gap-2">
                     <span>Result</span>
-                    <span *ngIf="isColumnSorted('testResult')" class="text-emerald-300 font-bold">
+                    <span *ngIf="isColumnSorted('testResult')" class="text-app-primary font-bold opacity-90">
                       {{ getSortIcon('testResult') }}
                     </span>
                   </div>
                 </th>
-                <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
+                <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
+                    (click)="onSortChange('riskPercent')">
+                  <div class="flex items-center justify-center gap-2">
+                    <span>Risk</span>
+                    <span *ngIf="isColumnSorted('riskPercent')" class="text-app-primary font-bold opacity-90">
+                      {{ getSortIcon('riskPercent') }}
+                    </span>
+                  </div>
+                </th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('accuracy')">
                   <div class="flex items-center justify-center gap-2">
                     <span>Accuracy</span>
-                    <span *ngIf="isColumnSorted('accuracy')" class="text-emerald-300 font-bold">
+                    <span *ngIf="isColumnSorted('accuracy')" class="text-app-primary font-bold opacity-90">
                       {{ getSortIcon('accuracy') }}
                     </span>
                   </div>
                 </th>
-                <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300" 
+                <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('status')">
                   <div class="flex items-center justify-center gap-2">
                     <span>Status</span>
-                    <span *ngIf="isColumnSorted('status')" class="text-emerald-300 font-bold">
+                    <span *ngIf="isColumnSorted('status')" class="text-app-primary font-bold opacity-90">
                       {{ getSortIcon('status') }}
                     </span>
                   </div>
                 </th>
-                <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-400">Actions</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-white/10">
-              <tr *ngFor="let record of records" class="hover:bg-white/5 transition-colors">
-                <td class="px-6 py-4 text-sm text-gray-300">{{ record.userName }}</td>
-                <td class="px-6 py-4 text-sm text-gray-300">{{ record.testDate | date:'short' }}</td>
+            <tbody class="divide-y divide-app-border">
+              <tr *ngFor="let record of records" class="hover:bg-app-surface-muted transition-colors">
+                <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.userName }}</td>
+                <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.testDate | date:'short' }}</td>
                 <td class="px-6 py-4 text-center">
                   <span [class]="'px-3 py-1 rounded text-xs font-semibold border ' + getResultBadgeColor(record.testResult)">
                     {{ record.testResult }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-center text-sm text-gray-300">{{ record.accuracy }}%</td>
+                <td class="px-6 py-4 text-center text-sm text-app-text-primary">{{ getRiskDisplay(record) }}</td>
+                <td class="px-6 py-4 text-center text-sm text-app-text-primary">{{ record.accuracy }}%</td>
                 <td class="px-6 py-4 text-center">
                   <span [class]="'px-3 py-1 rounded text-xs font-semibold border ' + getStatusBadgeColor(record.status)">
                     {{ record.status }}
@@ -223,7 +231,7 @@
                     <p-button 
                       icon="pi pi-eye"
                       (onClick)="viewRecord(record.id)"
-                      severity="success"
+                      severity="secondary"
                       styleClass="p-button-rounded p-button-text p-button-plain p-button-sm"
                       pTooltip="View Details"
                       tooltipPosition="top">
@@ -265,11 +273,11 @@
 
     <!-- Empty State -->
     <div *ngIf="!loading && records.length === 0" class="max-w-[1600px] mx-auto text-center py-12">
-      <p class="text-gray-300 text-xl mb-4">No test records found</p>
-      <p class="text-gray-500 mb-6">Try adjusting your filters or take a new test</p>
+      <p class="text-app-text-primary text-xl mb-4">No test records found</p>
+      <p class="text-app-text-muted mb-6">Try adjusting your filters or take a new test</p>
       <button 
         (click)="takeNewTest()"
-        class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+        class="bg-app-primary hover:bg-app-primary-hover text-white px-6 py-3 rounded-app-lg transition-colors font-semibold"
       >
         Take New Test
       </button>
@@ -277,19 +285,19 @@
 
     <!-- Pagination -->
     <div *ngIf="!loading && totalPages > 0" class="max-w-[1600px] mx-auto">
-      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+      <div class="bg-white border border-app-border rounded-lg p-4 shadow-sm">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="text-sm text-gray-300">
+          <div class="text-sm text-app-text-primary">
             Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} records
           </div>
           <div class="flex items-center gap-3">
             <!-- Rows per page selector -->
-            <div class="flex items-center gap-2 text-gray-300 text-sm">
+            <div class="flex items-center gap-2 text-app-text-primary text-sm">
               <span>Rows:</span>
               <select 
                 [(ngModel)]="pageSize"
                 (change)="onPageSizeChange()"
-                class="px-3 py-2 bg-white/10 border border-white/20 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white">
+                class="px-3 py-2 bg-white border border-app-border rounded-app focus:ring-2 focus:ring-app-primary focus:border-app-primary text-app-text-primary">
                 <option [ngValue]="10">10</option>
                 <option [ngValue]="20">20</option>
                 <option [ngValue]="25">25</option>
@@ -301,7 +309,7 @@
             <!-- Pager -->
             <div class="flex items-center gap-2">
               <p-button icon="pi pi-chevron-left" [outlined]="true" [rounded]="true" (onClick)="previousPage()" [disabled]="!hasPrevious" pTooltip="Previous" tooltipPosition="top"></p-button>
-              <span class="px-2 text-gray-300 text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
+              <span class="px-2 text-app-text-primary text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
               <p-button icon="pi pi-chevron-right" [outlined]="true" [rounded]="true" (onClick)="nextPage()" [disabled]="!hasNext" pTooltip="Next" tooltipPosition="top"></p-button>
             </div>
           </div>
@@ -330,12 +338,12 @@
     styleClass="confirm-delete-dialog"
     maskStyleClass="confirm-delete-mask">
     <ng-template pTemplate="header">
-      <div class="flex items-center gap-3">
-        <span class="pi pi-exclamation-triangle text-yellow-400 text-xl"></span>
+      <div class="flex items-center gap-3 text-white">
+        <span class="pi pi-exclamation-triangle text-xl opacity-90"></span>
         <span class="text-lg font-semibold">Confirm Deletion</span>
       </div>
     </ng-template>
-    <div class="text-gray-300 text-base leading-7">
+    <div class="text-app-text-primary text-base leading-7">
       Are you sure you want to delete this test record?
     </div>
     <ng-template pTemplate="footer">
@@ -363,40 +371,40 @@
     </ng-template>
     <div *ngIf="loadingTrends" class="text-center py-8">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-      <p class="text-gray-300">Loading trend data...</p>
+      <p class="text-app-text-primary">Loading trend data...</p>
     </div>
     <div *ngIf="!loadingTrends && trendData" class="space-y-6">
       <!-- Summary -->
-      <div class="bg-white/5 rounded-lg p-4">
-        <h3 class="text-lg font-semibold text-emerald-400 mb-3">Summary</h3>
+      <div class="bg-app-surface-muted rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-app-primary mb-3">Summary</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p class="text-sm text-gray-400">Total Tests</p>
-            <p class="text-xl font-bold text-white">{{ trendData.summary.totalTests }}</p>
+            <p class="text-sm text-app-text-muted">Total Tests</p>
+            <p class="text-xl font-bold text-app-text-primary">{{ trendData.summary.totalTests }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-400">Completed</p>
-            <p class="text-xl font-bold text-white">{{ trendData.summary.completedTests }}</p>
+            <p class="text-sm text-app-text-muted">Completed</p>
+            <p class="text-xl font-bold text-app-text-primary">{{ trendData.summary.completedTests }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-400">Avg Accuracy</p>
-            <p class="text-xl font-bold text-white">{{ trendData.summary.averageAccuracy.toFixed(1) }}%</p>
+            <p class="text-sm text-app-text-muted">Avg Accuracy</p>
+            <p class="text-xl font-bold text-app-text-primary">{{ trendData.summary.averageAccuracy.toFixed(1) }}%</p>
           </div>
           <div>
-            <p class="text-sm text-gray-400">Trend</p>
-            <p class="text-xl font-bold text-white">{{ trendData.summary.overallTrend || 'N/A' }}</p>
+            <p class="text-sm text-app-text-muted">Trend</p>
+            <p class="text-xl font-bold text-app-text-primary">{{ trendData.summary.overallTrend || 'N/A' }}</p>
           </div>
         </div>
       </div>
 
       <!-- Trend Data -->
-      <div class="bg-white/5 rounded-lg p-4">
-        <h3 class="text-lg font-semibold text-emerald-400 mb-3">Test History</h3>
+      <div class="bg-app-surface-muted rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-app-primary mb-3">Test History</h3>
         <div class="space-y-2 max-h-96 overflow-y-auto">
-          <div *ngFor="let trend of trendData.trends" class="bg-white/5 rounded p-3 flex items-center justify-between">
+          <div *ngFor="let trend of trendData.trends" class="bg-white border border-app-border rounded p-3 flex items-center justify-between">
             <div class="flex-1">
-              <p class="text-sm text-gray-300">{{ trend.date | date:'short' }}</p>
-              <p class="text-xs text-gray-400">Accuracy: {{ trend.accuracy }}%</p>
+              <p class="text-sm text-app-text-primary">{{ trend.date | date:'short' }}</p>
+              <p class="text-xs text-app-text-muted">Accuracy: {{ trend.accuracy }}%</p>
             </div>
             <div class="flex gap-2 items-center">
               <span *ngIf="trend.riskLevel" [class]="'px-2 py-1 rounded text-xs ' + getRiskLevelColor(trend.riskLevel)">
@@ -434,12 +442,12 @@
     </ng-template>
     <div *ngIf="loadingComparison" class="text-center py-8">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-      <p class="text-gray-300">Loading comparison...</p>
+      <p class="text-app-text-primary">Loading comparison...</p>
     </div>
     <div *ngIf="!loadingComparison && !comparisonData" class="space-y-4">
-      <p class="text-gray-300">Select two records from the table to compare.</p>
-      <div class="bg-white/5 rounded-lg p-4">
-        <p class="text-sm text-gray-400 mb-2">Selected Records:</p>
+      <p class="text-app-text-primary">Select two records from the table to compare.</p>
+      <div class="bg-app-surface-muted rounded-lg p-4">
+        <p class="text-sm text-app-text-muted mb-2">Selected Records:</p>
         <div class="flex gap-2">
           <span *ngIf="selectedRecord1" class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded">Record #{{ selectedRecord1 }}</span>
           <span *ngIf="selectedRecord2" class="px-3 py-1 bg-green-500/20 text-green-300 rounded">Record #{{ selectedRecord2 }}</span>
@@ -448,48 +456,48 @@
     </div>
     <div *ngIf="!loadingComparison && comparisonData" class="space-y-6">
       <!-- Differences Summary -->
-      <div class="bg-white/5 rounded-lg p-4">
-        <h3 class="text-lg font-semibold text-purple-400 mb-3">Key Differences</h3>
+      <div class="bg-app-surface-muted rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-app-primary mb-3">Key Differences</h3>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-sm text-gray-400">Days Between</p>
-            <p class="text-xl font-bold text-white">{{ comparisonData.differences.daysBetween }} days</p>
+            <p class="text-sm text-app-text-muted">Days Between</p>
+            <p class="text-xl font-bold text-app-text-primary">{{ comparisonData.differences.daysBetween }} days</p>
           </div>
           <div>
-            <p class="text-sm text-gray-400">Accuracy Change</p>
+            <p class="text-sm text-app-text-muted">Accuracy Change</p>
             <p class="text-xl font-bold" [class.text-red-400]="comparisonData.differences.accuracyChange < 0" [class.text-green-400]="comparisonData.differences.accuracyChange >= 0">
               {{ comparisonData.differences.accuracyChange > 0 ? '+' : '' }}{{ comparisonData.differences.accuracyChange.toFixed(1) }}%
             </p>
           </div>
         </div>
         <div *ngIf="comparisonData.differences.riskLevelChanged" class="mt-3">
-          <p class="text-sm text-gray-400">Risk Level Change</p>
+          <p class="text-sm text-app-text-muted">Risk Level Change</p>
           <p class="text-lg font-semibold text-yellow-400">{{ comparisonData.differences.riskLevelChange }}</p>
         </div>
         <div *ngIf="comparisonData.differences.predictionChanged" class="mt-3">
-          <p class="text-sm text-gray-400">Prediction Change</p>
+          <p class="text-sm text-app-text-muted">Prediction Change</p>
           <p class="text-lg font-semibold text-yellow-400">{{ comparisonData.differences.predictionChange }}</p>
         </div>
       </div>
 
       <!-- Side by Side Comparison -->
       <div class="grid grid-cols-2 gap-4">
-        <div class="bg-white/5 rounded-lg p-4">
-          <h4 class="font-semibold text-blue-400 mb-3">Record 1</h4>
+        <div class="bg-app-surface-muted rounded-lg p-4">
+          <h4 class="font-semibold text-app-primary mb-3">Record 1</h4>
           <div class="space-y-2 text-sm">
-            <p><span class="text-gray-400">Date:</span> <span class="text-white">{{ comparisonData.record1.testDate | date:'short' }}</span></p>
-            <p><span class="text-gray-400">Result:</span> <span [class]="'px-2 py-1 rounded text-xs ' + getResultBadgeColor(comparisonData.record1.testResult)">{{ comparisonData.record1.testResult }}</span></p>
-            <p><span class="text-gray-400">Accuracy:</span> <span class="text-white">{{ comparisonData.record1.accuracy }}%</span></p>
-            <p><span class="text-gray-400">Status:</span> <span class="text-white">{{ comparisonData.record1.status }}</span></p>
+            <p><span class="text-app-text-muted">Date:</span> <span class="text-app-text-primary">{{ comparisonData.record1.testDate | date:'short' }}</span></p>
+            <p><span class="text-app-text-muted">Result:</span> <span [class]="'px-2 py-1 rounded text-xs ' + getResultBadgeColor(comparisonData.record1.testResult)">{{ comparisonData.record1.testResult }}</span></p>
+            <p><span class="text-app-text-muted">Accuracy:</span> <span class="text-app-text-primary">{{ comparisonData.record1.accuracy }}%</span></p>
+            <p><span class="text-app-text-muted">Status:</span> <span class="text-app-text-primary">{{ comparisonData.record1.status }}</span></p>
           </div>
         </div>
-        <div class="bg-white/5 rounded-lg p-4">
-          <h4 class="font-semibold text-green-400 mb-3">Record 2</h4>
+        <div class="bg-app-surface-muted rounded-lg p-4">
+          <h4 class="font-semibold text-app-primary mb-3">Record 2</h4>
           <div class="space-y-2 text-sm">
-            <p><span class="text-gray-400">Date:</span> <span class="text-white">{{ comparisonData.record2.testDate | date:'short' }}</span></p>
-            <p><span class="text-gray-400">Result:</span> <span [class]="'px-2 py-1 rounded text-xs ' + getResultBadgeColor(comparisonData.record2.testResult)">{{ comparisonData.record2.testResult }}</span></p>
-            <p><span class="text-gray-400">Accuracy:</span> <span class="text-white">{{ comparisonData.record2.accuracy }}%</span></p>
-            <p><span class="text-gray-400">Status:</span> <span class="text-white">{{ comparisonData.record2.status }}</span></p>
+            <p><span class="text-app-text-muted">Date:</span> <span class="text-app-text-primary">{{ comparisonData.record2.testDate | date:'short' }}</span></p>
+            <p><span class="text-app-text-muted">Result:</span> <span [class]="'px-2 py-1 rounded text-xs ' + getResultBadgeColor(comparisonData.record2.testResult)">{{ comparisonData.record2.testResult }}</span></p>
+            <p><span class="text-app-text-muted">Accuracy:</span> <span class="text-app-text-primary">{{ comparisonData.record2.accuracy }}%</span></p>
+            <p><span class="text-app-text-muted">Status:</span> <span class="text-app-text-primary">{{ comparisonData.record2.status }}</span></p>
           </div>
         </div>
       </div>

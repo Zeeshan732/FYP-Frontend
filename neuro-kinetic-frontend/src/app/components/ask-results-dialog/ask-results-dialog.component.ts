@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { RagChatComponent } from '../rag-chat/rag-chat.component';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-ask-results-dialog',
@@ -13,15 +13,18 @@ export class AskResultsDialogComponent {
 
   @Output() visibleChange = new EventEmitter<boolean>();
 
-  @ViewChild('ragChat') ragChat?: RagChatComponent;
-
-  constructor() {}
+  constructor(private router: Router) {}
 
   onHide(): void {
     this.visibleChange.emit(false);
   }
 
-  onOpen(): void {
-    this.ragChat?.reset();
+  goToConsultation(): void {
+    this.visibleChange.emit(false);
+    const queryParams: { riskPercent?: number; mode: string } = { mode: this.mode };
+    if (this.riskPercent != null && !isNaN(this.riskPercent)) {
+      queryParams.riskPercent = this.riskPercent;
+    }
+    this.router.navigate(['/consultation'], { queryParams });
   }
 }

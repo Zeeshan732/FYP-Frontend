@@ -1,13 +1,71 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
-/* PrimeNG Theme */
-@import "primeng/resources/themes/lara-dark-blue/theme.css";
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+/* PrimeNG Theme – light to match consultation modal */
+@import "primeng/resources/themes/lara-light-teal/theme.css";
 @import "primeng/resources/primeng.css";
 @import "primeicons/primeicons.css";
+
+/* Nebular theme (for chat UI) */
+@import "@nebular/theme/styles/prebuilt/default.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Global theme: consultation-style (dark teal primary, white/light surfaces, rounded corners).
+ * Use CSS vars: --app-primary, --app-primary-hover, --app-surface, --app-text-primary, --app-text-muted, --app-radius, --app-radius-lg.
+ * Use classes: .btn-app-primary, .btn-app-secondary, .surface-app, .surface-app-muted, .bg-app-primary, .text-app-primary.
+ * Tailwind: bg-app-primary, text-app-text-primary, rounded-app, rounded-app-lg, shadow-app.
+ */
+/* ========== App theme ========== */
+:root,
+[data-theme="light"] {
+  /* Light / default – consultation-style teal primary, light surfaces */
+  --app-bg: #b1aaaa;
+  --app-primary: #38856e;
+  --app-primary-hover: #3f9478;
+  --app-primary-foreground: #ffffff;
+  --app-surface: #ffffff;
+  --app-surface-muted: #f8f8f8;
+  --app-text-primary: #333333;
+  --app-text-muted: #000000;
+  --app-secondary-border: #333333;
+  --app-border: #e5e7eb;
+  --app-border-strong: #d1d5db;
+  --app-radius: 8px;
+  --app-radius-lg: 12px;
+  --app-card-radius: 1rem; /* 16px – align all cards to rounded-2xl */
+  --app-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.07);
+}
+
+[data-theme="dark"] {
+  /* Keep brand teal; slightly lighter for visibility on dark */
+  --app-bg: #b1aaaa;
+  --app-primary: #3d9b7a;
+  --app-primary-hover: #4ab88a;
+  --app-primary-foreground: #ffffff;
+  --app-surface: #1a1f2e;
+  --app-surface-muted: #252b3b;
+  --app-text-primary: #e2e8f0;
+  --app-text-muted: #94a3b8;
+  --app-secondary-border: #94a3b8;
+  --app-border: #334155;
+  --app-border-strong: #475569;
+  --app-radius: 8px;
+  --app-radius-lg: 12px;
+  --app-card-radius: 1rem;
+  --app-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark theme: cards and tables that use bg-white */
+[data-theme="dark"] .bg-white {
+  background-color: var(--app-surface-muted) !important;
+  border-color: var(--app-border) !important;
+}
+[data-theme="dark"] .border-app-border {
+  border-color: var(--app-border);
+}
 
 /* Global font family */
 * {
@@ -16,10 +74,126 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #0f172a; /* slate-900 background */
-  color: #ffffff;
+  background-color: var(--app-bg);
+  color: var(--app-text-primary);
   margin: 0;
   padding: 0;
+}
+
+/* ========== Global button styles – no border radius ========== */
+button,
+.p-button {
+  border-radius: 0 !important;
+}
+
+.btn-app-primary {
+  background: var(--app-primary) !important;
+  color: var(--app-primary-foreground) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-weight: 500;
+  font-size: 0.9375rem; /* 15px – match dialog buttons */
+  transition: background-color 0.15s ease;
+}
+.btn-app-primary:hover {
+  background: var(--app-primary-hover) !important;
+  border-color: var(--app-primary-hover) !important;
+}
+
+.btn-app-secondary {
+  background: var(--app-surface) !important;
+  color: var(--app-secondary-border) !important;
+  border: 1px solid var(--app-secondary-border) !important;
+  border-radius: 0 !important;
+  font-weight: 500;
+  font-size: 0.9375rem; /* 15px – match dialog buttons */
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.btn-app-secondary:hover {
+  background: var(--app-surface-muted) !important;
+  border-color: var(--app-secondary-border) !important;
+  color: #000000 !important;
+}
+
+/* Light content surfaces (cards, modals) use these for consistent look */
+.surface-app {
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+  border-radius: var(--app-radius-lg);
+}
+.surface-app-muted {
+  background: var(--app-surface-muted);
+  color: var(--app-text-primary);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+}
+
+/* Align all cards: same radius, border, and base shadow */
+.app-card {
+  border-radius: var(--app-card-radius);
+  border: 1px solid var(--app-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* ========== PrimeNG theme overrides (use app primary teal) ========== */
+.p-button.p-button-primary,
+.p-button:not(.p-button-outlined):not(.p-button-text).p-button-primary {
+  background: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+  border-radius: 0 !important;
+}
+.p-button.p-button-primary:hover,
+.p-button:not(.p-button-outlined):not(.p-button-text).p-button-primary:hover {
+  background: var(--app-primary-hover) !important;
+  border-color: var(--app-primary-hover) !important;
+}
+
+/* Success severity = primary teal (e.g. View button in tables) */
+.p-button.p-button-success,
+.p-button.p-button-success:hover {
+  color: var(--app-primary-foreground) !important;
+  background: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+}
+.p-button.p-button-success:hover {
+  background: var(--app-primary-hover) !important;
+  border-color: var(--app-primary-hover) !important;
+}
+.p-button.p-button-text.p-button-success:hover,
+.p-button.p-button-outlined.p-button-success:hover {
+  background: rgba(56, 133, 110, 0.15) !important;
+  color: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+}
+
+.p-dialog .p-dialog-header {
+  background: var(--app-primary) !important;
+  color: var(--app-primary-foreground) !important;
+  border-radius: var(--app-radius-lg) var(--app-radius-lg) 0 0;
+}
+.p-dialog .p-dialog-content {
+  background: var(--app-surface) !important;
+  color: var(--app-text-primary);
+  border-radius: 0 0 var(--app-radius-lg) var(--app-radius-lg);
+}
+
+.p-dropdown.p-dropdown-open .p-dropdown-label,
+.p-inputtext:focus,
+.p-focus {
+  box-shadow: 0 0 0 2px rgba(56, 133, 110, 0.3) !important;
+  border-color: var(--app-primary) !important;
+}
+
+/* Links and accents */
+a.text-app-primary,
+.text-app-primary {
+  color: var(--app-primary);
+}
+.bg-app-primary {
+  background-color: var(--app-primary);
+}
+.border-app-primary {
+  border-color: var(--app-primary);
 }
 
 /* Smooth scrolling */

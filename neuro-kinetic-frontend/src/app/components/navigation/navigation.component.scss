@@ -47,13 +47,13 @@ aside {
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0b1224;
-  color: #e2e8f0;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text-primary);
   display: none;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--app-shadow);
   backdrop-filter: blur(6px);
 }
 

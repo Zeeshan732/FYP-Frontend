@@ -52,6 +52,7 @@ export class TestRecordsComponent implements OnInit {
   sortOptions = [
     { label: 'Sort by Date', value: 'testDate' },
     { label: 'Sort by Accuracy', value: 'accuracy' },
+    { label: 'Sort by Risk', value: 'riskPercent' },
     { label: 'Sort by Result', value: 'testResult' }
   ];
 
@@ -457,6 +458,25 @@ export class TestRecordsComponent implements OnInit {
       default:
         return 'bg-gray-500/20 border-gray-500 text-gray-400';
     }
+  }
+
+  /**
+   * Get risk percentage for display: from record.riskPercent (API) or parsed from analysisNotes.
+   * analysisNotes format: "Analysis completed. Risk: 43% (Moderate). Session: ..."
+   */
+  getRiskPercent(record: UserTestRecord): number | null {
+    if (record.riskPercent != null && !isNaN(record.riskPercent)) {
+      return record.riskPercent;
+    }
+    const notes = record.analysisNotes || '';
+    const match = notes.match(/Risk:\s*(\d+(?:\.\d+)?)\s*%/);
+    return match ? parseFloat(match[1]) : null;
+  }
+
+  /** Format risk for table: "43%" or "—" when missing. */
+  getRiskDisplay(record: UserTestRecord): string {
+    const risk = this.getRiskPercent(record);
+    return risk != null ? `${Math.round(risk)}%` : '—';
   }
 }
 
