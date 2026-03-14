@@ -1,97 +1,33 @@
-<!-- Top Navbar (Public/Not Authenticated OR Landing Page, but NOT Login/Signup) -->
+<!-- Top Navbar (Public/Not Authenticated OR Landing Page, but NOT Login/Signup) — NeuroSync Dark -->
 <nav *ngIf="(!isAuthenticated || isLandingPage) && currentRoute !== '/login' && currentRoute !== '/signup'" 
-     class="fixed w-full top-0 z-50 transition-transform duration-300 ease-in-out" 
+     class="navbar"
      [class.-translate-y-full]="!isNavbarVisible"
      [class.scrolled]="isScrolled">
-  <div class="max-w-7xl mx-auto px-6 lg:px-8">
-    <div class="backdrop-blur-md bg-white/60 border-b border-white/20 rounded-2xl mx-4 lg:mx-8 mt-3 navbar-container">
-      <div class="flex justify-between items-center py-3 px-4 lg:px-6">
-        <!-- Logo -->
-        <div class="flex items-center">
-          <a routerLink="/landing" class="text-2xl font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
-           NeuroSync
-          </a>
-        </div>
-
-        <!-- Desktop Navigation (public) -->
-        <div class="hidden md:flex items-center space-x-6">
-          <a routerLink="/landing" 
-             routerLinkActive="text-emerald-600" 
-             [routerLinkActiveOptions]="{exact: true}"
-             class="text-gray-700 hover:text-emerald-600 transition-colors font-medium">
-            Home
-          </a>
-          <a routerLink="/technology-demo" 
-             routerLinkActive="text-emerald-600" 
-             class="text-gray-700 hover:text-emerald-600 transition-colors font-medium">
-            Demo
-          </a>
-          <a routerLink="/contact" 
-             routerLinkActive="text-emerald-600" 
-             class="text-gray-700 hover:text-emerald-600 transition-colors font-medium">
-            Contact
-          </a>
-
-          <!-- Auth Buttons -->
-          <div class="flex items-center space-x-4 pl-4 border-l border-gray-300">
-            <button (click)="openLoginModal()" 
-                    class="text-gray-700 hover:text-emerald-600 transition-colors font-medium">
-              Login
-            </button>
-            <button (click)="openSignupModal()" 
-                    class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium">
-              Sign Up
-            </button>
-          </div>
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <div class="md:hidden">
-          <button (click)="toggleMobileMenu()" 
-                  class="text-gray-700 hover:text-emerald-600 focus:outline-none focus:text-emerald-600">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path *ngIf="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              <path *ngIf="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Mobile Navigation -->
-      <div *ngIf="mobileMenuOpen" class="md:hidden pb-4 px-4">
-        <div class="flex flex-col space-y-4 pt-4 border-t border-gray-200">
-          <a routerLink="/landing" 
-             routerLinkActive="text-emerald-600" 
-             [routerLinkActiveOptions]="{exact: true}"
-             (click)="closeMobileMenu()"
-             class="text-gray-700 hover:text-emerald-600 transition-colors font-medium">
-            Home
-          </a>
-          <a routerLink="/technology-demo" 
-             routerLinkActive="text-emerald-600" 
-             (click)="closeMobileMenu()"
-             class="text-gray-700 hover:text-emerald-600 transition-colors font-medium">
-            Demo
-          </a>
-          <a routerLink="/contact" 
-             routerLinkActive="text-emerald-600" 
-             (click)="closeMobileMenu()"
-             class="text-gray-700 hover:text-emerald-600 transition-colors font-medium">
-            Contact
-          </a>
-          <div class="flex flex-col space-y-2 pt-4 border-t border-gray-200">
-            <button (click)="openLoginModal()" 
-                    class="text-gray-700 hover:text-emerald-600 transition-colors font-medium text-left">
-              Login
-            </button>
-            <button (click)="openSignupModal()" 
-                    class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium text-center">
-              Sign Up
-            </button>
-          </div>
-        </div>
-      </div>
+  <div class="navbar-inner">
+    <a routerLink="/landing" class="navbar-brand">
+      <span class="brand-dot"></span>
+      NeuroSync
+    </a>
+    <div class="navbar-links">
+      <a routerLink="/landing" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/about" routerLinkActive="active">About</a>
+      <a routerLink="/blog" routerLinkActive="active">Blog</a>
+      <a routerLink="/contact" routerLinkActive="active">Contact</a>
     </div>
+    <div class="navbar-actions">
+      <button type="button" (click)="openLoginModal()" class="btn-ghost">Login</button>
+      <button type="button" (click)="openSignupModal()" class="btn-primary">Sign Up</button>
+    </div>
+    <button type="button" class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Menu">☰</button>
+  </div>
+  <!-- Mobile menu dropdown -->
+  <div *ngIf="mobileMenuOpen" class="navbar-mobile-menu">
+    <a routerLink="/landing" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMobileMenu()">Home</a>
+    <a routerLink="/about" routerLinkActive="active" (click)="closeMobileMenu()">About</a>
+    <a routerLink="/blog" routerLinkActive="active" (click)="closeMobileMenu()">Blog</a>
+    <a routerLink="/contact" routerLinkActive="active" (click)="closeMobileMenu()">Contact</a>
+    <button type="button" (click)="openLoginModal()" class="btn-ghost">Login</button>
+    <button type="button" (click)="openSignupModal()" class="btn-primary">Sign Up</button>
   </div>
 </nav>
 
@@ -116,7 +52,7 @@
 
 <!-- Sidebar (Authenticated Users - NOT on Landing/Login/Signup Pages) -->
 <aside *ngIf="isAuthenticated && !isLandingPage && currentRoute !== '/login' && currentRoute !== '/signup'" 
-       class="fixed left-0 top-0 h-full z-50 bg-slate-800 border-r border-white/10 transition-all duration-300 ease-in-out"
+       class="neuro-sidebar fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out shadow-sm"
        [class.w-64]="!sidebarCollapsed"
        [class.w-20]="sidebarCollapsed"
        [class.mobile-open]="mobileSidebarOpen">
@@ -126,14 +62,14 @@
     <div class="flex items-center p-4 border-b border-white/10 relative">
       <div class="flex items-center space-x-3" [class.opacity-0]="sidebarCollapsed" [class.w-0]="sidebarCollapsed" [class.overflow-hidden]="sidebarCollapsed">
         <div class="flex flex-col">
-          <div class="text-xl font-bold text-emerald-400 whitespace-nowrap">NeuroSync</div>
-          <div *ngIf="roleLabel" class="text-[11px] uppercase tracking-wide text-gray-400">{{ roleLabel }}</div>
+          <div class="sidebar-logo text-xl font-medium whitespace-nowrap">NeuroSync</div>
+          <div *ngIf="roleLabel" class="sidebar-role text-[11px] uppercase tracking-wide">{{ roleLabel }}</div>
         </div>
       </div>
       <div class="flex-1"></div>
       <div class="flex items-center gap-2">
         <button (click)="toggleSidebar()" 
-                class="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors">
+                class="sidebar-toggle p-2 rounded-lg transition-colors">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" [class.rotate-180]="sidebarCollapsed">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
           </svg>
@@ -144,9 +80,9 @@
     <!-- Navigation Links: single flat list, role-based visibility -->
     <nav class="flex-1 overflow-y-auto p-4 space-y-2">
       <a [routerLink]="isAdmin ? '/admin-dashboard' : '/home'" 
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
          [routerLinkActiveOptions]="{exact: true}"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'Home' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -155,8 +91,8 @@
       </a>
 
       <a routerLink="/patient-test" 
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'Take Test' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -165,8 +101,8 @@
       </a>
 
       <a routerLink="/test-records" 
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'My Tests' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -174,9 +110,19 @@
         <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">My Tests</span>
       </a>
 
+      <a routerLink="/analytics-dashboard" 
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+         [title]="sidebarCollapsed ? 'Analytics' : ''">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Analytics</span>
+      </a>
+
       <a *ngIf="!isAdmin" routerLink="/live-voice-monitor" 
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'Live Voice Monitor' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -185,8 +131,8 @@
       </a>
 
       <a routerLink="/notifications"
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'Notifications' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -196,7 +142,7 @@
 
       <button type="button"
               (click)="openAskResultsDialog()"
-              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group text-left"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group text-left"
               [title]="sidebarCollapsed ? 'Ask about your results' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -206,8 +152,8 @@
 
       <!-- Admin only -->
       <a *ngIf="isAdmin" routerLink="/admin-dashboard" 
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'Admin Dashboard' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -215,8 +161,8 @@
         <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
       </a>
       <a *ngIf="isAdmin" routerLink="/account-requests" 
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'Account Requests' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h4m6 0h4a7 7 0 00-7-7z" />
@@ -224,8 +170,8 @@
         <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Account Requests</span>
       </a>
       <a *ngIf="isAdmin" routerLink="/admin-users" 
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'All Users' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -234,8 +180,8 @@
       </a>
 
       <a routerLink="/contact" 
-         routerLinkActive="bg-emerald-600/20 text-emerald-400 border-emerald-400"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors group mt-2"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group mt-2"
          [title]="sidebarCollapsed ? 'Contact' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -247,7 +193,7 @@
     <!-- Sidebar Footer -->
     <div class="p-4 border-t border-white/10">
       <button (click)="logout()" 
-              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-600/20 hover:text-red-400 transition-colors group"
+              class="sidebar-logout w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors group"
               [title]="sidebarCollapsed ? 'Logout' : ''">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -34,7 +34,6 @@ import { NavigationComponent } from './components/navigation/navigation.componen
 import { FooterComponent } from './components/footer/footer.component';
 import { LoginModalComponent } from './components/modals/login-modal/login-modal.component';
 import { SignupModalComponent } from './components/modals/signup-modal/signup-modal.component';
-import { TechnologyDemoComponent } from './pages/technology-demo/technology-demo.component';
 import { PatientTestComponent } from './pages/patient-test/patient-test.component';
 import { TestRecordsComponent } from './pages/test-records/test-records.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
@@ -48,8 +47,15 @@ import { NotificationsComponent } from './pages/notifications/notifications.comp
 import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
 import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.component';
 import { LiveVoiceMonitorComponent } from './pages/live-voice-monitor/live-voice-monitor.component';
+import { ConsultationComponent } from './pages/consultation/consultation.component';
+import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
+import { AboutComponent } from './pages/about/about.component';
+import { BlogComponent } from './pages/blog/blog.component';
+import { ArticleCardComponent } from './components/blog/article-card/article-card.component';
+import { SectionRowComponent } from './components/blog/section-row/section-row.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
-
+import { NbThemeModule } from '@nebular/theme';
+import { NbChatModule } from '@nebular/theme';
 @NgModule({
   declarations: [
     AppComponent,
@@ -66,7 +72,6 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     FooterComponent,
     LoginModalComponent,
     SignupModalComponent,
-    TechnologyDemoComponent,
     PatientTestComponent,
     TestRecordsComponent,
     OAuthCallbackComponent,
@@ -79,7 +84,13 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     AdminUsersComponent,
     NotificationsComponent,
     VoiceInputComponent,
-    LiveVoiceMonitorComponent
+    LiveVoiceMonitorComponent,
+    ConsultationComponent,
+    AnalyticsDashboardComponent,
+    AboutComponent,
+    BlogComponent,
+    ArticleCardComponent,
+    SectionRowComponent
   ],
   imports: [
     BrowserModule,
@@ -100,7 +111,9 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     InputTextareaModule,
     TooltipModule,
     TagModule,
-    ProgressBarModule
+    ProgressBarModule,
+    NbThemeModule.forRoot({ name: 'default' }),
+    NbChatModule,
   ],
   providers: [
     {

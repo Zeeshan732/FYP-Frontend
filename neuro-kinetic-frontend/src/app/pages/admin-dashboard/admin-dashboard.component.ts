@@ -122,18 +122,26 @@ export class AdminDashboardComponent implements OnInit {
     }
 
     const Chart = (window as any).Chart;
+    const axisColor = '#8B95A6';
+    const gridColor = 'rgba(255, 255, 255, 0.06)';
+    const tooltipBg = '#162A4A';
+    const tooltipText = '#E8EBF0';
+    const tooltipBorder = 'rgba(255, 255, 255, 0.1)';
+    const lineColor = '#2E86DE';
+    const barMonthColor = '#7F77DD';
+    const barYearColor = '#2E86DE';
+    const pointBorderDark = '#112240';
 
-    // Usage by Day Chart - Professional Design
+    // Usage by Day — Line chart (FIX 5: stroke #2E86DE)
     if (this.usageByDayChartRef) {
       const ctx = this.usageByDayChartRef.nativeElement.getContext('2d');
       if (!ctx) return;
-      
-      // Create gradient for area fill
+
       const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, 'rgba(20, 184, 166, 0.3)');
-      gradient.addColorStop(0.5, 'rgba(20, 184, 166, 0.15)');
-      gradient.addColorStop(1, 'rgba(20, 184, 166, 0.05)');
-      
+      gradient.addColorStop(0, 'rgba(46, 134, 222, 0.35)');
+      gradient.addColorStop(0.5, 'rgba(46, 134, 222, 0.15)');
+      gradient.addColorStop(1, 'rgba(46, 134, 222, 0.05)');
+
       const chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -141,118 +149,69 @@ export class AdminDashboardComponent implements OnInit {
           datasets: [{
             label: 'Tests',
             data: this.analytics.usageByDay.map((u: UsageStatistic) => u.count),
-            borderColor: 'rgba(20, 184, 166, 1)',
+            borderColor: lineColor,
             backgroundColor: gradient,
-            borderWidth: 3,
+            borderWidth: 2,
             tension: 0.4,
             fill: true,
             pointRadius: 4,
             pointHoverRadius: 6,
-            pointBackgroundColor: 'rgba(20, 184, 166, 1)',
-            pointBorderColor: '#ffffff',
+            pointBackgroundColor: lineColor,
+            pointBorderColor: pointBorderDark,
             pointBorderWidth: 2,
-            pointHoverBackgroundColor: 'rgba(20, 184, 166, 1)',
-            pointHoverBorderColor: '#ffffff',
+            pointHoverBackgroundColor: lineColor,
+            pointHoverBorderColor: pointBorderDark,
             pointHoverBorderWidth: 3
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: {
-            duration: 1500,
-            easing: 'easeInOutQuart'
-          },
+          animation: { duration: 1500, easing: 'easeInOutQuart' },
           plugins: {
-            legend: {
-              display: false
-            },
+            legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
-              padding: 12,
-              titleColor: 'rgb(209, 213, 219)',
-              bodyColor: 'rgb(209, 213, 219)',
-              borderColor: 'rgba(20, 184, 166, 0.5)',
+              backgroundColor: tooltipBg,
+              titleColor: tooltipText,
+              bodyColor: tooltipText,
+              borderColor: tooltipBorder,
               borderWidth: 1,
               cornerRadius: 8,
               displayColors: false,
-              titleFont: {
-                size: 14,
-                weight: 'bold'
-              },
-              bodyFont: {
-                size: 16,
-                weight: '600'
-              },
-              callbacks: {
-                label: function(context: any) {
-                  return `${context.parsed.y} tests`;
-                }
-              }
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 16, weight: '600' },
+              callbacks: { label: (c: any) => `${c.parsed.y} tests` }
             }
           },
           scales: {
             x: {
-              ticks: {
-                color: 'rgba(209, 213, 219, 0.7)',
-                font: {
-                  size: 10,
-                  weight: '500'
-                },
-                maxRotation: 45,
-                minRotation: 0
-              },
-              grid: {
-                display: false,
-                drawBorder: false
-              },
-              border: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              }
+              ticks: { color: axisColor, font: { size: 10, weight: '500' }, maxRotation: 45, minRotation: 0 },
+              grid: { display: false, drawBorder: false },
+              border: { color: gridColor }
             },
             y: {
               beginAtZero: true,
               ticks: {
-                color: 'rgba(209, 213, 219, 0.7)',
-                font: {
-                  size: 11,
-                  weight: '500'
-                },
+                color: axisColor,
+                font: { size: 11, weight: '500' },
                 stepSize: null,
-                callback: function(value: any) {
-                  return value.toLocaleString();
-                }
+                callback: (v: any) => v.toLocaleString()
               },
-              grid: {
-                color: 'rgba(255, 255, 255, 0.08)',
-                drawBorder: false,
-                lineWidth: 1
-              },
-              border: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              }
+              grid: { color: gridColor, drawBorder: false, lineWidth: 1 },
+              border: { color: gridColor }
             }
           },
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          }
+          interaction: { intersect: false, mode: 'index' }
         }
       });
       this.charts.push(chart);
     }
 
-    // Usage by Month Chart - Professional Design
+    // Usage by Month — Bar chart (FIX 5: fill #7F77DD)
     if (this.usageByMonthChartRef) {
       const ctx = this.usageByMonthChartRef.nativeElement.getContext('2d');
       if (!ctx) return;
-      
-      // Create gradient for bars
-      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.9)');
-      gradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.7)');
-      gradient.addColorStop(1, 'rgba(16, 185, 129, 0.4)');
-      
+
       const chart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -260,10 +219,10 @@ export class AdminDashboardComponent implements OnInit {
           datasets: [{
             label: 'Tests',
             data: this.analytics.usageByMonth.map((u: UsageStatistic) => u.count),
-            backgroundColor: gradient,
-            borderColor: 'rgba(16, 185, 129, 1)',
-            borderWidth: 2,
-            borderRadius: 8,
+            backgroundColor: barMonthColor,
+            borderColor: barMonthColor,
+            borderWidth: 0,
+            borderRadius: 4,
             borderSkipped: false,
             maxBarThickness: 60
           }]
@@ -271,100 +230,51 @@ export class AdminDashboardComponent implements OnInit {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: {
-            duration: 1500,
-            easing: 'easeInOutQuart'
-          },
+          animation: { duration: 1500, easing: 'easeInOutQuart' },
           plugins: {
-            legend: {
-              display: false
-            },
+            legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
-              padding: 12,
-              titleColor: 'rgb(209, 213, 219)',
-              bodyColor: 'rgb(209, 213, 219)',
-              borderColor: 'rgba(16, 185, 129, 0.5)',
+              backgroundColor: tooltipBg,
+              titleColor: tooltipText,
+              bodyColor: tooltipText,
+              borderColor: tooltipBorder,
               borderWidth: 1,
               cornerRadius: 8,
               displayColors: false,
-              titleFont: {
-                size: 14,
-                weight: 'bold'
-              },
-              bodyFont: {
-                size: 16,
-                weight: '600'
-              },
-              callbacks: {
-                label: function(context: any) {
-                  return `${context.parsed.y} tests`;
-                }
-              }
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 16, weight: '600' },
+              callbacks: { label: (c: any) => `${c.parsed.y} tests` }
             }
           },
           scales: {
             x: {
-              ticks: {
-                color: 'rgba(209, 213, 219, 0.7)',
-                font: {
-                  size: 11,
-                  weight: '500'
-                },
-                maxRotation: 45,
-                minRotation: 0
-              },
-              grid: {
-                display: false,
-                drawBorder: false
-              },
-              border: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              }
+              ticks: { color: axisColor, font: { size: 11, weight: '500' }, maxRotation: 45, minRotation: 0 },
+              grid: { display: false, drawBorder: false },
+              border: { color: gridColor }
             },
             y: {
               beginAtZero: true,
               ticks: {
-                color: 'rgba(209, 213, 219, 0.7)',
-                font: {
-                  size: 11,
-                  weight: '500'
-                },
+                color: axisColor,
+                font: { size: 11, weight: '500' },
                 stepSize: null,
-                callback: function(value: any) {
-                  return value.toLocaleString();
-                }
+                callback: (v: any) => v.toLocaleString()
               },
-              grid: {
-                color: 'rgba(255, 255, 255, 0.08)',
-                drawBorder: false,
-                lineWidth: 1
-              },
-              border: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              }
+              grid: { color: gridColor, drawBorder: false, lineWidth: 1 },
+              border: { color: gridColor }
             }
           },
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          }
+          interaction: { intersect: false, mode: 'index' }
         }
       });
       this.charts.push(chart);
     }
 
-    // Usage by Year Chart - Professional Design
+    // Usage by Year — Bar chart (FIX 5: fill #2E86DE)
     if (this.usageByYearChartRef) {
       const ctx = this.usageByYearChartRef.nativeElement.getContext('2d');
       if (!ctx) return;
-      
-      // Create gradient for bars (blue to purple)
-      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.9)');
-      gradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.8)');
-      gradient.addColorStop(1, 'rgba(139, 92, 246, 0.6)');
-      
+
       const chart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -372,10 +282,10 @@ export class AdminDashboardComponent implements OnInit {
           datasets: [{
             label: 'Tests',
             data: this.analytics.usageByYear.map((u: UsageStatistic) => u.count),
-            backgroundColor: gradient,
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 2,
-            borderRadius: 8,
+            backgroundColor: barYearColor,
+            borderColor: barYearColor,
+            borderWidth: 0,
+            borderRadius: 4,
             borderSkipped: false,
             maxBarThickness: 80
           }]
@@ -383,97 +293,54 @@ export class AdminDashboardComponent implements OnInit {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: {
-            duration: 1500,
-            easing: 'easeInOutQuart'
-          },
+          animation: { duration: 1500, easing: 'easeInOutQuart' },
           plugins: {
-            legend: {
-              display: false
-            },
+            legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
-              padding: 12,
-              titleColor: 'rgb(209, 213, 219)',
-              bodyColor: 'rgb(209, 213, 219)',
-              borderColor: 'rgba(59, 130, 246, 0.5)',
+              backgroundColor: tooltipBg,
+              titleColor: tooltipText,
+              bodyColor: tooltipText,
+              borderColor: tooltipBorder,
               borderWidth: 1,
               cornerRadius: 8,
               displayColors: false,
-              titleFont: {
-                size: 14,
-                weight: 'bold'
-              },
-              bodyFont: {
-                size: 16,
-                weight: '600'
-              },
-              callbacks: {
-                label: function(context: any) {
-                  return `${context.parsed.y.toLocaleString()} tests`;
-                }
-              }
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 16, weight: '600' },
+              callbacks: { label: (c: any) => `${c.parsed.y.toLocaleString()} tests` }
             }
           },
           scales: {
             x: {
-              ticks: {
-                color: 'rgba(209, 213, 219, 0.7)',
-                font: {
-                  size: 12,
-                  weight: '600'
-                },
-                maxRotation: 0,
-                minRotation: 0
-              },
-              grid: {
-                display: false,
-                drawBorder: false
-              },
-              border: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              }
+              ticks: { color: axisColor, font: { size: 12, weight: '500' }, maxRotation: 0, minRotation: 0 },
+              grid: { display: false, drawBorder: false },
+              border: { color: gridColor }
             },
             y: {
               beginAtZero: true,
               ticks: {
-                color: 'rgba(209, 213, 219, 0.7)',
-                font: {
-                  size: 11,
-                  weight: '500'
-                },
+                color: axisColor,
+                font: { size: 11, weight: '500' },
                 stepSize: null,
-                callback: function(value: any) {
-                  if (value >= 1000) {
-                    return (value / 1000).toFixed(1) + 'K';
-                  }
+                callback: (value: any) => {
+                  if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
                   return value.toLocaleString();
                 }
               },
-              grid: {
-                color: 'rgba(255, 255, 255, 0.08)',
-                drawBorder: false,
-                lineWidth: 1
-              },
-              border: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              }
+              grid: { color: gridColor, drawBorder: false, lineWidth: 1 },
+              border: { color: gridColor }
             }
           },
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          }
+          interaction: { intersect: false, mode: 'index' }
         }
       });
       this.charts.push(chart);
     }
 
-    // Result Distribution Chart - Professional Design
+    // Result Distribution — Doughnut (FIX 5: Positive #E05252, Negative #1D9E75, Uncertain #F0A500)
     if (this.resultDistributionChartRef) {
       const ctx = this.resultDistributionChartRef.nativeElement.getContext('2d');
       if (!ctx) return;
-      
+
       const chart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -484,62 +351,40 @@ export class AdminDashboardComponent implements OnInit {
               this.analytics.testResultsDistribution.negative,
               this.analytics.testResultsDistribution.uncertain
             ],
-            backgroundColor: [
-              'rgba(239, 68, 68, 0.9)',
-              'rgba(34, 197, 94, 0.9)',
-              'rgba(234, 179, 8, 0.9)'
-            ],
-            borderColor: [
-              'rgba(239, 68, 68, 1)',
-              'rgba(34, 197, 94, 1)',
-              'rgba(234, 179, 8, 1)'
-            ],
-            borderWidth: 3,
-            hoverBorderWidth: 4,
+            backgroundColor: ['#E05252', '#1D9E75', '#F0A500'],
+            borderColor: ['#E05252', '#1D9E75', '#F0A500'],
+            borderWidth: 2,
+            hoverBorderWidth: 3,
             hoverOffset: 8
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: {
-            duration: 1500,
-            easing: 'easeInOutQuart',
-            animateRotate: true,
-            animateScale: true
-          },
+          animation: { duration: 1500, easing: 'easeInOutQuart', animateRotate: true, animateScale: true },
           plugins: {
             legend: {
               position: 'bottom',
               labels: {
-                color: 'rgba(209, 213, 219, 0.9)',
+                color: '#8B95A6',
                 padding: 15,
-                font: {
-                  size: 12,
-                  weight: '600'
-                },
+                font: { size: 12, weight: '500' },
                 usePointStyle: true,
                 pointStyle: 'circle'
               }
             },
             tooltip: {
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
+              backgroundColor: tooltipBg,
               padding: 12,
-              titleColor: 'rgb(209, 213, 219)',
-              bodyColor: 'rgb(209, 213, 219)',
-              borderColor: 'rgba(139, 92, 246, 0.5)',
+              titleColor: tooltipText,
+              bodyColor: tooltipText,
+              borderColor: tooltipBorder,
               borderWidth: 1,
               cornerRadius: 8,
-              titleFont: {
-                size: 14,
-                weight: 'bold'
-              },
-              bodyFont: {
-                size: 16,
-                weight: '600'
-              },
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 16, weight: '600' },
               callbacks: {
-                label: function(context: any) {
+                label: (context: any) => {
                   const label = context.label || '';
                   const value = context.parsed || 0;
                   const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
@@ -550,10 +395,7 @@ export class AdminDashboardComponent implements OnInit {
             }
           },
           cutout: '60%',
-          interaction: {
-            intersect: true,
-            mode: 'point'
-          }
+          interaction: { intersect: true, mode: 'point' }
         }
       });
       this.charts.push(chart);

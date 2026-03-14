@@ -1,9 +1,94 @@
-::ng-deep .ask-results-dialog .p-dialog-header {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  color: white;
-  border-radius: 8px 8px 0 0;
+// Consultation redirect dialog – uses global app theme (see styles.scss :root)
+:host ::ng-deep .consultation-redirect-dialog {
+  .p-dialog {
+    border-radius: var(--app-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--app-shadow);
+  }
+
+  .p-dialog-header {
+    background: var(--app-primary);
+    color: var(--app-primary-foreground);
+    padding: 1rem 1.25rem;
+    border-bottom: none;
+    font-weight: 500;
+    font-size: 1.25rem; /* 20px – match dialog title */
+    letter-spacing: -0.01em;
+  }
+
+  .p-dialog-header-icon {
+    color: rgba(255, 255, 255, 0.9);
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .p-dialog-header-icon:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: var(--app-radius);
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem 1.25rem;
+    background: var(--app-surface);
+  }
 }
 
-::ng-deep .ask-results-dialog .p-dialog-content {
-  padding: 1.25rem;
+.redirect-body {
+  margin-bottom: 1.5rem;
+}
+
+.redirect-message {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem; /* 18px – primary question */
+  line-height: 1.5;
+  color: var(--app-text-primary);
+  font-weight: 500;
+}
+
+.redirect-hint {
+  margin: 0;
+  font-size: 0.9375rem; /* 15px – secondary description */
+  line-height: 1.5;
+  color: var(--app-text-muted);
+}
+
+.redirect-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  min-width: 6rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9375rem; /* 15–16px – match dialog buttons */
+  font-weight: 500;
+  border-radius: var(--app-radius);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.action-btn-secondary {
+  background: var(--app-surface);
+  color: var(--app-secondary-border, #333333);
+  border: 1px solid var(--app-secondary-border, #333333);
+}
+
+.action-btn-secondary:hover {
+  background: var(--app-surface-muted);
+  border-color: var(--app-secondary-border, #333333);
+  color: var(--color-ink);
+}
+
+.action-btn-primary {
+  background: var(--app-primary);
+  color: var(--app-primary-foreground);
+  border: none;
+}
+
+.action-btn-primary:hover {
+  background: var(--app-primary-hover);
+  border-color: var(--app-primary-hover);
 }

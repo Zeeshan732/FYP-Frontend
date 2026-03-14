@@ -28,8 +28,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   routeLabels: { [key: string]: string } = {
     'landing': 'Home',
     'home': 'Home',
-    'technology-demo': 'Technology Demo',
     'contact': 'Contact',
+    'consultation': 'Consultation',
     'patient-test': 'Take Test',
     'test-records': 'Test Records',
     'admin-dashboard': 'Admin Dashboard',
@@ -140,16 +140,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Get the final route path
-    const urlSegments = this.router.url.split('/').filter(segment => segment);
+    // Get the final route path (strip query string for display)
+    const urlWithoutQuery = this.router.url.split('?')[0];
+    const urlSegments = urlWithoutQuery.split('/').filter(segment => segment);
     
     if (urlSegments.length > 0) {
       const currentPath = urlSegments[urlSegments.length - 1];
       this.currentRoute = this.routeLabels[currentPath] || this.formatRouteName(currentPath);
       
-      // Build breadcrumb from URL
+      // Build breadcrumb from URL (no query params in labels)
       const breadcrumbParts: string[] = ['Home'];
-      urlSegments.forEach((segment, index) => {
+      urlSegments.forEach((segment) => {
         const label = this.routeLabels[segment] || this.formatRouteName(segment);
         if (label && label !== 'Details') {
           breadcrumbParts.push(label);

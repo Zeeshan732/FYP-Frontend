@@ -1,0 +1,159 @@
+<div class="blog-page">
+  <!-- Blog Navbar -->
+  <nav class="blog-navbar">
+    <div class="blog-container blog-navbar-inner">
+      <a routerLink="/landing" class="blog-navbar-brand">
+        NeuroSync <span class="blog-navbar-badge">Blog</span>
+      </a>
+      <div class="blog-navbar-search">
+        <svg class="blog-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search articles, research, guides…" class="blog-search-input">
+      </div>
+      <div class="blog-navbar-links">
+        <a href="#" class="blog-nav-link">News</a>
+        <a href="#" class="blog-nav-link">Our Voices</a>
+        <a href="#" class="blog-nav-link">Research</a>
+        <a href="#" class="blog-nav-link">Case Studies</a>
+      </div>
+      <button type="button" class="blog-navbar-cta" (click)="goToNeuroSync()">Go to NeuroSync</button>
+      <button type="button" class="blog-navbar-menu" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- Hero featured article -->
+  <section class="blog-hero">
+    <div class="blog-container blog-hero-inner">
+      <div class="blog-hero-thumb">
+        <svg class="blog-hero-thumb-svg" width="120" height="80" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.25">
+          <path d="M20 40 Q40 20 60 40 T100 40"/>
+          <circle cx="60" cy="40" r="12"/>
+          <circle cx="30" cy="30" r="6"/>
+          <circle cx="90" cy="30" r="6"/>
+          <circle cx="30" cy="50" r="6"/>
+          <circle cx="90" cy="50" r="6"/>
+        </svg>
+      </div>
+      <div class="blog-hero-content">
+        <span class="blog-hero-eyebrow">Featured Research</span>
+        <p class="blog-hero-meta">NeuroSync Team · March 10, 2026</p>
+        <h1 class="blog-hero-title">
+          AI-Powered Parkinson's Detection: <span class="blog-hero-accent">2026 Research Recap</span>
+        </h1>
+        <p class="blog-hero-desc">
+          NeuroSync's latest cohort study shows a 76.59% average accuracy across voice, gait, and finger-tapping biomarkers — outperforming single-signal baselines by 18%.
+        </p>
+        <a routerLink="/about" class="blog-hero-cta">Read article →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- News row -->
+  <section class="blog-section-row">
+    <div class="blog-container">
+      <app-section-row title="News" viewAllHref="/blog">
+        <div class="blog-cards-grid">
+          <app-article-card
+            *ngFor="let a of newsArticles"
+            [thumbBg]="a.thumbBg"
+            [thumbLabel]="a.thumbLabel"
+            [tag]="a.tag"
+            [tagColor]="a.tagColor"
+            [title]="a.title"
+            [desc]="a.desc"
+            [author]="a.author"
+            [date]="a.date"
+            [iconType]="a.iconType ?? 'research'">
+          </app-article-card>
+        </div>
+      </app-section-row>
+    </div>
+  </section>
+
+  <!-- Featured wide card -->
+  <section class="blog-featured-wrap">
+    <div class="blog-container">
+      <div class="blog-featured">
+      <div class="blog-featured-thumb">
+        <svg width="100" height="80" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="1" opacity="0.35">
+          <path d="M10 40 L30 20 L50 40 L70 20 L90 40"/>
+          <path d="M10 50 L30 30 L50 50 L70 30 L90 50"/>
+          <circle cx="50" cy="40" r="4"/>
+        </svg>
+      </div>
+      <div class="blog-featured-body">
+        <span class="blog-featured-tag">Deep dive</span>
+        <p class="blog-featured-meta">Umair Azam · March 5, 2026</p>
+        <h2 class="blog-featured-title">Inside the model: how we classify Parkinson's risk from three signals simultaneously</h2>
+        <p class="blog-featured-desc">A technical walkthrough of the ensemble architecture that combines voice, gait, and tap features into a single confidence score — and why we chose late fusion over early fusion.</p>
+        <a routerLink="/about" class="blog-featured-cta">Read article →</a>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Research row -->
+  <section class="blog-section-row">
+    <div class="blog-container">
+      <app-section-row title="Research" viewAllHref="/blog">
+    <div class="blog-cards-grid">
+      <app-article-card
+        *ngFor="let a of researchArticles"
+        [thumbBg]="a.thumbBg"
+        [thumbLabel]="a.thumbLabel"
+        [tag]="a.tag"
+        [tagColor]="a.tagColor"
+        [title]="a.title"
+        [desc]="a.desc"
+        [author]="a.author"
+        [date]="a.date"
+        [iconType]="a.iconType ?? 'research'">
+      </app-article-card>
+    </div>
+      </app-section-row>
+    </div>
+  </section>
+
+  <!-- CTA banner -->
+  <section class="blog-cta-wrap">
+    <div class="blog-container">
+      <div class="blog-cta">
+      <div class="blog-cta-left">
+        <span class="blog-cta-eyebrow">For clinicians</span>
+        <h3 class="blog-cta-title">The best diagnosis is an <span class="blog-cta-accent">early</span> diagnosis.</h3>
+        <p class="blog-cta-sub">Run a full 3-signal assessment in under 5 minutes.</p>
+      </div>
+      <button type="button" class="blog-cta-btn" (click)="tryFree()">Try NeuroSync free</button>
+    </div>
+    </div>
+  </section>
+
+  <!-- Case Studies row -->
+  <section class="blog-section-row">
+    <div class="blog-container">
+      <app-section-row title="Case Studies" viewAllHref="/blog">
+    <div class="blog-cards-grid">
+      <app-article-card
+        *ngFor="let a of caseStudyArticles"
+        [thumbBg]="a.thumbBg"
+        [thumbLabel]="a.thumbLabel"
+        [tag]="a.tag"
+        [tagColor]="a.tagColor"
+        [title]="a.title"
+        [desc]="a.desc"
+        [author]="a.author"
+        [date]="a.date"
+        [metaOverride]="a.metaOverride"
+        [iconType]="a.iconType ?? 'research'">
+      </app-article-card>
+    </div>
+      </app-section-row>
+    </div>
+  </section>
+
+  <div class="blog-container blog-footer-wrap">
+    <app-footer></app-footer>
+  </div>
+</div>

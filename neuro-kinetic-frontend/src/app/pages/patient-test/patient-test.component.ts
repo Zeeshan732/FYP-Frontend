@@ -68,6 +68,14 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('voiceFeaturesChart') voiceFeaturesChartRef?: ElementRef<HTMLCanvasElement>;
   private voiceFeaturesChart: Chart | null = null;
 
+  // Live waveform during recording (Web Audio API)
+  @ViewChild('waveformCanvas') waveformCanvasRef?: ElementRef<HTMLCanvasElement>;
+  private audioContext: AudioContext | null = null;
+  private analyser: AnalyserNode | null = null;
+  private streamSource: MediaStreamAudioSourceNode | null = null;
+  private waveformData: Uint8Array | null = null;
+  private waveformAnimationId: number | null = null;
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
@@ -173,7 +181,10 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
 
       // Start recording
       this.mediaRecorder.start();
-      
+
+      // Start live waveform visualization (run after view updates so canvas is in DOM)
+      setTimeout(() => this.startWaveformVisualization(), 50);
+
       // Start timer
       this.recordingTimer = setInterval(() => {
         this.recordingTime++;
@@ -187,6 +198,7 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   stopRecording() {
+    this.stopWaveformVisualization();
     if (this.mediaRecorder && this.isRecording) {
       this.mediaRecorder.stop();
       if (this.audioStream) {
@@ -196,6 +208,85 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
         clearInterval(this.recordingTimer);
       }
     }
+  }
+
+  private startWaveformVisualization(): void {
+    const canvas = this.waveformCanvasRef?.nativeElement;
+    if (!canvas || !this.audioStream) return;
+
+    try {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      if (!this.audioContext || this.audioContext.state === 'closed') {
+        this.audioContext = new AudioContext();
+      }
+      this.streamSource = this.audioContext.createMediaStreamSource(this.audioStream);
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 2048;
+      this.streamSource.connect(this.analyser);
+
+      const bufferLength = this.analyser.fftSize;
+      this.waveformData = new Uint8Array(bufferLength);
+
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.scale(dpr, dpr);
+
+      const draw = (): void => {
+        if (!this.isRecording || !this.analyser || !this.waveformData || !this.waveformCanvasRef?.nativeElement) return;
+        const c = this.waveformCanvasRef.nativeElement;
+        const context = c.getContext('2d');
+        if (!context) return;
+
+        const w = c.getBoundingClientRect().width;
+        const h = c.getBoundingClientRect().height;
+        this.analyser.getByteTimeDomainData(this.waveformData);
+
+        context.fillStyle = 'rgba(248, 250, 252, 0.95)';
+        context.fillRect(0, 0, w, h);
+
+        context.lineWidth = 2;
+        context.strokeStyle = '#38816e';
+        context.beginPath();
+
+        const sliceWidth = w / bufferLength;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const v = this.waveformData[i] / 128;
+          const y = (v * h) / 2 + h / 2;
+          if (i === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+          x += sliceWidth;
+        }
+        context.lineTo(w, h / 2);
+        context.stroke();
+
+        this.waveformAnimationId = requestAnimationFrame(draw);
+      };
+      draw();
+    } catch (e) {
+      console.warn('Waveform visualization failed', e);
+    }
+  }
+
+  private stopWaveformVisualization(): void {
+    if (this.waveformAnimationId != null) {
+      cancelAnimationFrame(this.waveformAnimationId);
+      this.waveformAnimationId = null;
+    }
+    if (this.streamSource) {
+      try { this.streamSource.disconnect(); } catch (_) {}
+      this.streamSource = null;
+    }
+    this.analyser = null;
+    if (this.audioContext?.state !== 'closed') {
+      this.audioContext?.close().catch(() => {});
+      this.audioContext = null;
+    }
+    this.waveformData = null;
   }
 
   // Handle file selection
@@ -354,7 +445,8 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   userId: this.currentUser?.id,
                   status: 'Completed',
                   testResult: this.mapPredictedClass(analysisResponse.predictedClass),
-                  accuracy: (analysisResponse.confidenceScore || 0) * 100,
+                  accuracy: (analysisResponse.confidenceScore ?? 0) * 100,
+                  riskPercent: analysisResponse.riskPercent != null ? Math.round(analysisResponse.riskPercent) : undefined,
                   voiceRecordingUrl: uploadResponse?.fileUrl || uploadResponse?.filePath,
                   analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`
                 };
@@ -774,7 +866,8 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   userId: this.currentUser?.id,
                   status: 'Completed',
                   testResult: this.mapPredictedClass(analysisResponse.predictedClass),
-                  accuracy: (analysisResponse.confidenceScore || 0) * 100,
+                  accuracy: (analysisResponse.confidenceScore ?? 0) * 100,
+                  riskPercent: analysisResponse.riskPercent != null ? Math.round(analysisResponse.riskPercent) : undefined,
                   voiceRecordingUrl: uploadResponse?.fileUrl || uploadResponse?.filePath,
                   analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`
                 };
@@ -884,13 +977,13 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   getRiskLevelColor(riskLevel?: string): string {
     switch (riskLevel) {
       case 'High':
-        return 'bg-red-500/20 border-red-500 text-red-400';
+        return 'risk-badge-critical';
       case 'Moderate':
-        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+        return 'risk-badge-warning';
       case 'Low':
-        return 'bg-green-500/20 border-green-500 text-green-400';
+        return 'risk-badge-healthy';
       default:
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'risk-badge-warning';
     }
   }
 
@@ -1061,22 +1154,22 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     switch(predictedClass) {
       case 'ParkinsonPositive':
       case 'Positive':
-        return 'bg-red-500/20 border-red-500 text-red-400';
+        return 'risk-badge-critical';
       case 'Healthy':
       case 'Negative':
-        return 'bg-green-500/20 border-green-500 text-green-400';
+        return 'risk-badge-healthy';
       case 'Uncertain':
-        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+        return 'risk-badge-warning';
       default:
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'risk-badge-warning';
     }
   }
 
   getRiskPercentClass(riskPercent?: number): string {
-    if (riskPercent === undefined || riskPercent === null) return 'text-gray-400';
-    if (riskPercent >= 50) return 'text-red-400';
-    if (riskPercent >= 30) return 'text-yellow-400';
-    return 'text-green-400';
+    if (riskPercent === undefined || riskPercent === null) return 'risk-percent-muted';
+    if (riskPercent >= 50) return 'risk-percent-high';
+    if (riskPercent >= 30) return 'risk-percent-moderate';
+    return 'risk-percent-low';
   }
 
   getRiskPercentDisplay(): number {

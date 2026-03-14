@@ -1,0 +1,146 @@
+.consultation-page {
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: var(--app-surface);
+}
+
+.consultation-header {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.consultation-header--minimal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+}
+
+.consultation-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.consultation-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--app-text-primary);
+  margin: 0;
+}
+
+.consultation-caret {
+  font-size: 0.75rem;
+  color: var(--app-text-muted);
+  line-height: 1;
+}
+
+.consultation-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.consultation-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  border-radius: 0.5rem;
+}
+
+.consultation-header-icon:hover {
+  color: var(--app-text-primary);
+  background: var(--app-surface-muted);
+}
+
+.consultation-header-icon .pi {
+  font-size: 1.125rem;
+}
+
+.consultation-subtitle {
+  font-size: 0.875rem;
+  color: var(--app-text-muted);
+  margin: 0;
+}
+
+.consultation-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 1rem;
+}
+
+.consultation-notice {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--app-text-primary);
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--app-surface);
+  border: none;
+  padding: 0;
+}
+
+.consultation-footer {
+  margin-top: auto;
+  padding: 0.5rem 1.25rem;
+  border-top: 1px solid var(--app-border);
+}
+
+.disclaimer {
+  font-size: 0.75rem;
+  color: var(--app-text-muted);
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.no-results {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: var(--app-surface-muted);
+  border: 1px dashed var(--app-border);
+}
+
+.no-results p {
+  margin: 0 0 1rem 0;
+  color: var(--app-text-muted);
+}
+
+.go-button {
+  background: var(--app-primary);
+  color: var(--app-primary-foreground);
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.go-button:hover {
+  background: var(--app-primary-hover);
+}

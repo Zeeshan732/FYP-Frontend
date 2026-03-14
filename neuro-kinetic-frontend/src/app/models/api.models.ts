@@ -290,6 +290,8 @@ export interface UserTestRecord {
   testDate: string;
   testResult: 'Positive' | 'Negative' | 'Uncertain';
   accuracy: number;
+  /** Risk percentage 0–100 from screening (when provided by backend). */
+  riskPercent?: number;
   status: 'Completed' | 'Pending' | 'Failed';
   voiceRecordingUrl?: string;
   analysisNotes?: string;
@@ -302,6 +304,8 @@ export interface UserTestRecordRequest {
   userName: string;
   testResult?: 'Positive' | 'Negative' | 'Uncertain';
   accuracy?: number;
+  /** Risk percentage 0–100 from screening (for backend to store and return in list). */
+  riskPercent?: number;
   status?: 'Completed' | 'Pending' | 'Failed';
   voiceRecordingUrl?: string;
   analysisNotes?: string;
@@ -409,7 +413,8 @@ export interface UserTestRecordDto {
   userName: string;
   testDate: string; // ISO 8601
   testResult: 'Positive' | 'Negative' | 'Uncertain';
-  accuracy: number; // 0-100
+  accuracy: number; // 0-100 (model confidence)
+  riskPercent?: number; // 0-100 screening risk (e.g. 40, 43)
   status: 'Completed' | 'Pending' | 'Failed';
   voiceRecordingUrl?: string;
   analysisNotes?: string;
@@ -510,4 +515,81 @@ export type RagTestResponse = RagIrrelevantResponse | RagRelevantResponse;
 /** Type guard: response is irrelevant */
 export function isRagIrrelevant(r: RagTestResponse): r is RagIrrelevantResponse {
   return r.isRelevant === false;
+}
+
+/** Response from POST /api/rag/ask (Python RAG knowledge-base). */
+export interface RagAskResponse {
+  answer: string;
+}
+
+// ========== Voice Predict (FastAPI /api/voice/predict) ==========
+
+/** Request body for POST /api/voice/predict. Exactly these 10 keys (same names as backend/FastAPI). */
+export interface VoicePredictRequest {
+  spread1: number;
+  PPE: number;
+  MDVP_APQ: number;
+  MDVP_Flo: number;
+  MDVP_Fo: number;
+  Shimmer_dB: number;
+  APQ5: number;
+  Shimmer: number;
+  spread2: number;
+  RAP: number;
+}
+
+/** Success response from POST /api/voice/predict (e.g. prediction, probability, class). */
+export interface VoicePredictResponse {
+  prediction?: number | string;
+  probability?: number;
+  class?: string;
+  [key: string]: unknown;
+}
+
+/** Error body when API returns 500 (e.g. ML service unavailable). */
+export interface VoicePredictErrorBody {
+  message?: string;
+  detail?: string;
+  [key: string]: unknown;
+}
+
+// ========== Analytics Layer (independent of ML/RAG) ==========
+
+export interface RiskAdjustRequest {
+  mlRiskPercent: number;
+  gaitScore?: number;
+  age?: number;
+}
+
+export interface RiskAdjustResponse {
+  finalAdjustedRisk: number;
+}
+
+export interface TestRecordPoint {
+  testDate: string; // ISO
+  riskValue: number;
+}
+
+export interface ProgressionRequest {
+  userId?: number;
+  dataPoints?: TestRecordPoint[];
+}
+
+export interface ProgressionAnalysisDto {
+  linearRegressionSlope: number;
+  movingAverages: number[];
+  trendClassification: 'Stable' | 'Increasing' | 'Rapid increase';
+  smoothedPoints: TestRecordPoint[];
+}
+
+export interface StatisticsRequest {
+  values: number[];
+}
+
+export interface StatisticsResponse {
+  mean: number;
+  variance: number;
+  standardDeviation: number;
+  zScores: number[];
+  minMaxNormalized: number[];
 }

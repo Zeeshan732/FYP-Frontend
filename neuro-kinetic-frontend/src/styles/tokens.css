@@ -1,0 +1,67 @@
+/* NeuroSync — full dark theme */
+:root {
+  /* Dark theme base */
+  --color-page-bg:     #0A1628;
+  --color-sidebar-bg:  #0D1B2E;
+  --color-surface:     #112240;
+  --color-surface-2:   #162A4A;
+  --color-border:      rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.15);
+
+  /* Text */
+  --color-ink:         #E8EBF0;
+  --color-muted:       #8B95A6;
+  --color-hint:        #4A5568;
+
+  /* Brand */
+  --color-navy:        #0F3D6E;
+  --color-blue:        #2E86DE;
+  --color-blue-hover:  #1A6FA8;
+  --color-sky:         rgba(46, 134, 222, 0.12);
+
+  /* AI / Neural */
+  --color-violet:      #7F77DD;
+  --color-violet-bg:   rgba(127, 119, 221, 0.12);
+
+  /* Signal colors */
+  --color-voice:       #2E86DE;
+  --color-voice-bg:    rgba(46, 134, 222, 0.12);
+  --color-gait:        #7F77DD;
+  --color-gait-bg:     rgba(127, 119, 221, 0.12);
+  --color-tap:         #1D9E75;
+  --color-tap-bg:      rgba(29, 158, 117, 0.12);
+
+  /* Semantic / Risk */
+  --color-healthy:     #1D9E75;
+  --color-healthy-bg:   rgba(29, 158, 117, 0.15);
+  --color-warning:     #F0A500;
+  --color-warning-bg:  rgba(240, 165, 0, 0.15);
+  --color-critical:    #E05252;
+  --color-critical-bg: rgba(224, 82, 82, 0.15);
+
+  /* Card accent top borders */
+  --accent-registered: #2E86DE;
+  --accent-active:     #7F77DD;
+  --accent-total:      #1D9E75;
+  --accent-positive:   #E05252;
+  --accent-uncertain:  #F0A500;
+  --accent-accuracy:   #2E86DE;
+
+  /* Legacy / compatibility */
+  --color-ai-border:   rgba(175, 169, 236, 0.4);
+  --color-purple:      #7F77DD;
+  --color-lavender:    rgba(127, 119, 221, 0.15);
+
+  /* Typography */
+  --font-base:         'Inter', sans-serif;
+  --text-base:         16px;
+  --leading-base:      1.6;
+
+  /* Radius */
+  --radius-card:       10px;
+  --radius-input:      8px;
+  --radius-badge:      20px;
+
+  /* Shadows */
+  --shadow-card:       0 2px 8px rgba(0, 0, 0, 0.3);
+}

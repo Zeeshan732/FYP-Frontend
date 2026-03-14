@@ -1,75 +1,63 @@
-<p class="rag-chat-description text-gray-600 text-sm mb-4">
-  Get structured guidance about your screening result. Ask questions related to Parkinson's and your risk level.
-</p>
-<div class="flex flex-col sm:flex-row gap-3 mb-4">
-  <input
-    type="text"
-    [(ngModel)]="question"
-    (keydown.enter)="ask()"
-    placeholder="e.g. What does high Parkinson's risk mean?"
-    class="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-  />
-  <button
-    type="button"
-    (click)="ask()"
-    [disabled]="loading || !question?.trim() || riskPercent == null"
-    class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-semibold transition-colors whitespace-nowrap">
-    {{ loading ? 'Asking…' : 'Ask' }}
-  </button>
-</div>
-<button *ngIf="response" type="button" (click)="clearResponse()" class="text-gray-500 hover:text-gray-700 text-sm mb-2">Clear response</button>
-
-<div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
-  <p class="text-red-700 text-sm">{{ error }}</p>
-</div>
-
-<div *ngIf="response && isIrrelevant(response)" class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
-  <p class="text-amber-800 text-sm">{{ getRelevanceMessage(response) }}</p>
-</div>
-
-<div *ngIf="response && !isIrrelevant(response) && getClinical(response) as clinical" class="rag-chat-response space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    <div class="bg-gray-50 rounded-lg p-3">
-      <p class="text-gray-500 text-xs mb-1">Risk summary</p>
-      <p class="font-semibold text-gray-800">{{ clinical.risk_summary.risk_level }} ({{ clinical.risk_summary.risk_percent }}%)</p>
-      <p class="text-gray-600 text-sm mt-1">{{ clinical.risk_summary.summary_text }}</p>
+<div class="rag-chat" [class.rag-chat--light]="theme === 'light'">
+  <div class="rag-chat-header">
+    <div *ngIf="riskPercent == null && theme !== 'light'" class="rag-notice">
+      For personalized guidance, complete a screening first. You can still ask general questions here.
     </div>
-    <div class="bg-gray-50 rounded-lg p-3">
-      <p class="text-gray-500 text-xs mb-1">Priority</p>
-      <p class="font-semibold text-gray-800 capitalize">{{ clinical.recommendation.priority }}</p>
+    <button type="button" class="rag-btn-new-chat" (click)="newChat()" title="Start a new conversation">
+      <span class="rag-btn-new-chat-icon" aria-hidden="true">+</span>
+      New chat
+    </button>
+  </div>
+
+  <div class="rag-messages" [class.rag-messages--empty]="theme === 'light' && messages.length === 0">
+    <p *ngIf="theme === 'light' && messages.length === 0" class="rag-welcome">What can I help with?</p>
+    <p *ngIf="theme !== 'light' && messages.length === 0" class="rag-placeholder">Ask a question about your screening result, risk level, or general guidance.</p>
+    <div *ngFor="let msg of messages" class="rag-msg" [class.rag-msg--sent]="msg.reply">
+      <div class="rag-msg-bubble">
+        <span *ngIf="!msg.reply" class="rag-msg-sender">{{ msg.sender }}</span>
+        <div class="rag-msg-text">{{ msg.text }}</div>
+      </div>
+    </div>
+    <!-- Typing indicator (left side) – no loader, no green -->
+    <div *ngIf="loading" class="rag-msg rag-msg--loader">
+      <div class="rag-msg-bubble rag-msg-bubble--typing">
+        <span class="rag-msg-sender">NeuroSync</span>
+        <span class="rag-typing">typing....</span>
+      </div>
     </div>
   </div>
-  <div class="bg-gray-50 rounded-lg p-3">
-    <p class="text-emerald-600 font-semibold text-sm mb-2">Clinical analysis</p>
-    <p class="text-gray-600 text-sm mb-2">{{ clinical.clinical_analysis.interpretation }}</p>
-    <ul *ngIf="clinical.clinical_analysis.key_findings?.length" class="list-disc list-inside text-gray-600 text-sm space-y-1">
-      <li *ngFor="let f of clinical.clinical_analysis.key_findings">{{ f }}</li>
-    </ul>
+
+  <div class="rag-form" [class.rag-form--light]="theme === 'light'">
+    <ng-container *ngIf="theme === 'light'">
+      <div class="rag-input-wrap">
+        <input
+          type="text"
+          [(ngModel)]="inputMessage"
+          (keydown.enter)="$event.preventDefault(); sendMessage()"
+          placeholder="Ask anything"
+          [disabled]="loading"
+          class="rag-input rag-input--inside" />
+        
+      </div>
+
+      <button type="button" (click)="sendMessage()" [disabled]="loading || !inputMessage.trim()" class="rag-input-icon rag-input-icon--send" aria-label="Send">
+        <svg viewBox="0 0 24 24" fill="currentColor" class="rag-icon-send-arrow"><path d="M4 12l8-8 8 8h-5v8h-6v-8H4z"/></svg>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="theme !== 'light'">
+      <input
+        type="text"
+        [(ngModel)]="inputMessage"
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+        placeholder="Type a message"
+        [disabled]="loading"
+        class="rag-input" />
+      <button type="button" (click)="sendMessage()" [disabled]="loading" class="rag-send">
+        {{ loading ? '…' : 'Send' }}
+      </button>
+    </ng-container>
   </div>
-  <div class="bg-gray-50 rounded-lg p-3">
-    <p class="text-emerald-600 font-semibold text-sm mb-2">Recommendation</p>
-    <ul *ngIf="clinical.recommendation.next_steps?.length" class="list-disc list-inside text-gray-600 text-sm space-y-1">
-      <li *ngFor="let s of clinical.recommendation.next_steps">{{ s }}</li>
-    </ul>
-    <p class="text-gray-600 text-sm mt-2">{{ clinical.recommendation.follow_up }}</p>
-  </div>
-  <div class="bg-gray-50 rounded-lg p-3">
-    <p class="text-emerald-600 font-semibold text-sm mb-2">Doctor referral</p>
-    <p class="text-gray-600 text-sm"><strong>{{ clinical.doctor_referral.recommended_specialist }}</strong> — {{ clinical.doctor_referral.reason }}</p>
-    <p class="text-gray-500 text-xs mt-1">Timing: {{ clinical.doctor_referral.suggested_timing }}</p>
-    <p *ngIf="clinical.doctor_referral.city" class="text-gray-500 text-xs">City: {{ clinical.doctor_referral.city }}</p>
-  </div>
-  <div class="bg-gray-50 rounded-lg p-3">
-    <p class="text-emerald-600 font-semibold text-sm mb-2">Lifestyle guidance</p>
-    <ul *ngIf="clinical.lifestyle_guidance.general_advice?.length" class="list-disc list-inside text-gray-600 text-sm space-y-1">
-      <li *ngFor="let a of clinical.lifestyle_guidance.general_advice">{{ a }}</li>
-    </ul>
-    <ul *ngIf="clinical.lifestyle_guidance.activity_suggestions?.length" class="list-disc list-inside text-gray-600 text-sm mt-2 space-y-1">
-      <li *ngFor="let a of clinical.lifestyle_guidance.activity_suggestions">{{ a }}</li>
-    </ul>
-    <p *ngIf="clinical.lifestyle_guidance.notes" class="text-gray-600 text-sm mt-2">{{ clinical.lifestyle_guidance.notes }}</p>
-  </div>
-  <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-    <p class="text-yellow-800 text-xs">{{ clinical.disclaimer }}</p>
-  </div>
+
+  <div *ngIf="error" class="rag-error">{{ error }}</div>
+  <button *ngIf="messages.length > 0" type="button" (click)="newChat()" class="rag-clear">New chat</button>
 </div>

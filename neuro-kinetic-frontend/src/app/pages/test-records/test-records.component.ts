@@ -52,6 +52,7 @@ export class TestRecordsComponent implements OnInit {
   sortOptions = [
     { label: 'Sort by Date', value: 'testDate' },
     { label: 'Sort by Accuracy', value: 'accuracy' },
+    { label: 'Sort by Risk', value: 'riskPercent' },
     { label: 'Sort by Result', value: 'testResult' }
   ];
 
@@ -311,26 +312,26 @@ export class TestRecordsComponent implements OnInit {
   getResultBadgeColor(result: string): string {
     switch (result) {
       case 'Positive':
-        return 'bg-red-500/20 border-red-500 text-red-400';
+        return 'risk-badge-critical';
       case 'Negative':
-        return 'bg-green-500/20 border-green-500 text-green-400';
+        return 'risk-badge-healthy';
       case 'Uncertain':
-        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+        return 'risk-badge-warning';
       default:
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'risk-badge-warning';
     }
   }
 
   getStatusBadgeColor(status: string): string {
     switch (status) {
       case 'Completed':
-        return 'bg-green-500/20 border-green-500 text-green-400';
+        return 'risk-badge-healthy';
       case 'Pending':
-        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+        return 'risk-badge-warning';
       case 'Failed':
-        return 'bg-red-500/20 border-red-500 text-red-400';
+        return 'risk-badge-critical';
       default:
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'risk-badge-warning';
     }
   }
 
@@ -457,6 +458,25 @@ export class TestRecordsComponent implements OnInit {
       default:
         return 'bg-gray-500/20 border-gray-500 text-gray-400';
     }
+  }
+
+  /**
+   * Get risk percentage for display: from record.riskPercent (API) or parsed from analysisNotes.
+   * analysisNotes format: "Analysis completed. Risk: 43% (Moderate). Session: ..."
+   */
+  getRiskPercent(record: UserTestRecord): number | null {
+    if (record.riskPercent != null && !isNaN(record.riskPercent)) {
+      return record.riskPercent;
+    }
+    const notes = record.analysisNotes || '';
+    const match = notes.match(/Risk:\s*(\d+(?:\.\d+)?)\s*%/);
+    return match ? parseFloat(match[1]) : null;
+  }
+
+  /** Format risk for table: "43%" or "—" when missing. */
+  getRiskDisplay(record: UserTestRecord): string {
+    const risk = this.getRiskPercent(record);
+    return risk != null ? `${Math.round(risk)}%` : '—';
   }
 }
 
