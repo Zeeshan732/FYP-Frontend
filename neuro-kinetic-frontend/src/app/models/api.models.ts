@@ -517,6 +517,11 @@ export function isRagIrrelevant(r: RagTestResponse): r is RagIrrelevantResponse 
   return r.isRelevant === false;
 }
 
+/** Response from POST /api/rag/ask (Python RAG knowledge-base). */
+export interface RagAskResponse {
+  answer: string;
+}
+
 // ========== Voice Predict (FastAPI /api/voice/predict) ==========
 
 /** Request body for POST /api/voice/predict. Exactly these 10 keys (same names as backend/FastAPI). */
@@ -546,4 +551,45 @@ export interface VoicePredictErrorBody {
   message?: string;
   detail?: string;
   [key: string]: unknown;
+}
+
+// ========== Analytics Layer (independent of ML/RAG) ==========
+
+export interface RiskAdjustRequest {
+  mlRiskPercent: number;
+  gaitScore?: number;
+  age?: number;
+}
+
+export interface RiskAdjustResponse {
+  finalAdjustedRisk: number;
+}
+
+export interface TestRecordPoint {
+  testDate: string; // ISO
+  riskValue: number;
+}
+
+export interface ProgressionRequest {
+  userId?: number;
+  dataPoints?: TestRecordPoint[];
+}
+
+export interface ProgressionAnalysisDto {
+  linearRegressionSlope: number;
+  movingAverages: number[];
+  trendClassification: 'Stable' | 'Increasing' | 'Rapid increase';
+  smoothedPoints: TestRecordPoint[];
+}
+
+export interface StatisticsRequest {
+  values: number[];
+}
+
+export interface StatisticsResponse {
+  mean: number;
+  variance: number;
+  standardDeviation: number;
+  zScores: number[];
+  minMaxNormalized: number[];
 }

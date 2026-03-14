@@ -1,0 +1,791 @@
+/* About page — NeuroSync dark theme */
+/* Design tokens: page #0A1628, section alt #0D1B2E, card #112240 */
+
+$page-bg: #0A1628;
+$section-alt: #0D1B2E;
+$card-bg: #112240;
+$card-border: 1px solid rgba(255, 255, 255, 0.08);
+$card-radius: 12px;
+$text-primary: #ffffff;
+$text-body: rgba(255, 255, 255, 0.55);
+$text-muted: rgba(255, 255, 255, 0.4);
+$voice: #2E86DE;
+$voice-bg: rgba(46, 134, 222, 0.12);
+$voice-bg-10: rgba(46, 134, 222, 0.1);
+$gait: #7F77DD;
+$gait-bg: rgba(127, 119, 221, 0.12);
+$gait-bg-10: rgba(127, 119, 221, 0.1);
+$tap: #1D9E75;
+$tap-bg: rgba(29, 158, 117, 0.12);
+$tap-bg-10: rgba(29, 158, 117, 0.1);
+$amber: #F0A500;
+$amber-bg: rgba(240, 165, 0, 0.12);
+
+/* ═══ FIX 7 — Section vertical rhythm reset ═══ */
+.about-hero,
+.about-mission,
+.about-how,
+.about-team,
+.about-values,
+.about-cta-wrap {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.about-mission,
+.about-how,
+.about-team,
+.about-values {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ═══ FIX 1 — Angular host element (no default block margins) ═══ */
+:host {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* ═══ Global container (all sections) — FIX 1 ═══ */
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 36px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+}
+
+/* Section tag & title (FIX 8) */
+.section-tag {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: $voice;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.section-tag-center {
+  text-align: center;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: 16px;
+}
+
+.section-title-center {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* ═══ Section 1 — Hero (FIX 2) ═══ */
+.about-hero {
+  background: $page-bg;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 80px 0 72px;
+}
+
+.about-hero-inner {
+  text-align: center;
+}
+
+.eyebrow-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 auto 20px;
+  width: fit-content;
+  background: rgba(46, 134, 222, 0.1);
+  border: 1px solid rgba(46, 134, 222, 0.25);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  color: $voice;
+}
+
+.eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: $voice;
+}
+
+.about-hero-title {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.15;
+  max-width: 860px;
+  margin: 0 auto 16px;
+  color: $text-primary;
+}
+
+.about-hero-title .accent {
+  color: $voice;
+}
+
+.about-hero-subtitle {
+  text-align: center;
+  max-width: 580px;
+  margin: 0 auto 36px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: $text-body;
+}
+
+.about-stats {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 0;
+  max-width: 800px;
+  margin-top: 48px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.about-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 36px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 8px;
+}
+
+.about-stat:last-child {
+  border-right: none;
+}
+
+.about-stat-value {
+  font-size: 40px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  display: block;
+}
+
+.about-stat-char {
+  color: #2E86DE;
+  font-size: 40px;
+  font-weight: 700;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.about-stat-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  display: block;
+  font-weight: 400;
+}
+
+/* Mobile: stack vertically with horizontal dividers */
+@media (max-width: 540px) {
+  .about-stats {
+    flex-direction: column;
+    gap: 20px;
+    max-width: 280px;
+  }
+
+  .about-stat {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0 0 20px;
+  }
+
+  .about-stat:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+/* ═══ Section 2 — Mission (FIX 3) ═══ */
+.about-mission {
+  background: $section-alt;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 80px 0;
+}
+
+.about-mission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.about-mission-left .section-title {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.about-mission-left {
+  max-width: none;
+}
+
+.about-body {
+  max-width: none;
+  width: 100%;
+  font-size: 15px;
+  color: $text-body;
+  line-height: 1.75;
+}
+
+.about-body:first-of-type {
+  margin-bottom: 14px;
+}
+
+.about-body-mt {
+  margin-top: 0;
+}
+
+.about-quote-card {
+  background: $card-bg;
+  border: $card-border;
+  border-left: 3px solid $voice;
+  border-radius: $card-radius;
+  padding: 32px;
+}
+
+.about-quote-mark {
+  font-size: 44px;
+  color: $voice;
+  font-family: serif;
+  line-height: 1;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.about-quote-text {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.8;
+}
+
+.about-quote-attribution {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.about-quote-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(46, 134, 222, 0.2);
+  color: $voice;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.about-quote-name {
+  font-size: 13px;
+  color: $text-primary;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.about-quote-role {
+  font-size: 11px;
+  color: $text-muted;
+}
+
+/* ═══ FIX 4 — Section inner wrappers (no double padding) ═══ */
+.about-mission-inner,
+.about-how-inner,
+.about-team-inner,
+.about-values-inner {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.about-mission-grid,
+.about-how-inner > *:first-child,
+.about-team-inner > *:first-child,
+.about-values-inner > *:first-child {
+  margin-top: 0;
+}
+
+/* ═══ Section 3 — How it works (FIX 4) ═══ */
+.about-how {
+  background: $page-bg;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 80px 0;
+}
+
+.about-how-inner .section-tag-center,
+.about-how-inner .section-title-center {
+  text-align: center;
+}
+
+.about-how-inner .section-title-center {
+  font-size: 28px;
+  margin-bottom: 48px;
+}
+
+.about-cards-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.about-cards-three {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.about-step-card {
+  display: flex;
+  flex-direction: column;
+  background: $card-bg;
+  border: $card-border;
+  border-radius: $card-radius;
+  padding: 28px;
+  min-height: 260px;
+}
+
+.about-step-card.card-voice {
+  border-top: 2px solid $voice;
+}
+
+.about-step-card.card-gait {
+  border-top: 2px solid $gait;
+}
+
+.about-step-card.card-tap {
+  border-top: 2px solid $tap;
+}
+
+.about-step-label {
+  font-size: 11px;
+  color: $text-muted;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 14px;
+}
+
+.about-step-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.about-step-icon-box.voice {
+  background: $voice-bg;
+  color: $voice;
+}
+
+.about-step-icon-box.gait {
+  background: $gait-bg;
+  color: $gait;
+}
+
+.about-step-icon-box.tap {
+  background: $tap-bg;
+  color: $tap;
+}
+
+.about-step-title {
+  font-size: 17px;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: 10px;
+}
+
+.about-step-desc {
+  font-size: 14px;
+  color: $text-body;
+  line-height: 1.7;
+  flex: 1;
+}
+
+.signal-badge {
+  margin-top: auto;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+}
+
+.signal-badge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.signal-badge.voice {
+  background: $voice-bg-10;
+  color: $voice;
+
+  .signal-badge-dot {
+    background: $voice;
+  }
+}
+
+.signal-badge.gait {
+  background: $gait-bg-10;
+  color: $gait;
+
+  .signal-badge-dot {
+    background: $gait;
+  }
+}
+
+.signal-badge.tap {
+  background: $tap-bg-10;
+  color: $tap;
+
+  .signal-badge-dot {
+    background: $tap;
+  }
+}
+
+/* ═══ Section 4 — Team (FIX 5) ═══ */
+.about-team {
+  background: $section-alt;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 80px 0;
+}
+
+.about-team-inner .section-title {
+  margin-bottom: 12px;
+}
+
+.about-team-inner .about-cards-three {
+  max-width: 100%;
+  margin: 36px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.about-team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: $card-bg;
+  border: $card-border;
+  border-top: 2px solid $voice;
+  border-radius: $card-radius;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.about-team-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.about-team-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: 6px;
+}
+
+.about-team-role {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.about-team-bio {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.65;
+  flex: 1;
+}
+
+.about-team-tag {
+  margin-top: 16px;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+}
+
+.about-team-tag-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+/* ═══ Section 5 — Values (FIX 6) ═══ */
+.about-values {
+  background: $page-bg;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 80px 0;
+}
+
+.about-values-inner .section-tag-center,
+.about-values-inner .section-title-center {
+  text-align: center;
+}
+
+.about-values-inner .section-title-center {
+  margin-bottom: 36px;
+}
+
+.about-values-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.about-value-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: $card-bg;
+  border: $card-border;
+  border-radius: 10px;
+  padding: 24px;
+  height: 100%;
+}
+
+.about-value-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-value-icon.voice {
+  background: $voice-bg;
+  color: $voice;
+}
+
+.about-value-icon.gait {
+  background: $gait-bg;
+  color: $gait;
+}
+
+.about-value-icon.tap {
+  background: $tap-bg;
+  color: $tap;
+}
+
+.about-value-icon.amber {
+  background: $amber-bg;
+  color: $amber;
+}
+
+.about-value-card > div:last-child {
+  flex: 1;
+}
+
+.about-value-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.about-value-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+}
+
+/* ═══ Section 6 — CTA Banner (FIX 7) ═══ */
+.about-cta-wrap {
+  margin: 0;
+  padding: 0 0 80px;
+}
+
+.about-cta {
+  background: $card-bg;
+  border: 1px solid rgba(46, 134, 222, 0.2);
+  border-radius: 16px;
+  padding: 56px 48px;
+  text-align: center;
+}
+
+.about-cta-title {
+  font-size: 28px;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: 12px;
+}
+
+.about-cta-desc {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 32px;
+}
+
+.about-cta-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.about-btn-primary {
+  height: 46px;
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  background: $voice;
+  color: $text-primary;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.about-btn-primary:hover {
+  background: #1A6FA8;
+}
+
+.about-btn-ghost {
+  height: 46px;
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 400;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.about-btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ═══ Responsive ═══ */
+@media (max-width: 1024px) {
+  .about-hero-title {
+    font-size: clamp(30px, 5vw, 48px);
+  }
+
+  .about-mission-grid {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    padding: 56px 0;
+  }
+
+  .about-hero-title {
+    font-size: clamp(28px, 6vw, 38px);
+  }
+
+  .about-mission,
+  .about-how,
+  .about-team,
+  .about-values {
+    padding: 72px 0;
+  }
+
+  .about-mission-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .about-how-inner .about-cards-three,
+  .about-cards-three {
+    grid-template-columns: 1fr;
+  }
+
+  .about-step-card {
+    min-height: unset;
+  }
+
+  .about-team-inner .about-cards-three {
+    grid-template-columns: 1fr;
+  }
+
+  .about-values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-cta {
+    padding: 36px 24px;
+  }
+
+  .about-stat {
+    padding: 0 16px;
+  }
+
+  .about-stat-value {
+    font-size: 30px;
+  }
+}

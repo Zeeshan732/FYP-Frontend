@@ -18,6 +18,9 @@ import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
 import { LiveVoiceMonitorComponent } from './pages/live-voice-monitor/live-voice-monitor.component';
 import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.component';
 import { ConsultationComponent } from './pages/consultation/consultation.component';
+import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
+import { AboutComponent } from './pages/about/about.component';
+import { BlogComponent } from './pages/blog/blog.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -34,11 +37,14 @@ const routes: Routes = [
   { path: 'voice-input', component: VoiceInputComponent, canActivate: [AuthGuard] },
   { path: 'live-voice-monitor', component: LiveVoiceMonitorComponent, canActivate: [AuthGuard] },
   { path: 'consultation', component: ConsultationComponent, canActivate: [AuthGuard] },
+  { path: 'analytics-dashboard', component: AnalyticsDashboardComponent, canActivate: [AuthGuard] },
   { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },
   { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
   { path: 'account-requests', component: AccountRequestsComponent, canActivate: [AdminGuard] },
   { path: 'admin-users', component: AdminUsersComponent, canActivate: [AdminGuard] },
   { path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
+  { path: 'about', component: AboutComponent },
+  { path: 'blog', component: BlogComponent },
   { path: 'clinical-use', component: ClinicalUseComponent },
   { path: 'collaboration', component: CollaborationComponent },
   { path: 'voice-analysis', loadChildren: () => import('./modules/voice-analysis/voice-analysis.module').then(m => m.VoiceAnalysisModule) },

@@ -1,10 +1,12 @@
-import { Component, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import {
   RagTestResponse,
   RagRelevantResponse,
   isRagIrrelevant
 } from '../../models/api.models';
+
+const RAG_CHAT_STORAGE_KEY = 'neurosync_rag_chat_messages';
 
 export interface ChatMessage {
   type: 'text';
@@ -14,15 +16,25 @@ export interface ChatMessage {
   date: Date;
 }
 
+/** Serializable shape for localStorage */
+interface StoredChatMessage {
+  type: 'text';
+  text: string;
+  reply: boolean;
+  sender: string;
+  date: string;
+}
+
 /**
  * Simple RAG (Clinical Decision Support) chat. Pass riskPercent and mode from screening result.
+ * Chat history is persisted in localStorage and restored on load; "New chat" clears and starts fresh.
  */
 @Component({
   selector: 'app-rag-chat',
   templateUrl: './rag-chat.component.html',
   styleUrls: ['./rag-chat.component.scss']
 })
-export class RagChatComponent {
+export class RagChatComponent implements OnInit {
   @Input() riskPercent: number | null = null;
   @Input() mode: 'voice' | 'gait' | 'multimodal' = 'voice';
   /** When 'light', uses centered empty state and compact input matching the rest of the app. */
@@ -38,6 +50,45 @@ export class RagChatComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
+  ngOnInit(): void {
+    this.loadChatFromStorage();
+  }
+
+  private loadChatFromStorage(): void {
+    try {
+      const raw = localStorage.getItem(RAG_CHAT_STORAGE_KEY);
+      if (!raw) return;
+      const stored: StoredChatMessage[] = JSON.parse(raw);
+      if (Array.isArray(stored) && stored.length > 0) {
+        this.messages = stored.map(m => ({
+          type: 'text' as const,
+          text: m.text,
+          reply: m.reply,
+          sender: m.sender,
+          date: new Date(m.date)
+        }));
+        this.cdr.detectChanges();
+      }
+    } catch {
+      // Invalid or old format; ignore
+    }
+  }
+
+  private saveChatToStorage(): void {
+    try {
+      const toStore: StoredChatMessage[] = this.messages.map(m => ({
+        type: 'text',
+        text: m.text,
+        reply: m.reply,
+        sender: m.sender,
+        date: m.date instanceof Date ? m.date.toISOString() : new Date().toISOString()
+      }));
+      localStorage.setItem(RAG_CHAT_STORAGE_KEY, JSON.stringify(toStore));
+    } catch {
+      // Quota or other; ignore
+    }
+  }
+
   sendMessage(): void {
     const q = this.inputMessage.trim();
     if (!q) return;
@@ -50,41 +101,54 @@ export class RagChatComponent {
       ...this.messages,
       { type: 'text', text: q, reply: true, sender: 'You', date: new Date() }
     ];
-    this.messages = [
-      ...this.messages,
-      { type: 'text', text: 'Getting guidance…', reply: false, sender: 'NeuroSync', date: new Date() }
-    ];
+    this.saveChatToStorage();
     this.cdr.detectChanges();
 
+    const setReply = (text: string) => {
+      this.loading = false;
+      this.messages = [
+        ...this.messages,
+        { type: 'text', text, reply: false, sender: 'NeuroSync', date: new Date() }
+      ];
+      this.saveChatToStorage();
+      this.cdr.detectChanges();
+    };
+    const setError = (err: any) => {
+      this.loading = false;
+      const body = err?.error;
+      const backendMessage = typeof body === 'string' ? body : body?.message;
+      const errMsg = err?.status === 400
+        ? (backendMessage || 'Please enter a valid question.')
+        : err?.status === 502
+          ? (backendMessage || 'The knowledge-base service is not responding. Start the RAG service (port 8100) and Ollama, then try again.')
+          : err?.status === 503 || err?.status === 500
+            ? (backendMessage || 'Service temporarily unavailable. Please try again later.')
+            : (backendMessage || 'Something went wrong. Please try again.');
+      this.messages = [
+        ...this.messages,
+        { type: 'text', text: errMsg, reply: false, sender: 'NeuroSync', date: new Date() }
+      ];
+      this.saveChatToStorage();
+      this.cdr.detectChanges();
+    };
+
+    // No screening result: use Python RAG knowledge-base (FAISS + Ollama).
+    if (this.riskPercent == null) {
+      this.apiService.ragAsk(q).subscribe({
+        next: (res) => setReply(res.answer || 'No answer returned.'),
+        error: setError
+      });
+      return;
+    }
+
+    // Has risk from screening: use hybrid RAG (OpenAI/Ollama) for clinical guidance.
     this.apiService.ragTest({
       question: q,
       riskPercent: riskValue,
       mode: this.mode
     }).subscribe({
-      next: (res) => {
-        this.loading = false;
-        const text = this.formatResponseAsText(res);
-        this.messages = this.messages.slice(0, -1);
-        this.messages = [
-          ...this.messages,
-          { type: 'text', text, reply: false, sender: 'NeuroSync', date: new Date() }
-        ];
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.loading = false;
-        const errMsg = err?.status === 400
-          ? (err?.error?.message || 'Please enter a valid question.')
-          : err?.status === 500
-            ? 'Service temporarily unavailable. Please try again later.'
-            : (err?.error?.message || 'Something went wrong. Please try again.');
-        this.messages = this.messages.slice(0, -1);
-        this.messages = [
-          ...this.messages,
-          { type: 'text', text: errMsg, reply: false, sender: 'NeuroSync', date: new Date() }
-        ];
-        this.cdr.detectChanges();
-      }
+      next: (res) => setReply(this.formatResponseAsText(res)),
+      error: setError
     });
   }
 
@@ -125,10 +189,21 @@ export class RagChatComponent {
     return parts.join('\n');
   }
 
-  clearChat(): void {
+  /** Start a new chat: clear messages and persisted history. */
+  newChat(): void {
     this.messages = [];
     this.error = '';
+    try {
+      localStorage.removeItem(RAG_CHAT_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
     this.cdr.detectChanges();
+  }
+
+  /** @deprecated Use newChat(). Kept for compatibility. */
+  clearChat(): void {
+    this.newChat();
   }
 
   reset(): void {

@@ -1,0 +1,78 @@
+/* Footer — NeuroSync Dark Theme */
+.footer {
+  background: #060F1E;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 60px 24px 24px;
+}
+
+.footer-brand {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.footer-desc {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 8px;
+  max-width: 280px;
+}
+
+.footer-heading {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 16px;
+}
+
+.footer-link {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 8px;
+  transition: color 0.15s;
+}
+
+.footer-link:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.footer-contact-item {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 40px;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-copyright {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+}
+
+.footer-bottom-links a {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  text-decoration: none;
+  margin-left: 20px;
+}
+
+.footer-bottom-links a:hover {
+  color: rgba(255, 255, 255, 0.6);
+}

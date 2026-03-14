@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, timeout, catchError } from 'rxjs/operators';
+import { TimeoutError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   PagedResult,
@@ -29,6 +30,7 @@ import {
   FeatureExplanationDto,
   RagTestRequest,
   RagTestResponse,
+  RagAskResponse,
   VoicePredictRequest,
   VoicePredictResponse
 } from '../models/api.models';
@@ -295,6 +297,23 @@ export class ApiService {
       riskPercent: request.riskPercent,
       mode: request.mode ?? 'voice'
     });
+  }
+
+  /**
+   * POST /api/rag/ask – Python RAG knowledge-base Q&A (FAISS + Ollama).
+   * Use for general Parkinson questions when no screening result is available.
+   * Allow up to 3 minutes (backend may take 1–2 min for embeddings + LLM).
+   */
+  ragAsk(question: string): Observable<RagAskResponse> {
+    return this.http.post<RagAskResponse>(`${this.apiUrl}/rag/ask`, { question }).pipe(
+      timeout(180000),
+      catchError((err) => {
+        if (err instanceof TimeoutError) {
+          throw { status: 408, error: { message: 'The request took too long. The knowledge-base service may be busy. Please try again.' } };
+        }
+        throw err;
+      })
+    );
   }
 
   /**

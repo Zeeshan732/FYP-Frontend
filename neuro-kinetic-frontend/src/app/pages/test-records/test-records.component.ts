@@ -312,26 +312,26 @@ export class TestRecordsComponent implements OnInit {
   getResultBadgeColor(result: string): string {
     switch (result) {
       case 'Positive':
-        return 'bg-red-500/20 border-red-500 text-red-400';
+        return 'risk-badge-critical';
       case 'Negative':
-        return 'bg-green-500/20 border-green-500 text-green-400';
+        return 'risk-badge-healthy';
       case 'Uncertain':
-        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+        return 'risk-badge-warning';
       default:
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'risk-badge-warning';
     }
   }
 
   getStatusBadgeColor(status: string): string {
     switch (status) {
       case 'Completed':
-        return 'bg-green-500/20 border-green-500 text-green-400';
+        return 'risk-badge-healthy';
       case 'Pending':
-        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+        return 'risk-badge-warning';
       case 'Failed':
-        return 'bg-red-500/20 border-red-500 text-red-400';
+        return 'risk-badge-critical';
       default:
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'risk-badge-warning';
     }
   }
 

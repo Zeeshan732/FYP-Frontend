@@ -977,13 +977,13 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   getRiskLevelColor(riskLevel?: string): string {
     switch (riskLevel) {
       case 'High':
-        return 'bg-red-500/20 border-red-500 text-red-400';
+        return 'risk-badge-critical';
       case 'Moderate':
-        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+        return 'risk-badge-warning';
       case 'Low':
-        return 'bg-green-500/20 border-green-500 text-green-400';
+        return 'risk-badge-healthy';
       default:
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'risk-badge-warning';
     }
   }
 
@@ -1154,22 +1154,22 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     switch(predictedClass) {
       case 'ParkinsonPositive':
       case 'Positive':
-        return 'bg-red-500/20 border-red-500 text-red-400';
+        return 'risk-badge-critical';
       case 'Healthy':
       case 'Negative':
-        return 'bg-green-500/20 border-green-500 text-green-400';
+        return 'risk-badge-healthy';
       case 'Uncertain':
-        return 'bg-yellow-500/20 border-yellow-500 text-yellow-400';
+        return 'risk-badge-warning';
       default:
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'risk-badge-warning';
     }
   }
 
   getRiskPercentClass(riskPercent?: number): string {
-    if (riskPercent === undefined || riskPercent === null) return 'text-gray-400';
-    if (riskPercent >= 50) return 'text-red-400';
-    if (riskPercent >= 30) return 'text-yellow-400';
-    return 'text-green-400';
+    if (riskPercent === undefined || riskPercent === null) return 'risk-percent-muted';
+    if (riskPercent >= 50) return 'risk-percent-high';
+    if (riskPercent >= 30) return 'risk-percent-moderate';
+    return 'risk-percent-low';
   }
 
   getRiskPercentDisplay(): number {

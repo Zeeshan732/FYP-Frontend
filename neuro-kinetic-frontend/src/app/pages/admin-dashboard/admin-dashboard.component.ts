@@ -122,21 +122,25 @@ export class AdminDashboardComponent implements OnInit {
     }
 
     const Chart = (window as any).Chart;
-    const axisColor = '#888888';
-    const gridColor = 'rgba(0, 0, 0, 0.08)';
-    const tooltipBg = 'rgba(255, 255, 255, 0.98)';
-    const tooltipText = '#333333';
-    const appPrimaryRgb = '56, 133, 110';
+    const axisColor = '#8B95A6';
+    const gridColor = 'rgba(255, 255, 255, 0.06)';
+    const tooltipBg = '#162A4A';
+    const tooltipText = '#E8EBF0';
+    const tooltipBorder = 'rgba(255, 255, 255, 0.1)';
+    const lineColor = '#2E86DE';
+    const barMonthColor = '#7F77DD';
+    const barYearColor = '#2E86DE';
+    const pointBorderDark = '#112240';
 
-    // Usage by Day Chart – light theme
+    // Usage by Day — Line chart (FIX 5: stroke #2E86DE)
     if (this.usageByDayChartRef) {
       const ctx = this.usageByDayChartRef.nativeElement.getContext('2d');
       if (!ctx) return;
 
       const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, `rgba(${appPrimaryRgb}, 0.3)`);
-      gradient.addColorStop(0.5, `rgba(${appPrimaryRgb}, 0.15)`);
-      gradient.addColorStop(1, `rgba(${appPrimaryRgb}, 0.05)`);
+      gradient.addColorStop(0, 'rgba(46, 134, 222, 0.35)');
+      gradient.addColorStop(0.5, 'rgba(46, 134, 222, 0.15)');
+      gradient.addColorStop(1, 'rgba(46, 134, 222, 0.05)');
 
       const chart = new Chart(ctx, {
         type: 'line',
@@ -145,18 +149,18 @@ export class AdminDashboardComponent implements OnInit {
           datasets: [{
             label: 'Tests',
             data: this.analytics.usageByDay.map((u: UsageStatistic) => u.count),
-            borderColor: `rgba(${appPrimaryRgb}, 1)`,
+            borderColor: lineColor,
             backgroundColor: gradient,
-            borderWidth: 3,
+            borderWidth: 2,
             tension: 0.4,
             fill: true,
             pointRadius: 4,
             pointHoverRadius: 6,
-            pointBackgroundColor: `rgba(${appPrimaryRgb}, 1)`,
-            pointBorderColor: '#ffffff',
+            pointBackgroundColor: lineColor,
+            pointBorderColor: pointBorderDark,
             pointBorderWidth: 2,
-            pointHoverBackgroundColor: `rgba(${appPrimaryRgb}, 1)`,
-            pointHoverBorderColor: '#ffffff',
+            pointHoverBackgroundColor: lineColor,
+            pointHoverBorderColor: pointBorderDark,
             pointHoverBorderWidth: 3
           }]
         },
@@ -170,7 +174,7 @@ export class AdminDashboardComponent implements OnInit {
               backgroundColor: tooltipBg,
               titleColor: tooltipText,
               bodyColor: tooltipText,
-              borderColor: 'rgba(0, 0, 0, 0.1)',
+              borderColor: tooltipBorder,
               borderWidth: 1,
               cornerRadius: 8,
               displayColors: false,
@@ -203,15 +207,10 @@ export class AdminDashboardComponent implements OnInit {
       this.charts.push(chart);
     }
 
-    // Usage by Month Chart – light theme (app-primary teal)
+    // Usage by Month — Bar chart (FIX 5: fill #7F77DD)
     if (this.usageByMonthChartRef) {
       const ctx = this.usageByMonthChartRef.nativeElement.getContext('2d');
       if (!ctx) return;
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, `rgba(${appPrimaryRgb}, 0.9)`);
-      gradient.addColorStop(0.5, `rgba(${appPrimaryRgb}, 0.7)`);
-      gradient.addColorStop(1, `rgba(${appPrimaryRgb}, 0.4)`);
 
       const chart = new Chart(ctx, {
         type: 'bar',
@@ -220,10 +219,10 @@ export class AdminDashboardComponent implements OnInit {
           datasets: [{
             label: 'Tests',
             data: this.analytics.usageByMonth.map((u: UsageStatistic) => u.count),
-            backgroundColor: gradient,
-            borderColor: `rgba(${appPrimaryRgb}, 1)`,
-            borderWidth: 2,
-            borderRadius: 8,
+            backgroundColor: barMonthColor,
+            borderColor: barMonthColor,
+            borderWidth: 0,
+            borderRadius: 4,
             borderSkipped: false,
             maxBarThickness: 60
           }]
@@ -238,7 +237,7 @@ export class AdminDashboardComponent implements OnInit {
               backgroundColor: tooltipBg,
               titleColor: tooltipText,
               bodyColor: tooltipText,
-              borderColor: 'rgba(0, 0, 0, 0.1)',
+              borderColor: tooltipBorder,
               borderWidth: 1,
               cornerRadius: 8,
               displayColors: false,
@@ -271,15 +270,10 @@ export class AdminDashboardComponent implements OnInit {
       this.charts.push(chart);
     }
 
-    // Usage by Year Chart – light theme (app-primary teal)
+    // Usage by Year — Bar chart (FIX 5: fill #2E86DE)
     if (this.usageByYearChartRef) {
       const ctx = this.usageByYearChartRef.nativeElement.getContext('2d');
       if (!ctx) return;
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, `rgba(${appPrimaryRgb}, 0.9)`);
-      gradient.addColorStop(0.5, `rgba(${appPrimaryRgb}, 0.7)`);
-      gradient.addColorStop(1, `rgba(${appPrimaryRgb}, 0.5)`);
 
       const chart = new Chart(ctx, {
         type: 'bar',
@@ -288,10 +282,10 @@ export class AdminDashboardComponent implements OnInit {
           datasets: [{
             label: 'Tests',
             data: this.analytics.usageByYear.map((u: UsageStatistic) => u.count),
-            backgroundColor: gradient,
-            borderColor: `rgba(${appPrimaryRgb}, 1)`,
-            borderWidth: 2,
-            borderRadius: 8,
+            backgroundColor: barYearColor,
+            borderColor: barYearColor,
+            borderWidth: 0,
+            borderRadius: 4,
             borderSkipped: false,
             maxBarThickness: 80
           }]
@@ -306,7 +300,7 @@ export class AdminDashboardComponent implements OnInit {
               backgroundColor: tooltipBg,
               titleColor: tooltipText,
               bodyColor: tooltipText,
-              borderColor: 'rgba(0, 0, 0, 0.1)',
+              borderColor: tooltipBorder,
               borderWidth: 1,
               cornerRadius: 8,
               displayColors: false,
@@ -317,7 +311,7 @@ export class AdminDashboardComponent implements OnInit {
           },
           scales: {
             x: {
-              ticks: { color: axisColor, font: { size: 12, weight: '600' }, maxRotation: 0, minRotation: 0 },
+              ticks: { color: axisColor, font: { size: 12, weight: '500' }, maxRotation: 0, minRotation: 0 },
               grid: { display: false, drawBorder: false },
               border: { color: gridColor }
             },
@@ -342,7 +336,7 @@ export class AdminDashboardComponent implements OnInit {
       this.charts.push(chart);
     }
 
-    // Result Distribution Chart – light theme (semantic colors; legend #333)
+    // Result Distribution — Doughnut (FIX 5: Positive #E05252, Negative #1D9E75, Uncertain #F0A500)
     if (this.resultDistributionChartRef) {
       const ctx = this.resultDistributionChartRef.nativeElement.getContext('2d');
       if (!ctx) return;
@@ -357,18 +351,10 @@ export class AdminDashboardComponent implements OnInit {
               this.analytics.testResultsDistribution.negative,
               this.analytics.testResultsDistribution.uncertain
             ],
-            backgroundColor: [
-              'rgba(239, 68, 68, 0.9)',
-              'rgba(34, 197, 94, 0.9)',
-              'rgba(234, 179, 8, 0.9)'
-            ],
-            borderColor: [
-              'rgba(239, 68, 68, 1)',
-              'rgba(34, 197, 94, 1)',
-              'rgba(234, 179, 8, 1)'
-            ],
-            borderWidth: 3,
-            hoverBorderWidth: 4,
+            backgroundColor: ['#E05252', '#1D9E75', '#F0A500'],
+            borderColor: ['#E05252', '#1D9E75', '#F0A500'],
+            borderWidth: 2,
+            hoverBorderWidth: 3,
             hoverOffset: 8
           }]
         },
@@ -380,9 +366,9 @@ export class AdminDashboardComponent implements OnInit {
             legend: {
               position: 'bottom',
               labels: {
-                color: '#333333',
+                color: '#8B95A6',
                 padding: 15,
-                font: { size: 12, weight: '600' },
+                font: { size: 12, weight: '500' },
                 usePointStyle: true,
                 pointStyle: 'circle'
               }
@@ -392,7 +378,7 @@ export class AdminDashboardComponent implements OnInit {
               padding: 12,
               titleColor: tooltipText,
               bodyColor: tooltipText,
-              borderColor: 'rgba(0, 0, 0, 0.1)',
+              borderColor: tooltipBorder,
               borderWidth: 1,
               cornerRadius: 8,
               titleFont: { size: 14, weight: 'bold' },

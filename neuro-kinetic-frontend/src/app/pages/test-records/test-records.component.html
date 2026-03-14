@@ -2,14 +2,14 @@
 <app-navigation></app-navigation>
 
 <!-- Test Records Section -->
-<section class="min-h-screen bg-app-surface-muted text-app-text-primary pb-20">
+<section class="min-h-screen bg-pagebg pb-20">
   <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
     <!-- Header -->
     <!-- <div class="text-center mb-12">
       <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-6xl font-bold mb-4 bg-gradient-to-r from-app-primary to-app-primary-hover bg-clip-text text-transparent">
         Test Records
       </h1>
-      <p class="text-lg sm:text-xl lg:text-2xl text-gray-300 max-w-4xl mx-auto px-4">
+      <p class="text-lg sm:text-xl lg:text-2xl text-app-text-muted max-w-4xl mx-auto px-4">
         {{ isAdmin ? 'View all user test records' : 'View your test history' }}
       </p>
     </div> -->
@@ -52,7 +52,7 @@
         *ngIf="showFilterMenu"
         class="absolute right-0 mt-3 z-30 w-full sm:w-[420px]"
       >
-        <div class="test-records-filter-panel app-card bg-white shadow-app p-5">
+        <div class="test-records-filter-panel app-card bg-app-surface shadow-app p-5">
           <div class="flex items-center justify-between border-b border-app-border pb-3 mb-4">
             <span class="text-xs font-semibold uppercase tracking-wide text-app-text-muted">
               Filters
@@ -148,10 +148,10 @@
 
         <!-- Records Table -->
     <div *ngIf="!loading && records.length > 0" class="max-w-[1600px] mx-auto mb-8">
-      <div class="bg-white border border-app-border rounded-lg overflow-hidden shadow-sm">
+      <div class="bg-app-surface border border-app-border rounded-lg overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-app-surface-muted border-b border-app-border">
+          <table class="w-full neuro-table">
+            <thead class="border-b border-border">
               <tr>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('userName')">
@@ -210,8 +210,8 @@
                 <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-app-border">
-              <tr *ngFor="let record of records" class="hover:bg-app-surface-muted transition-colors">
+            <tbody>
+              <tr *ngFor="let record of records" class="transition-colors">
                 <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.userName }}</td>
                 <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.testDate | date:'short' }}</td>
                 <td class="px-6 py-4 text-center">
@@ -285,7 +285,7 @@
 
     <!-- Pagination -->
     <div *ngIf="!loading && totalPages > 0" class="max-w-[1600px] mx-auto">
-      <div class="bg-white border border-app-border rounded-lg p-4 shadow-sm">
+      <div class="bg-app-surface border border-app-border rounded-lg p-4 shadow-sm">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="text-sm text-app-text-primary">
             Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} records
@@ -297,7 +297,7 @@
               <select 
                 [(ngModel)]="pageSize"
                 (change)="onPageSizeChange()"
-                class="px-3 py-2 bg-white border border-app-border rounded-app focus:ring-2 focus:ring-app-primary focus:border-app-primary text-app-text-primary">
+                class="px-3 py-2 bg-app-surface border border-app-border rounded-app focus:ring-2 focus:ring-app-primary focus:border-app-primary text-app-text-primary">
                 <option [ngValue]="10">10</option>
                 <option [ngValue]="20">20</option>
                 <option [ngValue]="25">25</option>
@@ -401,7 +401,7 @@
       <div class="bg-app-surface-muted rounded-lg p-4">
         <h3 class="text-lg font-semibold text-app-primary mb-3">Test History</h3>
         <div class="space-y-2 max-h-96 overflow-y-auto">
-          <div *ngFor="let trend of trendData.trends" class="bg-white border border-app-border rounded p-3 flex items-center justify-between">
+          <div *ngFor="let trend of trendData.trends" class="bg-app-surface border border-app-border rounded p-3 flex items-center justify-between">
             <div class="flex-1">
               <p class="text-sm text-app-text-primary">{{ trend.date | date:'short' }}</p>
               <p class="text-xs text-app-text-muted">Accuracy: {{ trend.accuracy }}%</p>

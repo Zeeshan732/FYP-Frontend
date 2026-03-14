@@ -1,7 +1,14 @@
-// Header Styles
-// Fixed header that adjusts based on sidebar state
+/* Top bar / Header — dark theme (FIX 2) */
+.neuro-header {
+  background: var(--color-sidebar-bg);
+  border-bottom: 1px solid var(--color-border);
+}
 
+.neuro-header-icon {
+  color: var(--color-muted);
+}
 
-
-
-
+.neuro-header-icon:hover {
+  background: var(--color-sky);
+  color: var(--color-blue);
+}

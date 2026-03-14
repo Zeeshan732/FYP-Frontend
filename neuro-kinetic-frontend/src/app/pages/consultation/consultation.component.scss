@@ -5,7 +5,7 @@
   max-width: none;
   margin: 0;
   padding: 0;
-  background: #ffffff;
+  background: var(--app-surface);
 }
 
 .consultation-header {
@@ -20,8 +20,8 @@
   justify-content: space-between;
   padding: 0.75rem 1.25rem;
   margin-bottom: 0;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
 }
 
 .consultation-header-left {
@@ -32,14 +32,14 @@
 
 .consultation-title {
   font-size: 1.125rem;
-  font-weight: 600;
-  color: #374151;
+  font-weight: 500;
+  color: var(--app-text-primary);
   margin: 0;
 }
 
 .consultation-caret {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--app-text-muted);
   line-height: 1;
 }
 
@@ -58,14 +58,14 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #6b7280;
+  color: var(--app-text-muted);
   cursor: pointer;
   border-radius: 0.5rem;
 }
 
 .consultation-header-icon:hover {
-  color: #374151;
-  background: #f3f4f6;
+  color: var(--app-text-primary);
+  background: var(--app-surface-muted);
 }
 
 .consultation-header-icon .pi {
@@ -90,9 +90,9 @@
   margin-bottom: 0.75rem;
   padding: 0.5rem 0.75rem;
   font-size: 0.75rem;
-  color: #92400e;
-  background: #fef3c7;
-  border: 1px solid #fcd34d;
+  color: var(--app-text-primary);
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
 }
 
 .chat-container {
@@ -100,7 +100,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: #ffffff;
+  background: var(--app-surface);
   border: none;
   padding: 0;
 }
@@ -108,7 +108,7 @@
 .consultation-footer {
   margin-top: auto;
   padding: 0.5rem 1.25rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--app-border);
 }
 
 .disclaimer {
@@ -136,7 +136,7 @@
   color: var(--app-primary-foreground);
   border: none;
   padding: 0.5rem 1rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   font-size: 0.875rem;
 }

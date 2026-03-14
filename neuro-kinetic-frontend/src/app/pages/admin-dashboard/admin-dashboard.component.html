@@ -2,32 +2,32 @@
 <app-navigation></app-navigation>
 
 <!-- Admin Dashboard Section -->
-<section class="admin-dashboard-wrap min-h-screen text-app-text-primary pt-18 pb-20">
+<section class="admin-dashboard-wrap min-h-screen pt-18 pb-20">
   <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
     <!-- Header -->
     <!-- <div class="text-center mb-12">
       <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-5xl 2xl:text-6xl font-bold mb-4 bg-gradient-to-r from-app-primary to-app-primary-hover bg-clip-text text-transparent">
         Admin Dashboard
       </h1>
-      <p class="text-base sm:text-lg md:text-xl lg:text-xl xl:text-lg 2xl:text-xl text-gray-300 max-w-4xl mx-auto px-4">
+      <p class="text-base sm:text-lg md:text-xl lg:text-xl xl:text-lg 2xl:text-xl text-app-text-muted max-w-4xl mx-auto px-4">
         Analytics and statistics for NeuroSync test system
       </p>
     </div> -->
 
     <!-- Time Range Selectors and Action Buttons -->
     <div class="max-w-[1600px] mx-auto mb-6">
-      <div class="admin-dashboard-filters bg-white border border-app-border rounded-2xl p-4 sm:p-5 md:p-6 mb-4 shadow-sm overflow-hidden">
+      <div class="admin-dashboard-filters filter-row rounded-2xl p-4 sm:p-5 md:p-6 mb-4 overflow-hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-5 items-end">
           <!-- Days Selector -->
           <div class="w-full">
-            <label class="block text-sm font-semibold text-app-text-primary mb-2">Usage by Day</label>
+            <label class="block text-sm font-medium mb-2">Usage by Day</label>
             <select
               [(ngModel)]="selectedDays"
               (change)="onDaysChange()"
               [disabled]="loading"
-              class="w-full h-12 px-3 sm:px-4 bg-white border border-app-border rounded-lg focus:ring-2 focus:ring-app-primary focus:border-app-primary text-app-text-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium shadow-sm"
+              class="w-full h-12 px-3 sm:px-4 rounded-lg focus:ring-2 focus:ring-app-primary focus:border-app-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium"
             >
-              <option *ngFor="let option of daysOptions" [value]="option.value" class="bg-white text-app-text-primary">
+              <option *ngFor="let option of daysOptions" [value]="option.value">
                 {{ option.label }}
               </option>
             </select>
@@ -35,14 +35,14 @@
 
           <!-- Months Selector -->
           <div class="w-full">
-            <label class="block text-sm font-semibold text-app-text-primary mb-2">Usage by Month</label>
+            <label class="block text-sm font-medium mb-2">Usage by Month</label>
             <select
               [(ngModel)]="selectedMonths"
               (change)="onMonthsChange()"
               [disabled]="loading"
-              class="w-full h-12 px-3 sm:px-4 bg-white border border-app-border rounded-lg focus:ring-2 focus:ring-app-primary focus:border-app-primary text-app-text-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium shadow-sm"
+              class="w-full h-12 px-3 sm:px-4 rounded-lg focus:ring-2 focus:ring-app-primary focus:border-app-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium"
             >
-              <option *ngFor="let option of monthsOptions" [value]="option.value" class="bg-white text-app-text-primary">
+              <option *ngFor="let option of monthsOptions" [value]="option.value">
                 {{ option.label }}
               </option>
             </select>
@@ -50,14 +50,14 @@
 
           <!-- Years Selector -->
           <div class="w-full">
-            <label class="block text-sm font-semibold text-app-text-primary mb-2">Usage by Year</label>
+            <label class="block text-sm font-medium mb-2">Usage by Year</label>
             <select
               [(ngModel)]="selectedYears"
               (change)="onYearsChange()"
               [disabled]="loading"
-              class="w-full h-12 px-3 sm:px-4 bg-white border border-app-border rounded-lg focus:ring-2 focus:ring-app-primary focus:border-app-primary text-app-text-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium shadow-sm"
+              class="w-full h-12 px-3 sm:px-4 rounded-lg focus:ring-2 focus:ring-app-primary focus:border-app-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium"
             >
-              <option *ngFor="let option of yearsOptions" [value]="option.value" class="bg-white text-app-text-primary">
+              <option *ngFor="let option of yearsOptions" [value]="option.value">
                 {{ option.label }}
               </option>
             </select>
@@ -68,13 +68,13 @@
             <button 
               (click)="refreshData()"
               [disabled]="loading"
-              class="admin-dashboard-btn w-full sm:max-w-[calc(50%-6px)] h-12 px-4 sm:px-5 bg-app-primary hover:bg-app-primary-hover disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-semibold text-sm sm:text-base whitespace-nowrap shadow-md shadow-app-primary/25 flex items-center justify-center"
+              class="admin-dashboard-btn btn-refresh w-full sm:max-w-[calc(50%-6px)] h-12 px-4 sm:px-5 rounded-xl transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap flex items-center justify-center disabled:opacity-50"
             >
               {{ loading ? 'Loading...' : 'Refresh' }}
             </button>
             <button 
               (click)="navigateToTestRecords()"
-              class="admin-dashboard-btn w-full sm:max-w-[calc(50%-6px)] h-12 px-4 sm:px-5 bg-app-primary-hover hover:bg-app-primary text-white rounded-xl transition-all duration-200 font-semibold text-sm sm:text-base whitespace-nowrap shadow-md shadow-app-primary/20 flex items-center justify-center"
+              class="admin-dashboard-btn btn-all-records w-full sm:max-w-[calc(50%-6px)] h-12 px-4 sm:px-5 rounded-xl transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap flex items-center justify-center"
             >
               All Records
             </button>
@@ -86,12 +86,12 @@
     <!-- Loading State -->
     <div *ngIf="loading" class="max-w-[1600px] mx-auto text-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-app-primary mx-auto mb-4"></div>
-      <p class="text-app-text-muted">Loading analytics...</p>
+      <p class="text-[var(--color-muted)]">Loading analytics...</p>
     </div>
 
     <!-- Error Message -->
     <div *ngIf="error" class="max-w-[1600px] mx-auto mb-6">
-      <div class="app-card bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-2xl text-sm">
+      <div class="app-card px-4 py-3 rounded-2xl text-sm border border-[var(--color-critical)] bg-[var(--color-critical-bg)] text-[var(--color-critical)]">
         {{ error }}
       </div>
     </div>
@@ -100,84 +100,82 @@
     <div *ngIf="analytics && !loading" class="max-w-[1600px] mx-auto mb-12">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 xl:gap-6 2xl:gap-8 mb-8">
         <!-- Registered Users -->
-        <div class="admin-dashboard-kpi admin-dashboard-kpi--highlight bg-white border border-app-border rounded-2xl p-5 sm:p-6 lg:p-6 xl:p-5 2xl:p-7 text-center transition-all duration-200 overflow-hidden">
-          <div class="text-3xl sm:text-4xl lg:text-4xl xl:text-3xl 2xl:text-4xl font-bold text-app-primary mb-2">
+        <div class="admin-dashboard-kpi card-registered rounded-2xl p-5 sm:p-6 lg:p-6 xl:p-5 2xl:p-7 text-center transition-all duration-200 overflow-hidden">
+          <div class="text-3xl sm:text-4xl lg:text-4xl xl:text-3xl 2xl:text-4xl font-bold mb-2 value">
             {{ analytics.totalRegisteredUsers | number }}
           </div>
-          <div class="text-xs sm:text-sm text-app-text-primary font-medium">Registered Users</div>
+          <div class="text-xs sm:text-sm font-medium label">Registered Users</div>
         </div>
 
         <!-- Active Users -->
-        <div class="admin-dashboard-kpi bg-white border border-app-border rounded-2xl p-5 sm:p-6 lg:p-6 xl:p-5 2xl:p-7 text-center transition-all duration-200 overflow-hidden">
-          <div class="text-3xl sm:text-4xl lg:text-4xl xl:text-3xl 2xl:text-4xl font-bold text-app-text-primary mb-2">
+        <div class="admin-dashboard-kpi card-active rounded-2xl p-5 sm:p-6 lg:p-6 xl:p-5 2xl:p-7 text-center transition-all duration-200 overflow-hidden">
+          <div class="text-3xl sm:text-4xl lg:text-4xl xl:text-3xl 2xl:text-4xl font-bold mb-2 value">
             {{ analytics.activeUsers | number }}
           </div>
-          <div class="text-xs sm:text-sm text-app-text-primary font-medium">Active Users</div>
-          <div class="text-xs text-app-text-muted mt-1">
-            {{ analytics.activationRate | number:'1.0-1' }}% Activation
-          </div>
+          <div class="text-xs sm:text-sm font-medium label">Active Users</div>
+          <div class="text-xs mt-1 sublabel">{{ analytics.activationRate | number:'1.0-1' }}% Activation</div>
         </div>
 
         <!-- Total Tests -->
-        <div class="admin-dashboard-kpi bg-white border border-app-border rounded-2xl p-5 sm:p-6 lg:p-6 xl:p-5 2xl:p-7 text-center transition-all duration-200 overflow-hidden">
-          <div class="text-3xl sm:text-4xl lg:text-4xl xl:text-3xl 2xl:text-4xl font-bold text-app-text-primary mb-2">
+        <div class="admin-dashboard-kpi card-total-tests rounded-2xl p-5 sm:p-6 lg:p-6 xl:p-5 2xl:p-7 text-center transition-all duration-200 overflow-hidden">
+          <div class="text-3xl sm:text-4xl lg:text-4xl xl:text-3xl 2xl:text-4xl font-bold mb-2 value">
             {{ analytics.totalTests | number }}
           </div>
-          <div class="text-xs sm:text-sm text-app-text-primary font-medium">Total Tests</div>
+          <div class="text-xs sm:text-sm font-medium label">Total Tests</div>
         </div>
 
         <!-- Positive Cases -->
-        <div class="admin-dashboard-kpi bg-white border border-app-border rounded-2xl p-5 sm:p-6 lg:p-6 xl:p-5 2xl:p-7 text-center transition-all duration-200 overflow-hidden">
-          <div class="text-3xl sm:text-4xl lg:text-4xl xl:text-3xl 2xl:text-4xl font-bold text-app-text-primary mb-2">
+        <div class="admin-dashboard-kpi card-positive rounded-2xl p-5 sm:p-6 lg:p-6 xl:p-5 2xl:p-7 text-center transition-all duration-200 overflow-hidden">
+          <div class="text-3xl sm:text-4xl lg:text-4xl xl:text-3xl 2xl:text-4xl font-bold mb-2 value">
             {{ analytics.positiveCases | number }}
           </div>
-          <div class="text-xs sm:text-sm text-app-text-primary font-medium">Positive Cases</div>
-          <div class="text-xs text-app-text-muted mt-1">{{ getPositivePercentage() }}%</div>
+          <div class="text-xs sm:text-sm font-medium label">Positive Cases</div>
+          <div class="text-xs mt-1 sublabel">{{ getPositivePercentage() }}%</div>
         </div>
       </div>
 
       <!-- Additional Stats -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Uncertain Cases -->
-        <div class="admin-dashboard-kpi bg-white border border-app-border rounded-2xl p-6 text-center transition-all duration-200 overflow-hidden">
-          <div class="text-3xl font-bold text-app-text-primary mb-2">{{ analytics.uncertainCases | number }}</div>
-          <div class="text-sm text-app-text-primary font-medium">Uncertain Cases</div>
-          <div class="text-xs text-app-text-muted mt-1">{{ getUncertainPercentage() }}%</div>
+        <div class="admin-dashboard-kpi card-uncertain rounded-2xl p-6 text-center transition-all duration-200 overflow-hidden">
+          <div class="text-3xl font-bold mb-2 value">{{ analytics.uncertainCases | number }}</div>
+          <div class="text-sm font-medium label">Uncertain Cases</div>
+          <div class="text-xs mt-1 sublabel">{{ getUncertainPercentage() }}%</div>
         </div>
 
         <!-- Average Accuracy -->
-        <div class="admin-dashboard-kpi admin-dashboard-kpi--highlight bg-white border border-app-border rounded-2xl p-6 text-center transition-all duration-200 overflow-hidden">
-          <div class="text-3xl font-bold text-app-primary mb-2"
+        <div class="admin-dashboard-kpi card-accuracy rounded-2xl p-6 text-center transition-all duration-200 overflow-hidden">
+          <div class="text-3xl font-bold mb-2 value"
                pTooltip="{{ analytics.averageAccuracy | number:'1.0-6' }}%"
                tooltipPosition="top">
             {{ analytics.averageAccuracy | number:'1.0-2' }}%
           </div>
-          <div class="text-sm text-app-text-primary font-medium">Average Accuracy</div>
+          <div class="text-sm font-medium label">Average Accuracy</div>
         </div>
 
-        <!-- Test Completion Rate -->
-        <div class="admin-dashboard-kpi bg-white border border-app-border rounded-2xl p-6 text-center transition-all duration-200 overflow-hidden">
-          <div class="text-3xl font-bold text-app-text-primary mb-2"
+        <!-- Tests per User -->
+        <div class="admin-dashboard-kpi card-per-user rounded-2xl p-6 text-center transition-all duration-200 overflow-hidden">
+          <div class="text-3xl font-bold mb-2 value"
                pTooltip="{{ (analytics.totalTests / (analytics.totalRegisteredUsers || 1)) | number:'1.0-4' }}"
                tooltipPosition="top">
             {{ getTestsPerUser() | number:'1.0-1' }}
           </div>
-          <div class="text-sm text-app-text-primary font-medium">Tests per User</div>
+          <div class="text-sm font-medium label">Tests per User</div>
         </div>
       </div>
 
       <!-- Charts Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-8">
         <!-- Usage by Day -->
-        <div class="admin-dashboard-chart-card bg-white border border-app-border rounded-2xl p-6 shadow-sm transition-all duration-300 overflow-hidden">
+        <div class="admin-dashboard-chart-card chart-card rounded-2xl p-6 transition-all duration-300 overflow-hidden">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-lg font-semibold text-app-text-primary mb-1">Usage by Day</h3>
-              <p class="text-xs text-app-text-muted">Last {{ selectedDays }} Days</p>
+              <h3 class="text-lg font-medium mb-1 chart-title">Usage by Day</h3>
+              <p class="text-xs chart-subtitle">Last {{ selectedDays }} Days</p>
             </div>
-            <div class="flex items-center gap-2 px-3 py-1.5 bg-app-primary/15 rounded-xl border border-app-primary/25">
-              <div class="w-2 h-2 rounded-full bg-app-primary animate-pulse"></div>
-              <span class="text-xs font-semibold text-app-primary">Active</span>
+            <div class="flex items-center gap-2 px-3 py-1.5 chart-badge rounded-xl">
+              <div class="w-2 h-2 rounded-full bg-[var(--color-blue)] animate-pulse"></div>
+              <span class="text-xs font-medium">Active</span>
             </div>
           </div>
           <div class="h-64">
@@ -186,15 +184,15 @@
         </div>
 
         <!-- Usage by Month -->
-        <div class="admin-dashboard-chart-card bg-white border border-app-border rounded-2xl p-6 shadow-sm transition-all duration-300 overflow-hidden">
+        <div class="admin-dashboard-chart-card chart-card rounded-2xl p-6 transition-all duration-300 overflow-hidden">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-lg font-semibold text-app-text-primary mb-1">Usage by Month</h3>
-              <p class="text-xs text-app-text-muted">Last {{ selectedMonths }} Months</p>
+              <h3 class="text-lg font-medium mb-1 chart-title">Usage by Month</h3>
+              <p class="text-xs chart-subtitle">Last {{ selectedMonths }} Months</p>
             </div>
-            <div class="flex items-center gap-2 px-3 py-1.5 bg-app-primary/15 rounded-xl border border-app-primary/25">
-              <div class="w-2 h-2 rounded-full bg-app-primary animate-pulse"></div>
-              <span class="text-xs font-semibold text-app-primary">Active</span>
+            <div class="flex items-center gap-2 px-3 py-1.5 chart-badge rounded-xl">
+              <div class="w-2 h-2 rounded-full bg-[var(--color-blue)] animate-pulse"></div>
+              <span class="text-xs font-medium">Active</span>
             </div>
           </div>
           <div class="h-64">
@@ -206,15 +204,15 @@
       <!-- Charts Row 2 -->
       <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-8">
         <!-- Usage by Year -->
-        <div class="admin-dashboard-chart-card bg-white border border-app-border rounded-2xl p-6 shadow-sm transition-all duration-300 overflow-hidden">
+        <div class="admin-dashboard-chart-card chart-card rounded-2xl p-6 transition-all duration-300 overflow-hidden">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-lg font-semibold text-app-text-primary mb-1">Usage by Year</h3>
-              <p class="text-xs text-app-text-muted">Last {{ selectedYears }} {{ selectedYears === 1 ? 'Year' : 'Years' }}</p>
+              <h3 class="text-lg font-medium mb-1 chart-title">Usage by Year</h3>
+              <p class="text-xs chart-subtitle">Last {{ selectedYears }} {{ selectedYears === 1 ? 'Year' : 'Years' }}</p>
             </div>
-            <div class="flex items-center gap-2 px-3 py-1.5 bg-app-primary/15 rounded-xl border border-app-primary/25">
-              <div class="w-2 h-2 rounded-full bg-app-primary animate-pulse"></div>
-              <span class="text-xs font-semibold text-app-primary">Active</span>
+            <div class="flex items-center gap-2 px-3 py-1.5 chart-badge rounded-xl">
+              <div class="w-2 h-2 rounded-full bg-[var(--color-blue)] animate-pulse"></div>
+              <span class="text-xs font-medium">Active</span>
             </div>
           </div>
           <div class="h-64">
@@ -223,15 +221,15 @@
         </div>
 
         <!-- Result Distribution -->
-        <div class="admin-dashboard-chart-card bg-white border border-app-border rounded-2xl p-6 shadow-sm transition-all duration-300 overflow-hidden">
+        <div class="admin-dashboard-chart-card chart-card rounded-2xl p-6 transition-all duration-300 overflow-hidden">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-lg font-semibold text-app-text-primary mb-1">Test Results</h3>
-              <p class="text-xs text-app-text-muted">Distribution Overview</p>
+              <h3 class="text-lg font-medium mb-1 chart-title">Test Results</h3>
+              <p class="text-xs chart-subtitle">Distribution Overview</p>
             </div>
-            <div class="flex items-center gap-2 px-3 py-1.5 bg-app-primary/15 rounded-xl border border-app-primary/25">
-              <div class="w-2 h-2 rounded-full bg-app-primary animate-pulse"></div>
-              <span class="text-xs font-semibold text-app-primary">Active</span>
+            <div class="flex items-center gap-2 px-3 py-1.5 chart-badge rounded-xl">
+              <div class="w-2 h-2 rounded-full bg-[var(--color-blue)] animate-pulse"></div>
+              <span class="text-xs font-medium">Active</span>
             </div>
           </div>
           <div class="h-64">

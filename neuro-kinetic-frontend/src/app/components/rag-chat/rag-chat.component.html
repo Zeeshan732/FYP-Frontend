@@ -1,14 +1,29 @@
 <div class="rag-chat" [class.rag-chat--light]="theme === 'light'">
-  <div *ngIf="riskPercent == null && theme !== 'light'" class="rag-notice">
-    For personalized guidance, complete a screening first. You can still ask general questions here.
+  <div class="rag-chat-header">
+    <div *ngIf="riskPercent == null && theme !== 'light'" class="rag-notice">
+      For personalized guidance, complete a screening first. You can still ask general questions here.
+    </div>
+    <button type="button" class="rag-btn-new-chat" (click)="newChat()" title="Start a new conversation">
+      <span class="rag-btn-new-chat-icon" aria-hidden="true">+</span>
+      New chat
+    </button>
   </div>
 
   <div class="rag-messages" [class.rag-messages--empty]="theme === 'light' && messages.length === 0">
     <p *ngIf="theme === 'light' && messages.length === 0" class="rag-welcome">What can I help with?</p>
     <p *ngIf="theme !== 'light' && messages.length === 0" class="rag-placeholder">Ask a question about your screening result, risk level, or general guidance.</p>
-    <div *ngFor="let msg of messages" class="rag-msg" [class.rag-msg--reply]="msg.reply">
-      <span class="rag-msg-sender">{{ msg.sender }}</span>
-      <div class="rag-msg-text">{{ msg.text }}</div>
+    <div *ngFor="let msg of messages" class="rag-msg" [class.rag-msg--sent]="msg.reply">
+      <div class="rag-msg-bubble">
+        <span *ngIf="!msg.reply" class="rag-msg-sender">{{ msg.sender }}</span>
+        <div class="rag-msg-text">{{ msg.text }}</div>
+      </div>
+    </div>
+    <!-- Typing indicator (left side) – no loader, no green -->
+    <div *ngIf="loading" class="rag-msg rag-msg--loader">
+      <div class="rag-msg-bubble rag-msg-bubble--typing">
+        <span class="rag-msg-sender">NeuroSync</span>
+        <span class="rag-typing">typing....</span>
+      </div>
     </div>
   </div>
 
@@ -44,5 +59,5 @@
   </div>
 
   <div *ngIf="error" class="rag-error">{{ error }}</div>
-  <button *ngIf="messages.length > 0" type="button" (click)="clearChat()" class="rag-clear">Clear chat</button>
+  <button *ngIf="messages.length > 0" type="button" (click)="newChat()" class="rag-clear">New chat</button>
 </div>

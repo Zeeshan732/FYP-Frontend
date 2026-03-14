@@ -142,7 +142,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.isNavbarVisible = false;
       }
       
-      this.isScrolled = currentScrollY > 50;
+      this.isScrolled = currentScrollY > 20;
       this.lastScrollY = currentScrollY;
     }
   }

@@ -1,51 +1,49 @@
-<div class="min-h-screen bg-gray-50">
+<div class="contact-page">
   <!-- Header -->
-  <div class="bg-white shadow-sm">
-    <div class="container mx-auto px-4 py-16">
-      <div class="text-center">
-        <h1 class="text-5xl font-bold text-gray-900 mb-4">Contact Us</h1>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-          Get in touch with our team to learn more about our neurological assessment solutions
-        </p>
+  <section class="contact-hero">
+    <div class="contact-container">
+      <div class="contact-eyebrow">
+        <span class="contact-eyebrow-dot"></span>
+        Get in touch
       </div>
+      <h1 class="contact-title">Contact Us</h1>
+      <p class="contact-subtitle">
+        Get in touch with our team to learn more about our neurological assessment solutions
+      </p>
     </div>
-  </div>
+  </section>
 
   <!-- Contact Form and Info -->
-  <div class="container mx-auto px-4 py-20">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+  <div class="contact-container contact-body">
+    <div class="contact-grid">
       <!-- Contact Form -->
-      <div class="bg-white rounded-xl shadow-lg p-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-6">Send us a Message</h2>
-        <form class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
-              <input type="text" 
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <div class="contact-form-card">
+        <h2 class="form-card-title">Send us a Message</h2>
+        <form class="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text">
             </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
-              <input type="text" 
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text">
             </div>
           </div>
-          
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-            <input type="email" 
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email">
           </div>
-          
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Organization</label>
-            <input type="text" 
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+
+          <div class="form-group">
+            <label class="form-label">Organization</label>
+            <input type="text">
           </div>
-          
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Subject</label>
-            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <select>
               <option>General Inquiry</option>
               <option>Sales Information</option>
               <option>Technical Support</option>
@@ -53,90 +51,101 @@
               <option>Research Collaboration</option>
             </select>
           </div>
-          
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Message</label>
-            <textarea rows="5" 
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea rows="5"></textarea>
           </div>
-          
-          <button type="submit" 
-                  class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-            Send Message
-          </button>
+
+          <button type="submit" class="btn-send">Send Message</button>
         </form>
       </div>
 
       <!-- Contact Information -->
-      <div class="space-y-8">
+      <div class="contact-sidebar">
         <!-- Office Info -->
-        <div class="bg-white rounded-xl shadow-lg p-8">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6">Office Information</h3>
-          <div class="space-y-4">
-            <div class="flex items-start">
-              <div class="text-blue-600 text-xl mr-4 mt-1">📍</div>
-              <div>
-                <p class="font-semibold text-gray-900">Headquarters</p>
-                <p class="text-gray-600">123 Innovation Drive<br>Tech City, TC 12345</p>
-              </div>
+        <div class="office-card">
+          <h3>Office Information</h3>
+          <div class="office-info-item">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                <circle cx="12" cy="9" r="2.5"/>
+              </svg>
             </div>
-            
-            <div class="flex items-start">
-              <div class="text-blue-600 text-xl mr-4 mt-1">📞</div>
-              <div>
-                <p class="font-semibold text-gray-900">Phone</p>
-                <p class="text-gray-600">+1 (555) 123-4567</p>
-              </div>
+            <div>
+              <span class="info-label">Headquarters</span>
+              <p class="info-value">123 Innovation Drive<br>Tech City, TC 12345</p>
             </div>
-            
-            <div class="flex items-start">
-              <div class="text-blue-600 text-xl mr-4 mt-1">✉️</div>
-              <div>
-                <p class="font-semibold text-gray-900">Email</p>
-                <p class="text-gray-600">info&#64;NeuroSync.com</p>
-              </div>
+          </div>
+
+          <div class="office-info-item">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.01 2.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+              </svg>
             </div>
-            
-            <div class="flex items-start">
-              <div class="text-blue-600 text-xl mr-4 mt-1">🕒</div>
-              <div>
-                <p class="font-semibold text-gray-900">Business Hours</p>
-                <p class="text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 4:00 PM</p>
-              </div>
+            <div>
+              <span class="info-label">Phone</span>
+              <p class="info-value">+1 (555) 123-4567</p>
+            </div>
+          </div>
+
+          <div class="office-info-item">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div>
+              <span class="info-label">Email</span>
+              <p class="info-value">info&#64;NeuroSync.com</p>
+            </div>
+          </div>
+
+          <div class="office-info-item">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <span class="info-label">Business Hours</span>
+              <p class="info-value">Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 4:00 PM</p>
             </div>
           </div>
         </div>
 
         <!-- Quick Links -->
-        <div class="bg-white rounded-xl shadow-lg p-8">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6">Quick Links</h3>
-          <div class="space-y-4">
-            <a routerLink="/services" 
-               class="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <div class="flex items-center justify-between">
-                <span class="font-semibold text-gray-900">Our Services</span>
-                <span class="text-blue-600">→</span>
-              </div>
-            </a>
-            
-            <a routerLink="/signup" 
-               class="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <div class="flex items-center justify-between">
-                <span class="font-semibold text-gray-900">Get Started</span>
-                <span class="text-blue-600">→</span>
-              </div>
-            </a>
-          </div>
+        <div class="quick-links-card">
+          <h3>Quick Links</h3>
+          <a routerLink="/services" class="quick-link-item">
+            <span>Our Services</span>
+            <span class="quick-link-arrow">→</span>
+          </a>
+          <a routerLink="/signup" class="quick-link-item">
+            <span>Get Started</span>
+            <span class="quick-link-arrow">→</span>
+          </a>
         </div>
 
         <!-- Support -->
-        <div class="bg-blue-600 rounded-xl shadow-lg p-8 text-white">
-          <h3 class="text-2xl font-bold mb-4">Need Immediate Support?</h3>
-          <p class="mb-6">Our technical support team is available 24/7 for critical issues.</p>
-          <div class="space-y-3">
-            <p><span class="font-semibold">Emergency Support:</span> +1 (555) 911-TECH</p>
-            <p><span class="font-semibold">Email:</span> support&#64;NeuroSync.com</p>
-            <p><span class="font-semibold">Live Chat:</span> Available on our platform</p>
+        <div class="support-card">
+          <h3>Need Immediate Support?</h3>
+          <p>Our technical support team is available 24/7 for critical issues.</p>
+          <div class="support-item">
+            <span class="support-label">Emergency Support:</span>
+            <span class="support-value">+1 (555) 911-TECH</span>
+          </div>
+          <div class="support-item">
+            <span class="support-label">Email:</span>
+            <span class="support-value">support&#64;NeuroSync.com</span>
+          </div>
+          <div class="support-item">
+            <span class="support-label">Live Chat:</span>
+            <span class="support-value">Available on our platform</span>
           </div>
         </div>
       </div>

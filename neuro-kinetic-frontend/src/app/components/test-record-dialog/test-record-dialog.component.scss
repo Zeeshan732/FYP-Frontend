@@ -1,22 +1,23 @@
-// Test Record Dialog – light theme (Consultation-style)
+// Test Record Dialog – dark theme (design tokens)
 
 ::ng-deep .test-record-dialog {
   .p-dialog {
-    border-radius: var(--app-radius-lg);
+    border-radius: var(--radius-card);
     overflow: hidden;
-    box-shadow: var(--app-shadow);
-    background: var(--app-surface);
+    box-shadow: var(--shadow-card);
+    background: var(--color-surface) !important;
+    border: 1px solid var(--color-border);
   }
 
   .p-dialog-header {
-    background: var(--app-primary);
+    background: var(--color-blue) !important;
     border-bottom: none;
     padding: 1.25rem 1.5rem;
 
     .p-dialog-title {
       font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--app-primary-foreground);
+      font-weight: 500;
+      color: #ffffff;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -42,8 +43,8 @@
   }
 
   .p-dialog-content {
-    background: var(--app-surface);
-    color: var(--app-text-primary);
+    background: var(--color-surface) !important;
+    color: var(--color-ink);
     padding: 1.5rem 2rem;
     max-height: 70vh;
     overflow-y: auto;
@@ -53,23 +54,23 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: var(--app-surface-muted);
+      background: var(--color-surface-2);
       border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: var(--app-border-strong);
+      background: var(--color-border-hover);
       border-radius: 4px;
 
       &:hover {
-        background: var(--app-text-muted);
+        background: var(--color-muted);
       }
     }
   }
 
   .p-dialog-footer {
-    background: var(--app-surface);
-    border-top: 1px solid var(--app-border);
+    background: var(--color-surface) !important;
+    border-top: 1px solid var(--color-border);
     padding: 1.25rem 2rem;
   }
 }
@@ -88,18 +89,18 @@
       gap: 0.75rem;
       margin-bottom: 1.25rem;
       padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--app-border);
+      border-bottom: 1px solid var(--color-border);
 
       .section-icon {
         width: 20px;
         height: 20px;
-        color: var(--app-primary);
+        color: var(--color-blue);
       }
 
       .section-title {
         font-size: 1.125rem;
-        font-weight: 600;
-        color: var(--app-text-primary);
+        font-weight: 500;
+        color: var(--color-ink);
         margin: 0;
       }
     }
@@ -141,18 +142,18 @@
       gap: 0.5rem;
       font-size: 0.875rem;
       font-weight: 500;
-      color: var(--app-text-primary);
+      color: var(--color-ink);
       margin-bottom: 0.5rem;
 
       .label-icon {
         width: 16px;
         height: 16px;
-        color: var(--app-text-muted);
+        color: var(--color-muted);
         flex-shrink: 0;
       }
 
       .required-indicator {
-        color: #dc2626;
+        color: var(--color-critical);
         margin-left: 2px;
       }
     }
@@ -165,34 +166,34 @@
     .form-input,
     .form-textarea {
       width: 100%;
-      background: var(--app-surface);
-      border: 1px solid var(--app-border);
-      border-radius: var(--app-radius);
+      background: var(--color-surface-2) !important;
+      border: 1px solid var(--color-border) !important;
+      border-radius: var(--radius-input);
       padding: 0.75rem 1rem;
-      color: var(--app-text-primary);
+      color: var(--color-ink);
       font-size: 0.875rem;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
       &:focus {
         outline: none;
-        border-color: var(--app-primary);
-        box-shadow: 0 0 0 3px rgba(56, 133, 110, 0.15);
+        border-color: var(--color-blue) !important;
+        box-shadow: 0 0 0 3px var(--color-sky);
       }
 
       &:disabled {
-        background: var(--app-surface-muted);
-        color: var(--app-text-muted);
+        background: var(--color-surface) !important;
+        color: var(--color-muted);
         cursor: not-allowed;
         opacity: 0.9;
       }
 
       &::placeholder {
-        color: var(--app-text-muted);
+        color: var(--color-muted);
       }
 
       &.readonly-input {
-        background: var(--app-surface-muted);
-        color: var(--app-text-primary);
+        background: var(--color-surface-2) !important;
+        color: var(--color-ink);
         cursor: default;
       }
     }
@@ -206,13 +207,13 @@
     .accuracy-indicator {
       margin-top: 0.5rem;
       height: 4px;
-      background: var(--app-surface-muted);
+      background: var(--color-surface-2);
       border-radius: 2px;
       overflow: hidden;
 
       .accuracy-bar {
         height: 100%;
-        background: var(--app-primary);
+        background: var(--color-blue);
         border-radius: 2px;
         transition: width 0.3s ease;
       }
@@ -222,7 +223,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      color: #dc2626;
+      color: var(--color-critical);
       font-size: 0.75rem;
       margin-top: 0.5rem;
 
@@ -255,25 +256,25 @@
     }
 
     .cancel-button {
-      background: var(--app-surface) !important;
-      border: 1px solid var(--app-secondary-border) !important;
-      color: var(--app-secondary-border) !important;
+      background: transparent !important;
+      border: 1px solid var(--color-blue) !important;
+      color: var(--color-blue) !important;
 
       &:hover:not(:disabled) {
-        background: var(--app-surface-muted) !important;
-        border-color: var(--app-secondary-border) !important;
-        color: var(--app-text-primary) !important;
+        background: var(--color-sky) !important;
+        border-color: var(--color-blue) !important;
+        color: var(--color-blue) !important;
       }
     }
 
     .save-button {
-      background: var(--app-primary) !important;
+      background: var(--color-blue) !important;
       border: none !important;
-      color: var(--app-primary-foreground) !important;
+      color: #ffffff !important;
 
       &:hover:not(:disabled) {
-        background: var(--app-primary-hover) !important;
-        box-shadow: 0 4px 12px rgba(56, 133, 110, 0.25);
+        background: var(--color-blue-hover) !important;
+        box-shadow: 0 4px 12px rgba(46, 134, 222, 0.25);
       }
 
       &:disabled {
@@ -284,93 +285,96 @@
   }
 }
 
-// PrimeNG input/dropdown/calendar – light theme
+// PrimeNG input/dropdown/calendar – dark theme (default border subtle, blue only on focus)
 ::ng-deep .test-record-dialog {
   .p-inputtext,
   .p-inputtextarea {
-    background: var(--app-surface) !important;
-    border: 1px solid var(--app-border) !important;
-    color: var(--app-text-primary) !important;
-    border-radius: var(--app-radius);
+    background: var(--color-surface-2) !important;
+    border: 1px solid var(--color-border) !important;
+    color: var(--color-ink) !important;
+    border-radius: var(--radius-input);
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
 
-    &:enabled:focus {
-      border-color: var(--app-primary) !important;
-      box-shadow: 0 0 0 3px rgba(56, 133, 110, 0.15);
-    }
+  .p-inputtext:enabled:focus,
+  .p-inputtextarea:enabled:focus {
+    border-color: var(--color-blue) !important;
+    box-shadow: 0 0 0 3px var(--color-sky) !important;
+  }
 
-    &:disabled {
-      background: var(--app-surface-muted) !important;
-      color: var(--app-text-muted) !important;
-      opacity: 0.9;
-    }
+  .p-inputtext:disabled,
+  .p-inputtextarea:disabled {
+    background: var(--color-surface) !important;
+    color: var(--color-muted) !important;
+    opacity: 0.9;
   }
 
   .p-dropdown {
-    background: var(--app-surface) !important;
-    border: 1px solid var(--app-border) !important;
-    border-radius: var(--app-radius);
-    transition: all 0.2s ease;
+    background: var(--color-surface-2) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: var(--radius-input);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
 
-    .p-dropdown-label {
-      color: var(--app-text-primary);
-      padding: 0.75rem 1rem;
-      font-size: 0.875rem;
-    }
+  .p-dropdown .p-dropdown-label {
+    color: var(--color-ink);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
 
-    .p-dropdown-trigger {
-      color: var(--app-text-muted);
-    }
+  .p-dropdown .p-dropdown-trigger {
+    color: var(--color-muted);
+  }
 
-    &:not(.p-disabled):hover {
-      border-color: var(--app-border-strong);
-    }
+  .p-dropdown:not(.p-disabled):hover {
+    border-color: var(--color-border-hover) !important;
+  }
 
-    &:not(.p-disabled).p-focus {
-      border-color: var(--app-primary);
-      box-shadow: 0 0 0 3px rgba(56, 133, 110, 0.15);
-    }
+  .p-dropdown:not(.p-disabled).p-focus,
+  .p-dropdown.p-dropdown-open {
+    border-color: var(--color-blue) !important;
+    box-shadow: 0 0 0 3px var(--color-sky) !important;
+  }
 
-    &.p-disabled {
-      background: var(--app-surface-muted);
-      opacity: 0.9;
-    }
+  .p-dropdown.p-disabled {
+    background: var(--color-surface) !important;
+    opacity: 0.9;
   }
 
   .p-calendar .p-inputtext {
-    background: var(--app-surface) !important;
-    border: 1px solid var(--app-border) !important;
-    color: var(--app-text-primary) !important;
+    background: var(--color-surface-2) !important;
+    border: 1px solid var(--color-border) !important;
+    color: var(--color-ink) !important;
   }
 
   .p-calendar .p-inputtext:disabled {
-    background: var(--app-surface-muted) !important;
-    color: var(--app-text-muted) !important;
+    background: var(--color-surface) !important;
+    color: var(--color-muted) !important;
     opacity: 0.9;
   }
 
   .p-dropdown-panel {
-    background: var(--app-surface);
-    border: 1px solid var(--app-border);
-    border-radius: var(--app-radius);
-    box-shadow: var(--app-shadow);
+    background: var(--color-surface) !important;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-input);
+    box-shadow: var(--shadow-card);
+  }
 
-    .p-dropdown-items .p-dropdown-item {
-      color: var(--app-text-primary);
-      padding: 0.75rem 1rem;
-      transition: all 0.2s ease;
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+    color: var(--color-ink);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+  }
 
-      &:hover {
-        background: var(--app-surface-muted);
-        color: var(--app-primary);
-      }
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item:hover {
+    background: var(--color-surface-2);
+    color: var(--color-blue);
+  }
 
-      &.p-highlight {
-        background: rgba(56, 133, 110, 0.12);
-        color: var(--app-primary);
-      }
-    }
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+    background: var(--color-sky);
+    color: var(--color-blue);
   }
 }
