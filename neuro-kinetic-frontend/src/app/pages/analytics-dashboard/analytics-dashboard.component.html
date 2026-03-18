@@ -6,7 +6,6 @@
     <p class="text-app-text-muted mb-6">Clinical analytics and progression monitoring. Independent of ML prediction and RAG.</p>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Risk Adjustment Panel -->
       <div class="bg-app-surface border border-app-border rounded-xl p-5 shadow-sm">
         <h2 class="text-lg font-semibold mb-4">Risk Adjustment</h2>
         <div class="space-y-3">
@@ -27,14 +26,14 @@
           </div>
           <button (click)="runRiskAdjust()" [disabled]="riskLoading"
                   class="mt-2 px-4 py-2 bg-app-primary text-white rounded-lg font-medium hover:bg-app-primary-hover disabled:opacity-50">
-            {{ riskLoading ? 'Calculating…' : 'Adjust Risk' }}
+            <app-loader *ngIf="riskLoading" variant="button" signal="default" title="Calculating..."></app-loader>
+            <ng-container *ngIf="!riskLoading">Adjust Risk</ng-container>
           </button>
           <p *ngIf="adjustedRisk !== null" class="mt-2 text-app-primary font-semibold">Adjusted risk: {{ adjustedRisk }}%</p>
           <p *ngIf="riskError" class="mt-2 text-red-600 text-sm">{{ riskError }}</p>
         </div>
       </div>
 
-      <!-- Statistical Summary Box -->
       <div class="bg-app-surface border border-app-border rounded-xl p-5 shadow-sm">
         <h2 class="text-lg font-semibold mb-4">Statistical Summary</h2>
         <div class="space-y-2">
@@ -43,7 +42,8 @@
                  class="w-full border border-app-border rounded-lg px-3 py-2" placeholder="e.g. 30, 45, 52, 60" />
           <button (click)="runStatistics()" [disabled]="statLoading"
                   class="mt-2 px-4 py-2 bg-app-primary text-white rounded-lg font-medium hover:bg-app-primary-hover disabled:opacity-50">
-            {{ statLoading ? 'Calculating…' : 'Compute' }}
+            <app-loader *ngIf="statLoading" variant="button" signal="default" title="Calculating..."></app-loader>
+            <ng-container *ngIf="!statLoading">Compute</ng-container>
           </button>
           <div *ngIf="statResult" class="mt-3 text-sm space-y-1">
             <p>Mean: {{ statResult.mean }}</p>
@@ -55,13 +55,12 @@
       </div>
     </div>
 
-    <!-- Disease Progression Graph -->
     <div class="bg-app-surface border border-app-border rounded-xl p-5 shadow-sm mb-6">
       <h2 class="text-lg font-semibold mb-4">Disease Progression</h2>
-      <p *ngIf="progressionLoading" class="text-app-text-muted">Loading…</p>
+      <app-loader *ngIf="progressionLoading" variant="inline" signal="default" title="Loading progression..."></app-loader>
       <p *ngIf="progressionError" class="text-red-600 text-sm">{{ progressionError }}</p>
       <div *ngIf="progressionResult && !progressionLoading" class="space-y-2">
-        <p class="text-sm">Trend: <strong>{{ progressionResult.trendClassification }}</strong> · Slope: {{ progressionResult.linearRegressionSlope }}</p>
+        <p class="text-sm">Trend: <strong>{{ progressionResult.trendClassification }}</strong> - Slope: {{ progressionResult.linearRegressionSlope }}</p>
         <div class="h-64">
           <canvas #progressionChart></canvas>
         </div>
@@ -72,7 +71,6 @@
       </button>
     </div>
 
-    <!-- Sensitivity Simulation Sliders -->
     <div class="bg-app-surface border border-app-border rounded-xl p-5 shadow-sm">
       <h2 class="text-lg font-semibold mb-4">Sensitivity Simulation (Monte Carlo, 1000 iterations)</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">

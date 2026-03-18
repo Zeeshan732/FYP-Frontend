@@ -3,7 +3,7 @@
 
 <!-- Patient Test Section -->
 <section class="min-h-screen patient-test-hero text-app-text-primary pt-24 pb-20">
-  <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
+  <div class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-12">
     <!-- Header -->
     <div class="text-center mb-12">
       <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-app-primary via-app-primary-hover to-app-primary bg-clip-text text-transparent tracking-tight">
@@ -21,6 +21,74 @@
       </div>
     </div>
 
+    <!-- Test type selector -->
+    <div class="test-type-section" *ngIf="!testStarted && !testCompleted">
+      <p class="test-type-label">Select test type</p>
+      <div class="test-type-grid">
+        <!-- Voice card -->
+        <div class="test-type-card"
+             [class.ttc-active-voice]="selectedTest === 'voice'"
+             (click)="selectTest('voice')">
+          <div class="ttc-icon ttc-icon-voice">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="#2E86DE" stroke-width="2" stroke-linecap="round">
+              <path d="M12 2a3 3 0 013 3v7a3 3 0 01-6 0V5a3 3 0 013-3z"/>
+              <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+          </div>
+          <div class="ttc-name">Voice Analysis</div>
+          <div class="ttc-desc">
+            Record or upload a voice sample for tremor detection
+          </div>
+          <span class="ttc-badge ttc-badge-voice">Voice signal</span>
+        </div>
+
+        <!-- Gait card (placeholder if gait test exists elsewhere) -->
+        <div class="test-type-card"
+             [class.ttc-active-gait]="selectedTest === 'gait'"
+             (click)="selectTest('gait')">
+          <div class="ttc-icon ttc-icon-gait">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="#7F77DD" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="4" r="2"/>
+              <path d="M12 6v6l-3 4"/>
+              <path d="M12 12l3 4"/>
+              <path d="M9 20l3-4 3 4"/>
+            </svg>
+          </div>
+          <div class="ttc-name">Gait Analysis</div>
+          <div class="ttc-desc">
+            Upload a walking video for stride and cadence analysis
+          </div>
+          <span class="ttc-badge ttc-badge-gait">Gait signal</span>
+        </div>
+
+        <!-- Finger Tap card -->
+        <div class="test-type-card ttc-tap-highlight"
+             [class.ttc-active-tap]="selectedTest === 'fingertap'"
+             (click)="selectTest('fingertap')">
+          <div class="ttc-new-badge">NEW</div>
+          <div class="ttc-icon ttc-icon-tap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="#1D9E75" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round">
+              <path d="M18 11V6a2 2 0 00-2-2 2 2 0 00-2 2"/>
+              <path d="M14 10V4a2 2 0 00-2-2 2 2 0 00-2 2v2"/>
+              <path d="M10 10.5V6a2 2 0 00-2-2 2 2 0 00-2 2v8"/>
+              <path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2
+                       a8 8 0 01-8-8 2 2 0 114 0"/>
+            </svg>
+          </div>
+          <div class="ttc-name">Finger Tapping</div>
+          <div class="ttc-desc">
+            Record live or upload a finger-tap video for bradykinesia detection
+          </div>
+          <span class="ttc-badge ttc-badge-tap">Tap signal</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Test Introduction -->
     <div *ngIf="!testStarted && !testCompleted" class="max-w-3xl mx-auto">
       <div class="patient-test-card bg-app-surface rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
@@ -28,38 +96,87 @@
         <div class="p-8 sm:p-10">
           <h2 class="text-xl font-bold text-app-text-primary mb-1 flex items-center gap-2">
             <span class="w-8 h-8 rounded-lg bg-app-primary/10 flex items-center justify-center text-app-primary text-sm font-extrabold">1</span>
-            Before You Begin
+            {{ selectedTest === 'fingertap' ? 'Finger-Tapping Screening' : 'Before You Begin' }}
           </h2>
-          <p class="text-app-text-muted text-sm mb-6">Choose how you’d like to provide your voice sample.</p>
+          <p class="text-app-text-muted text-sm mb-6">
+            {{ selectedTest === 'fingertap'
+                ? 'Choose how to record your finger-tapping test.'
+                : 'Choose how you’d like to provide your voice sample.' }}
+          </p>
         
           <!-- Mode Toggle -->
-          <div class="flex gap-3 sm:gap-4 mb-8">
+          <!-- Voice/Gait mode buttons (existing behavior preserved) -->
+          <div class="flex gap-3 sm:gap-4 mb-8" *ngIf="selectedTest !== 'fingertap'">
             <button 
-              (click)="inputMode = 'record'; selectedFile = null; error = ''"
+              (click)="selectMode('record'); selectedFile = null; error = ''"
               class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
               [ngClass]="{
-                'bg-app-primary border-app-primary text-white shadow-md shadow-app-primary/25': inputMode === 'record',
-                'bg-surface-2 border-app-border text-app-text-primary hover:border-app-primary/50 hover:bg-app-primary/5': inputMode !== 'record'
+                'bg-app-primary border-app-primary text-white shadow-md shadow-app-primary/25': selectedMode === 'record',
+                'bg-surface-2 border-app-border text-app-text-primary hover:border-app-primary/50 hover:bg-app-primary/5': selectedMode !== 'record'
               }"
             >
               <span class="text-lg">🎤</span>
               Record Voice
             </button>
             <button 
-              (click)="inputMode = 'upload'; audioBlob = null; error = ''"
+              (click)="selectMode('upload'); audioBlob = null; error = ''"
               class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
               [ngClass]="{
-                'bg-app-primary border-app-primary text-white shadow-md shadow-app-primary/25': inputMode === 'upload',
-                'bg-surface-2 border-app-border text-app-text-primary hover:border-app-primary/50 hover:bg-app-primary/5': inputMode !== 'upload'
+                'bg-app-primary border-app-primary text-white shadow-md shadow-app-primary/25': selectedMode === 'upload',
+                'bg-surface-2 border-app-border text-app-text-primary hover:border-app-primary/50 hover:bg-app-primary/5': selectedMode !== 'upload'
               }"
             >
               <span class="text-lg">📁</span>
               Upload File
             </button>
+            <!-- Finger Tap card shortcut -->
+            <button 
+              class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2 mode-btn-finger-tap-pill"
+              (click)="selectTest('fingertap')">
+              <svg width="13" height="13" viewBox="0 0 24 24"
+                   fill="none" stroke="#1D9E75" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 11V6a2 2 0 00-2-2 2 2 0 00-2 2"/>
+                <path d="M14 10V4a2 2 0 00-2-2 2 2 0 00-2 2v2"/>
+                <path d="M10 10.5V6a2 2 0 00-2-2 2 2 0 00-2 2v8"/>
+                <path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2
+                         a8 8 0 01-8-8 2 2 0 114 0"/>
+              </svg>
+              Finger Tap
+              <span class="new-inline-badge">NEW</span>
+            </button>
           </div>
 
-          <!-- Record Mode Instructions -->
-          <div *ngIf="inputMode === 'record'" class="patient-test-steps space-y-4 mb-8">
+          <!-- Finger-tap mode buttons -->
+          <div class="flex gap-3 sm:gap-4 mb-8" *ngIf="selectedTest === 'fingertap'">
+            <button 
+              (click)="selectMode('live')"
+              class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
+              [ngClass]="{
+                'mode-btn-tap-active': selectedMode === 'live',
+                'bg-surface-2 border-app-border text-app-text-primary hover:border-app-primary/50 hover:bg-app-primary/5': selectedMode !== 'live'
+              }"
+            >
+              <!-- camera/broadcast icon -->
+              <span class="text-lg">📹</span>
+              Record Live
+            </button>
+            <button 
+              (click)="selectMode('upload')"
+              class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
+              [ngClass]="{
+                'mode-btn-tap-active': selectedMode === 'upload',
+                'bg-surface-2 border-app-border text-app-text-primary hover:border-app-primary/50 hover:bg-app-primary/5': selectedMode !== 'upload'
+              }"
+            >
+              <!-- upload icon -->
+              <span class="text-lg">📁</span>
+              Upload Video
+            </button>
+          </div>
+
+          <!-- Record Mode Instructions (voice) -->
+          <div *ngIf="selectedTest !== 'fingertap' && inputMode === 'record'" class="patient-test-steps space-y-4 mb-8">
             <div class="flex items-start gap-4">
               <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">1</span>
               <p class="text-app-text-primary pt-0.5">Find a quiet environment with minimal background noise.</p>
@@ -78,8 +195,8 @@
             </div>
           </div>
 
-          <!-- Upload Mode Instructions -->
-          <div *ngIf="inputMode === 'upload'" class="patient-test-steps space-y-4 mb-8">
+          <!-- Upload Mode Instructions (voice) -->
+          <div *ngIf="selectedTest !== 'fingertap' && inputMode === 'upload'" class="patient-test-steps space-y-4 mb-8">
             <div class="flex items-start gap-4">
               <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">1</span>
               <p class="text-app-text-primary pt-0.5">Select an audio file from your device (WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS).</p>
@@ -94,8 +211,47 @@
             </div>
           </div>
 
+          <!-- Finger-tap Instructions -->
+          <div *ngIf="selectedTest === 'fingertap'" class="patient-test-steps space-y-4 mb-4">
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">1</span>
+              <p class="text-app-text-primary pt-0.5">
+                Sit at a stable surface with good lighting — avoid heavy shadows on your hand.
+              </p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">2</span>
+              <p class="text-app-text-primary pt-0.5">
+                Place your hand flat and tap your index finger against your thumb repeatedly.
+              </p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">3</span>
+              <p class="text-app-text-primary pt-0.5">
+                Keep your hand within the camera frame for the full 10–20 seconds.
+              </p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">4</span>
+              <p class="text-app-text-primary pt-0.5">
+                Click "Start Finger-Tapping Test" — the camera will open directly in your browser.
+              </p>
+            </div>
+          </div>
+
+          <!-- Finger-tap hint bar -->
+          <div class="ft-hint-bar" *ngIf="selectedTest === 'fingertap'">
+            <span>
+              <strong>Formats:</strong> MP4 · MOV · AVI · MKV · WEBM
+              &nbsp;·&nbsp;
+              <strong>Max:</strong> 100 MB
+              &nbsp;·&nbsp;
+              <strong>Duration:</strong> 10–20 seconds
+            </span>
+          </div>
+
         <!-- Upload Section (shown when in upload mode) -->
-        <div *ngIf="inputMode === 'upload'" class="mb-6">
+        <div *ngIf="inputMode === 'upload' && selectedTest !== 'fingertap'" class="mb-6">
           <div class="upload-area mb-4">
             <label for="voiceFileInput" class="upload-button flex flex-col items-center justify-center p-8 border-2 border-dashed border-app-border rounded-xl bg-surface-2 cursor-pointer transition-all duration-200 hover:border-app-primary hover:bg-app-primary/5">
               <span class="text-4xl mb-3">📁</span>
@@ -130,10 +286,10 @@
         
         <button 
           (click)="startTest()"
-          [disabled]="inputMode === 'upload' && !selectedFile"
+          [disabled]="selectedTest !== 'fingertap' && inputMode === 'upload' && !selectedFile"
           class="w-full bg-app-primary hover:bg-app-primary-hover text-white px-8 py-4 rounded-xl transition-all duration-200 font-semibold text-lg shadow-md shadow-app-primary/20 hover:shadow-lg hover:shadow-app-primary/25 disabled:bg-[var(--color-hint)] disabled:shadow-none disabled:cursor-not-allowed"
         >
-          Start Test
+          {{ selectedTest === 'fingertap' ? 'Start Finger-Tapping Test' : 'Start Test' }}
         </button>
         </div>
       </div>
@@ -171,7 +327,8 @@
                 [disabled]="isProcessing"
                 class="bg-app-primary hover:bg-app-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl transition-colors font-semibold"
               >
-                {{ isProcessing ? 'Processing...' : 'Submit Test' }}
+                <app-loader *ngIf="isProcessing" variant="button" signal="voice" title="Analyzing..."></app-loader>
+                <ng-container *ngIf="!isProcessing">Submit Test</ng-container>
               </button>
             </div>
           </div>
@@ -246,16 +403,20 @@
                 [disabled]="isProcessing"
                 class="bg-app-primary hover:bg-app-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl transition-colors font-semibold"
               >
-                {{ isProcessing ? 'Processing...' : 'Submit Test' }}
+                <app-loader *ngIf="isProcessing" variant="button" signal="voice" title="Analyzing..."></app-loader>
+                <ng-container *ngIf="!isProcessing">Submit Test</ng-container>
               </button>
             </div>
           </div>
 
           <!-- Processing -->
           <div *ngIf="isProcessing" class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-app-primary mx-auto mb-4"></div>
-            <p class="text-app-text-primary">Analyzing your voice recording...</p>
-            <p class="text-sm text-app-text-muted mt-2">This may take a few moments</p>
+            <app-loader
+              variant="page"
+              signal="voice"
+              title="Analyzing your voice recording"
+              subtitle="Extracting voice biomarkers and computing risk confidence. This may take a few moments.">
+            </app-loader>
           </div>
         </div>
         </div>
@@ -478,5 +639,3 @@
     </div>
   </div>
 </section>
-
-

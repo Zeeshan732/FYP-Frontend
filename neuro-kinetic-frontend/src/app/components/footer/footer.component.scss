@@ -6,9 +6,15 @@
 }
 
 .footer-brand {
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.footer-logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .footer-desc {

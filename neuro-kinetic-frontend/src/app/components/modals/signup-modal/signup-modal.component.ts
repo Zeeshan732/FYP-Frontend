@@ -22,7 +22,14 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   info = '';
   loading = false;
   isAdminEmail = false;
+  modalView: 'login' | 'signup' | 'forgot' | 'email-sent' = 'signup';
+  selectedRole: 'patient' | 'clinician' = 'patient';
+  showPassword = false;
+  showConfirmPassword = false;
+  passwordStrength: 0 | 1 | 2 | 3 | 4 = 0;
+  agreeTerms = false;
   private subscription: Subscription = new Subscription();
+  private previousBodyOverflow = '';
 
   // Available roles for signup (Admin cannot be self-selected)
   roleOptions = [
@@ -45,6 +52,12 @@ export class SignupModalComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.modalService.signupModal$.subscribe(isOpen => {
         this.isOpen = isOpen;
+        if (isOpen) {
+          this.previousBodyOverflow = document.body.style.overflow;
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = this.previousBodyOverflow;
+        }
         // Reset form when modal opens
         if (isOpen) {
           this.firstName = '';
@@ -58,6 +71,12 @@ export class SignupModalComponent implements OnInit, OnDestroy {
           this.info = '';
           this.loading = false;
           this.isAdminEmail = false;
+          this.modalView = 'signup';
+          this.selectedRole = 'patient';
+          this.showPassword = false;
+          this.showConfirmPassword = false;
+          this.passwordStrength = 0;
+          this.agreeTerms = false;
         }
       })
     );
@@ -65,6 +84,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
+    document.body.style.overflow = this.previousBodyOverflow;
   }
 
   closeModal() {
@@ -94,7 +114,42 @@ export class SignupModalComponent implements OnInit, OnDestroy {
       if (this.role === 'Admin') {
         this.role = 'Public';
       }
+      this.selectedRole = this.role === 'MedicalProfessional' ? 'clinician' : 'patient';
     }
+  }
+
+  switchTo(view: 'login' | 'signup' | 'forgot' | 'email-sent'): void {
+    if (view === 'login') {
+      this.openLoginModal();
+      return;
+    }
+    this.modalView = view;
+  }
+
+  selectRole(role: 'patient' | 'clinician'): void {
+    this.selectedRole = role;
+    if (!this.isAdminEmail) {
+      this.role = role === 'clinician' ? 'MedicalProfessional' : 'Public';
+    }
+  }
+
+  checkPasswordStrength(value: string): void {
+    let score = 0;
+    if (value.length >= 8) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^A-Za-z0-9]/.test(value)) score++;
+    this.passwordStrength = score as 0 | 1 | 2 | 3 | 4;
+  }
+
+  get strengthClass(): string {
+    if (this.passwordStrength <= 1) return 'weak';
+    if (this.passwordStrength <= 2) return 'medium';
+    return 'strong';
+  }
+
+  get isSigningUp(): boolean {
+    return this.loading;
   }
 
   onSubmit() {
@@ -104,13 +159,13 @@ export class SignupModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Passwords do not match';
+    if (this.password.length < 8) {
+      this.error = 'Password must be at least 8 characters long';
       return;
     }
 
-    if (this.password.length < 6) {
-      this.error = 'Password must be at least 6 characters long';
+    if (!this.agreeTerms) {
+      this.error = 'Please accept Terms of Service and Privacy Policy';
       return;
     }
 
@@ -132,6 +187,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
     if (this.isAdminEmail) {
       registrationData.role = 'Admin';
     } else {
+      this.role = this.selectedRole === 'clinician' ? 'MedicalProfessional' : 'Public';
       registrationData.role = this.role;
     }
 
@@ -165,8 +221,13 @@ export class SignupModalComponent implements OnInit, OnDestroy {
           if (isAdminAccount) {
             this.router.navigate(['/login']);
           } else if (isLoggedIn) {
-            // Other approved accounts, redirect to patient test page
-            this.router.navigate(['/patient-test']);
+            // Redirect based on role
+            const createdRole = response.user?.role;
+            if (createdRole === 'MedicalProfessional') {
+              this.router.navigate(['/clinician/patients']);
+            } else {
+              this.router.navigate(['/patient-test']);
+            }
           } else {
             // Pending accounts, redirect to login page
             this.router.navigate(['/login']);

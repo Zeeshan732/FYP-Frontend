@@ -141,10 +141,12 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="max-w-[1600px] mx-auto text-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-app-primary mx-auto mb-4"></div>
-      <p class="text-app-text-primary">Loading test records...</p>
-    </div>
+    <app-skeleton
+      *ngIf="loading"
+      variant="table"
+      [rows]="6"
+      [cols]="7">
+    </app-skeleton>
 
         <!-- Records Table -->
     <div *ngIf="!loading && records.length > 0" class="max-w-[1600px] mx-auto mb-8">
@@ -370,8 +372,12 @@
       </div>
     </ng-template>
     <div *ngIf="loadingTrends" class="text-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-      <p class="text-app-text-primary">Loading trend data...</p>
+      <app-loader
+        variant="page"
+        signal="default"
+        title="Loading trend data..."
+        subtitle="Preparing progression summaries for this patient.">
+      </app-loader>
     </div>
     <div *ngIf="!loadingTrends && trendData" class="space-y-6">
       <!-- Summary -->
@@ -441,8 +447,12 @@
       </div>
     </ng-template>
     <div *ngIf="loadingComparison" class="text-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-      <p class="text-app-text-primary">Loading comparison...</p>
+      <app-loader
+        variant="page"
+        signal="default"
+        title="Loading comparison..."
+        subtitle="Comparing selected test records and calculating differences.">
+      </app-loader>
     </div>
     <div *ngIf="!loadingComparison && !comparisonData" class="space-y-4">
       <p class="text-app-text-primary">Select two records from the table to compare.</p>
@@ -510,4 +520,3 @@
     </ng-template>
   </p-dialog>
 </section>
-

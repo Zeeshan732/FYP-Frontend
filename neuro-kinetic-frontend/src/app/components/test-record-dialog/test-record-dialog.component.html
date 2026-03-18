@@ -208,8 +208,11 @@
 
       <!-- Loading State -->
       <div *ngIf="loadingFeatures" class="text-center py-4">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-app-primary mx-auto mb-2"></div>
-        <p class="text-sm text-app-text-muted">Loading voice features...</p>
+        <app-loader
+          variant="inline"
+          signal="voice"
+          title="Loading voice features...">
+        </app-loader>
       </div>
 
       <!-- Voice Features Chart and Table -->
@@ -282,4 +285,3 @@
     </div>
   </ng-template>
 </p-dialog>
-

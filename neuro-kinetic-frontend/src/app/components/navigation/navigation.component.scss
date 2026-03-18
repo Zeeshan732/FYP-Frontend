@@ -9,7 +9,7 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  height: 64px;
+  height: 72px;
   transition: transform 0.3s ease-in-out, background 0.2s, border-color 0.2s;
 }
 
@@ -26,7 +26,7 @@
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 18px;
   font-weight: 600;
   color: #ffffff;
@@ -35,12 +35,11 @@
   flex-shrink: 0;
 }
 
-.navbar .brand-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #2E86DE;
-  box-shadow: 0 0 8px rgba(46, 134, 222, 0.6);
+.navbar .brand-logo-img {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .navbar-links {
@@ -190,6 +189,13 @@
 .neuro-sidebar .sidebar-logo {
   color: #ffffff;
   font-weight: 600;
+}
+
+.neuro-sidebar .sidebar-logo .sidebar-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .neuro-sidebar .sidebar-role {

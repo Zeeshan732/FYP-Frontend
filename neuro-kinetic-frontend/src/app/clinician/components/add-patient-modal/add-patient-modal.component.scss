@@ -1,0 +1,92 @@
+.cm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.cm-modal {
+  width: 100%;
+  max-width: 520px;
+  background: #112240;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+}
+
+.cm-header, .cm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.cm-footer {
+  border-bottom: none;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cm-header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #fff;
+}
+
+.cm-header button {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.cm-body {
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.cm-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+input, select, textarea {
+  background: #0A1628;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #E8EBF0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.cm-btn {
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  height: 36px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.cm-btn-ghost {
+  background: transparent;
+  color: #fff;
+}
+
+.cm-btn-primary {
+  background: #2E86DE;
+  border-color: #2E86DE;
+  color: #fff;
+}
+
+.cm-error {
+  color: #E05252;
+  font-size: 12px;
+}

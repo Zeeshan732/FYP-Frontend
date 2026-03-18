@@ -1,6 +1,8 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-landing',
@@ -17,7 +19,9 @@ export class LandingComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private modalService: ModalService
   ) {}
 
   ngOnInit() {
@@ -30,6 +34,10 @@ export class LandingComponent implements OnInit {
         this.router.navigate(['/patient-test']);
       }
       return;
+    }
+
+    if (this.route.snapshot.data['openLoginModal']) {
+      this.modalService.openLoginModal();
     }
     
     this.observeElements();

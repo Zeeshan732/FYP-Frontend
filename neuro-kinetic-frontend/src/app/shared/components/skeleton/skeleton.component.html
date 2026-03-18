@@ -1,0 +1,29 @@
+<div class="sk-cards" *ngIf="variant === 'card'">
+  <div class="sk-card" *ngFor="let _ of colArray">
+    <div class="sk-shimmer">
+      <div class="sk-line sk-line-60 sk-line-sm"></div>
+      <div class="sk-line sk-line-40 sk-line-lg"></div>
+      <div class="sk-line sk-line-50 sk-line-xs"></div>
+    </div>
+  </div>
+</div>
+
+<div class="sk-table" *ngIf="variant === 'table'">
+  <div class="sk-table-header">
+    <div class="sk-line sk-line-30 sk-line-xs" *ngFor="let _ of colArray"></div>
+  </div>
+  <div class="sk-table-row sk-shimmer" *ngFor="let _ of rowArray">
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="sk-avatar"></div>
+      <div class="sk-line sk-line-60 sk-line-sm" style="flex:1"></div>
+    </div>
+    <div class="sk-line sk-line-80 sk-line-sm" *ngFor="let _ of bodyCols"></div>
+  </div>
+</div>
+
+<div class="sk-text" *ngIf="variant === 'text'">
+  <div class="sk-line sk-line-100 sk-line-sm sk-shimmer"></div>
+  <div class="sk-line sk-line-80 sk-line-sm sk-shimmer"></div>
+  <div class="sk-line sk-line-60 sk-line-sm sk-shimmer"></div>
+</div>
+

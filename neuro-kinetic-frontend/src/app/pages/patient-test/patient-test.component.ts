@@ -76,6 +76,10 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   private waveformData: Uint8Array | null = null;
   private waveformAnimationId: number | null = null;
 
+  // Test type + mode selector
+  selectedTest: 'voice' | 'gait' | 'fingertap' = 'voice';
+  selectedMode: 'record' | 'upload' | 'live' = 'record';
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
@@ -119,13 +123,38 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-    if (this.voiceFeatures) {
-      this.updateVoiceFeaturesChart();
+  selectTest(test: 'voice' | 'gait' | 'fingertap'): void {
+    this.selectedTest = test;
+    if (test === 'fingertap') {
+      this.selectedMode = 'live';
+    } else {
+      this.selectedMode = 'record';
     }
   }
 
-  async startTest() {
+  selectMode(mode: 'record' | 'upload' | 'live'): void {
+    this.selectedMode = mode;
+    if (mode === 'record' || mode === 'upload') {
+      this.inputMode = mode;
+    }
+  }
+
+  startTest(): void {
+    if (this.selectedTest === 'fingertap') {
+      this.router.navigate(['/finger-tap']);
+      return;
+    } else if (this.selectedTest === 'gait') {
+      // Navigate to existing gait test page (route already configured elsewhere)
+      this.router.navigate(['/gait-test']);
+      return;
+    }
+
+    // Existing voice flow
+    this.startVoiceTest();
+  }
+
+  private async startVoiceTest(): Promise<void> {
+    // Moved original startTest logic here
     // If upload mode, just start the test without requesting microphone
     if (this.inputMode === 'upload') {
       if (!this.selectedFile) {
@@ -147,6 +176,14 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
       this.error = 'Unable to access microphone. Please check permissions and try again.';
     }
   }
+
+  ngAfterViewInit(): void {
+    if (this.voiceFeatures) {
+      this.updateVoiceFeaturesChart();
+    }
+  }
+
+  // startTest moved into startVoiceTest to support test type selector
 
   async startRecording() {
     if (!this.audioStream) {
@@ -243,7 +280,8 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
 
         const w = c.getBoundingClientRect().width;
         const h = c.getBoundingClientRect().height;
-        this.analyser.getByteTimeDomainData(this.waveformData);
+        // Cast to any to satisfy TypeScript while keeping the runtime behavior
+        this.analyser.getByteTimeDomainData(this.waveformData as any);
 
         context.fillStyle = 'rgba(248, 250, 252, 0.95)';
         context.fillRect(0, 0, w, h);

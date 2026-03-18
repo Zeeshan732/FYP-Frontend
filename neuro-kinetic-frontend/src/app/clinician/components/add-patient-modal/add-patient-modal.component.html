@@ -1,0 +1,36 @@
+<div class="cm-overlay" (click)="close.emit()">
+  <div class="cm-modal" (click)="$event.stopPropagation()">
+    <div class="cm-header">
+      <h3>Add patient</h3>
+      <button type="button" (click)="close.emit()">×</button>
+    </div>
+
+    <div class="cm-body">
+      <div class="cm-row">
+        <input [(ngModel)]="form.firstName" placeholder="First name">
+        <input [(ngModel)]="form.lastName" placeholder="Last name">
+      </div>
+      <input [(ngModel)]="form.email" placeholder="Email">
+      <div class="cm-row">
+        <input type="date" [(ngModel)]="form.dateOfBirth">
+        <select [(ngModel)]="form.gender">
+          <option value="">Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <textarea rows="3" [(ngModel)]="form.notes" placeholder="Clinical note (optional)"></textarea>
+
+      <div class="cm-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    </div>
+
+    <div class="cm-footer">
+      <button class="cm-btn cm-btn-ghost" type="button" (click)="close.emit()">Cancel</button>
+      <button class="cm-btn cm-btn-primary" type="button" [disabled]="isSubmitting" (click)="submit()">
+        <app-loader *ngIf="isSubmitting" variant="button" title="Saving..."></app-loader>
+        <ng-container *ngIf="!isSubmitting">Add patient</ng-container>
+      </button>
+    </div>
+  </div>
+</div>

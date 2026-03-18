@@ -40,10 +40,13 @@
     </div>
 
     <div class="table-card overflow-hidden relative">
-      <div *ngIf="loading" class="loader-overlay">
-        <div class="spinner"></div>
-      </div>
-      <div class="table-wrap">
+      <app-skeleton
+        *ngIf="loading"
+        variant="table"
+        [rows]="5"
+        [cols]="5">
+      </app-skeleton>
+      <div class="table-wrap" *ngIf="!loading">
         <div class="table-header">
           <div>User</div>
           <div>Email</div>
@@ -53,7 +56,6 @@
         </div>
 
         <div class="table-body">
-          <div class="row state-row" *ngIf="loading">Loading account requests...</div>
           <div class="row state-row" *ngIf="!loading && requests.length === 0">No account requests found.</div>
 
           <div class="row" *ngFor="let req of requests">
@@ -94,7 +96,7 @@
         </div>
       </div>
 
-      <div class="table-footer">
+      <div class="table-footer" *ngIf="!loading">
         <div class="table-footer-text">
           Showing {{ ((pageNumber - 1) * pageSize) + 1 }}-
           {{ Math.min(pageNumber * pageSize, totalCount) }} of {{ totalCount }}

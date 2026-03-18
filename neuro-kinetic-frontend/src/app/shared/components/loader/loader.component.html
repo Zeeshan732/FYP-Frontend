@@ -1,0 +1,138 @@
+<div class="ldr-page" *ngIf="variant === 'page' || variant === 'card'">
+  <div class="ldr-page-inner">
+    <div class="ldr-ring-wrap">
+      <svg width="72" height="72" viewBox="0 0 72 72" class="ldr-ring-svg">
+        <circle cx="36" cy="36" r="30" fill="none" [attr.stroke]="signalColorAlpha" stroke-width="4" />
+        <circle
+          cx="36"
+          cy="36"
+          r="30"
+          fill="none"
+          [attr.stroke]="signalColor"
+          stroke-width="4"
+          stroke-dasharray="188"
+          stroke-dashoffset="47"
+          stroke-linecap="round"
+          class="ldr-ring-arc"
+        />
+      </svg>
+
+      <div class="ldr-ring-icon">
+        <svg
+          *ngIf="signal === 'tap'"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          [attr.stroke]="signalColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 11V6a2 2 0 00-2-2 2 2 0 00-2 2" />
+          <path d="M14 10V4a2 2 0 00-2-2 2 2 0 00-2 2v2" />
+          <path d="M10 10.5V6a2 2 0 00-2-2 2 2 0 00-2 2v8" />
+          <path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2 a8 8 0 01-8-8 2 2 0 114 0" />
+        </svg>
+
+        <svg
+          *ngIf="signal === 'voice'"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          [attr.stroke]="signalColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        >
+          <path d="M12 2a3 3 0 013 3v7a3 3 0 01-6 0V5a3 3 0 013-3z" />
+          <path d="M19 10v2a7 7 0 01-14 0v-2" />
+          <line x1="12" y1="19" x2="12" y2="22" />
+        </svg>
+
+        <svg
+          *ngIf="signal === 'gait'"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          [attr.stroke]="signalColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        >
+          <circle cx="12" cy="4" r="2" />
+          <path d="M12 6v6l-3 4" />
+          <path d="M12 12l3 4" />
+        </svg>
+
+        <svg
+          *ngIf="signal === 'default'"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          [attr.stroke]="signalColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        >
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+      </div>
+    </div>
+
+    <h2 class="ldr-title">{{ title }}</h2>
+    <p class="ldr-subtitle">{{ subtitle }}</p>
+
+    <div class="ldr-steps" *ngIf="steps.length > 0">
+      <div
+        class="ldr-step"
+        *ngFor="let step of steps"
+        [class.ldr-step-done]="step.done"
+        [class.ldr-step-active]="step.active"
+        [class.ldr-step-pending]="!step.done && !step.active"
+      >
+        <div class="ldr-step-icon ldr-step-icon-done" *ngIf="step.done" [style.background]="signalColor">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+            <polyline points="2 6 5 9 10 3" />
+          </svg>
+        </div>
+
+        <div class="ldr-step-icon ldr-step-icon-active" *ngIf="step.active" [style.border-color]="signalColor">
+          <div class="ldr-step-dot-pulse" [style.background]="signalColor"></div>
+        </div>
+
+        <div class="ldr-step-icon ldr-step-icon-pending" *ngIf="!step.done && !step.active"></div>
+
+        <span
+          class="ldr-step-text"
+          [style.color]="step.done ? signalColor : step.active ? '#ffffff' : 'rgba(255,255,255,0.3)'"
+        >
+          {{ step.text }}
+        </span>
+      </div>
+    </div>
+
+    <button class="ldr-cancel-btn" *ngIf="showCancel" (click)="cancelClick.emit()">Cancel</button>
+  </div>
+</div>
+
+<div class="ldr-inline" *ngIf="variant === 'inline'">
+  <svg class="ldr-inline-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" [attr.stroke]="signalColor" stroke-width="2.5">
+    <circle cx="12" cy="12" r="9" stroke-dasharray="28 56" />
+  </svg>
+  <span class="ldr-inline-text">{{ title }}</span>
+</div>
+
+<span class="ldr-btn-wrap" *ngIf="variant === 'button'">
+  <svg class="ldr-btn-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5">
+    <circle cx="12" cy="12" r="9" stroke-dasharray="28 56" />
+  </svg>
+  <span>{{ title }}</span>
+</span>
+
+<div class="ldr-dots" *ngIf="variant === 'dots'">
+  <div class="ldr-dot" [style.background]="signalColor" style="animation-delay:0s"></div>
+  <div class="ldr-dot" [style.background]="signalColor" style="animation-delay:0.15s"></div>
+  <div class="ldr-dot" [style.background]="signalColor" style="animation-delay:0.3s"></div>
+</div>
+

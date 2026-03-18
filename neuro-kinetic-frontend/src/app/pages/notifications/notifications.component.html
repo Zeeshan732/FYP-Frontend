@@ -21,7 +21,13 @@
       </div>
     </div>
 
-    <div class="state" *ngIf="loading">Loading notifications...</div>
+    <div class="state" *ngIf="loading">
+      <app-loader
+        variant="inline"
+        signal="default"
+        title="Loading notifications...">
+      </app-loader>
+    </div>
     <div class="state" *ngIf="!loading && notifications.length === 0">No notifications.</div>
 
     <div class="list" *ngIf="!loading && notifications.length > 0">

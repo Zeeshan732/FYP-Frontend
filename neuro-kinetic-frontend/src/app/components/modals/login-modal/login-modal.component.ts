@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../../services/modal.service';
 import { AuthService } from '../../../services/auth.service';
+import { PasswordResetService } from '../../../services/password-reset.service';
 
 @Component({
   selector: 'app-login-modal',
@@ -13,15 +14,23 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   isOpen = false;
   email = '';
   password = '';
+  resetEmail = '';
+  sentResetEmail = '';
   error = '';
   info = '';
   loading = false;
   showContactAdmin = false;
+  modalView: 'login' | 'signup' | 'forgot' | 'email-sent' = 'login';
+  selectedRole: 'patient' | 'clinician' = 'patient';
+  showPassword = false;
+  showConfirmPassword = false;
+  passwordStrength: 0 | 1 | 2 | 3 | 4 = 0;
   private subscription: Subscription = new Subscription();
 
   constructor(
     private modalService: ModalService,
     private authService: AuthService,
+    private passwordResetService: PasswordResetService,
     private router: Router
   ) {}
 
@@ -33,10 +42,14 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         if (isOpen) {
           this.email = '';
           this.password = '';
+          this.resetEmail = '';
+          this.sentResetEmail = '';
           this.error = '';
           this.info = '';
           this.loading = false;
           this.showContactAdmin = false;
+          this.modalView = 'login';
+          this.showPassword = false;
         }
       })
     );
@@ -50,14 +63,17 @@ export class LoginModalComponent implements OnInit, OnDestroy {
     this.modalService.closeLoginModal();
   }
 
+  close() {
+    this.closeModal();
+  }
+
   openSignupModal() {
     this.modalService.closeLoginModal();
     this.modalService.openSignupModal();
   }
 
   openForgotPassword() {
-    this.modalService.closeLoginModal();
-    this.router.navigate(['/forgot-password']);
+    this.switchTo('forgot');
   }
 
   openContactPage() {
@@ -89,6 +105,77 @@ export class LoginModalComponent implements OnInit, OnDestroy {
     if (event.target === event.currentTarget) {
       this.closeModal();
     }
+  }
+
+  closeOnOverlay(event: Event) {
+    this.onBackdropClick(event);
+  }
+
+  switchTo(view: 'login' | 'signup' | 'forgot' | 'email-sent'): void {
+    if (view === 'signup') {
+      this.openSignupModal();
+      return;
+    }
+    this.modalView = view;
+    this.error = '';
+    this.info = '';
+    this.loading = false;
+  }
+
+  selectRole(role: 'patient' | 'clinician'): void {
+    this.selectedRole = role;
+  }
+
+  checkPasswordStrength(value: string): void {
+    let score = 0;
+    if (value.length >= 8) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^A-Za-z0-9]/.test(value)) score++;
+    this.passwordStrength = score as 0 | 1 | 2 | 3 | 4;
+  }
+
+  get strengthClass(): string {
+    if (this.passwordStrength <= 1) return 'weak';
+    if (this.passwordStrength <= 2) return 'medium';
+    return 'strong';
+  }
+
+  get isLoggingIn(): boolean {
+    return this.loading;
+  }
+
+  sendResetLink(): void {
+    const email = this.resetEmail?.trim();
+    if (!email) {
+      this.error = 'Please enter your email address.';
+      return;
+    }
+    this.error = '';
+    this.info = '';
+    this.loading = true;
+
+    this.passwordResetService.requestOTP(email).subscribe({
+      next: (response) => {
+        this.loading = false;
+        this.sentResetEmail = email;
+        this.info = response?.message || `Reset link sent to ${email}`;
+        this.switchTo('email-sent');
+      },
+      error: (error) => {
+        this.loading = false;
+        const apiMessage = (error?.error?.message || '').toString().toLowerCase();
+        if (error?.status === 404 || apiMessage.includes('not found') || apiMessage.includes('does not exist')) {
+          this.error = 'No account found with this email address.';
+          return;
+        }
+        if (error?.status === 400 || apiMessage.includes('invalid')) {
+          this.error = 'Please enter a valid email address.';
+          return;
+        }
+        this.error = error?.error?.message || 'Failed to send reset link. Please try again.';
+      }
+    });
   }
 
   onSubmit() {
