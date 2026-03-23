@@ -96,6 +96,21 @@
                 placeholder="All Results">
               </p-dropdown>
             </div>
+
+            <!-- Test Category -->
+            <div>
+              <label class="block text-sm font-medium text-app-text-primary mb-2">
+                Test Category
+              </label>
+              <p-dropdown
+                [(ngModel)]="filterTestType"
+                [options]="testTypeFilterOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full test-records-filter-dropdown"
+                placeholder="All Categories">
+              </p-dropdown>
+            </div>
           </div>
 
           <!-- Sort -->
@@ -145,7 +160,7 @@
       *ngIf="loading"
       variant="table"
       [rows]="6"
-      [cols]="7">
+      [cols]="8">
     </app-skeleton>
 
         <!-- Records Table -->
@@ -172,6 +187,9 @@
                       {{ getSortIcon('testDate') }}
                     </span>
                   </div>
+                </th>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-app-primary">
+                  Test Category
                 </th>
                 <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('testResult')">
@@ -216,6 +234,7 @@
               <tr *ngFor="let record of records" class="transition-colors">
                 <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.userName }}</td>
                 <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.testDate | date:'short' }}</td>
+                <td class="px-6 py-4 text-sm text-app-text-primary">{{ getTestCategoryLabel(record.testType) }}</td>
                 <td class="px-6 py-4 text-center">
                   <span [class]="'px-3 py-1 rounded text-xs font-semibold border ' + getResultBadgeColor(record.testResult)">
                     {{ record.testResult }}

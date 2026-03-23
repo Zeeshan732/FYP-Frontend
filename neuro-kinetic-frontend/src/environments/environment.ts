@@ -9,7 +9,7 @@ export const environment = {
   // Option 1: HTTP on port 5000 (currently active)
   apiUrl: 'http://localhost:5000/api',
   signalRUrl: 'http://localhost:5000/hubs/notifications',
-  
+
   // Option 2: HTTP on port 5130
   // apiUrl: 'http://localhost:5130/api',
   // signalRUrl: 'http://localhost:5130/hubs/notifications',

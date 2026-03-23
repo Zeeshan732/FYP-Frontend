@@ -172,6 +172,28 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px var(--color-sky);
 }
 
+/* Native <select> dark theme: avoid browser default white styling */
+select {
+  background-color: #0A1628 !important;
+  color: #E8EBF0 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: var(--radius-input) !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  padding-right: 36px !important;
+}
+
+select option {
+  background: #112240 !important;
+  color: #E8EBF0 !important;
+}
+
+select option:hover {
+  background: rgba(46,134,222,0.15) !important;
+  color: #ffffff !important;
+}
+
 /* ========== FIX 2 — Page & layout (dark theme) ========== */
 body, #root, .app-container, .admin-dashboard-wrap, section.min-h-screen {
   background-color: var(--color-page-bg);
@@ -432,6 +454,56 @@ button,
 .p-focus {
   box-shadow: 0 0 0 3px rgba(26, 111, 168, 0.15) !important;
   border-color: var(--color-blue) !important;
+}
+
+/* PrimeNG p-dropdown dark theme overrides (fix white overlay list) */
+.p-dropdown {
+  background: #0A1628 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: var(--radius-input) !important;
+}
+
+.p-dropdown .p-dropdown-label {
+  background: transparent !important;
+  color: #E8EBF0 !important;
+}
+
+.p-dropdown .p-dropdown-trigger {
+  color: rgba(255,255,255,0.45) !important;
+}
+
+/* Overlay panel shown when dropdown is open */
+.p-dropdown-panel {
+  background: #112240 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 9px !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  background: transparent !important;
+  color: rgba(255,255,255,0.75) !important;
+  font-size: 13px !important;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:last-child {
+  border-bottom: none !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:hover {
+  background: rgba(46,134,222,0.1) !important;
+  color: #ffffff !important;
+}
+
+/* Selected item highlight (fix light-blue theme highlight) */
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight:hover {
+  background: rgba(46,134,222,0.15) !important;
+  color: #2E86DE !important;
+  font-weight: 600 !important;
 }
 
 a.text-app-primary,

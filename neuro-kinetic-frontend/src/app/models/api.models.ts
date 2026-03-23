@@ -194,6 +194,7 @@ export interface ValidationResponse {
 
 // File Upload Response
 export interface FileUploadResponse {
+  fileId: number;
   fileName: string;
   filePath: string;
   fileUrl: string;
@@ -293,6 +294,8 @@ export interface UserTestRecord {
   /** Risk percentage 0–100 from screening (when provided by backend). */
   riskPercent?: number;
   status: 'Completed' | 'Pending' | 'Failed';
+  /** Test modality/category for UI filtering and display: 'voice' | 'gait' | 'fingertapping' */
+  testType?: 'voice' | 'gait' | 'fingertapping';
   voiceRecordingUrl?: string;
   analysisNotes?: string;
   createdAt: string;

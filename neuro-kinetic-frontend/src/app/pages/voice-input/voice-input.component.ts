@@ -191,7 +191,8 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       const analysisResponse = await this.apiService.processAnalysis({
         sessionId: this.sessionId,  // ⚠️ MUST match upload sessionId
         hasVoiceData: true,
-        hasGaitData: false
+        hasGaitData: false,
+        voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
       }).toPromise();
 
       console.log('✅ Analysis complete:', analysisResponse);
@@ -515,7 +516,8 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       const analysisResponse = await this.apiService.processAnalysis({
         sessionId: this.sessionId,  // ⚠️ MUST match upload sessionId
         hasVoiceData: true,
-        hasGaitData: false
+        hasGaitData: false,
+        voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
       }).toPromise();
 
       console.log('✅ Analysis complete:', analysisResponse);

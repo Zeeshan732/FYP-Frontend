@@ -13,6 +13,26 @@ export class FileUploadService {
   constructor(private http: HttpClient) {}
 
   /**
+   * Extracts database file id from POST /fileupload/upload JSON.
+   * Handles camelCase/PascalCase and numeric strings (defensive for different serializers).
+   */
+  parseFileIdFromUploadBody(body: unknown): number | undefined {
+    if (body == null || typeof body !== 'object') {
+      return undefined;
+    }
+    const o = body as Record<string, unknown>;
+    const raw = o['fileId'] ?? o['FileId'];
+    if (typeof raw === 'number' && raw > 0) {
+      return raw;
+    }
+    if (typeof raw === 'string') {
+      const n = parseInt(raw, 10);
+      return Number.isFinite(n) && n > 0 ? n : undefined;
+    }
+    return undefined;
+  }
+
+  /**
    * Upload a file to the server
    * @param file The file to upload
    * @param fileType Type of file: 'voice', 'gait', 'video', or 'image'

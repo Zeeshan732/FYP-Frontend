@@ -261,6 +261,7 @@ export class ApiService {
     sessionId: string;
     hasVoiceData?: boolean;
     hasGaitData?: boolean;
+    voiceFileId?: number;
     voiceDataJson?: string;
     gaitDataJson?: string;
     waveformDataJson?: string;
@@ -271,6 +272,7 @@ export class ApiService {
       sessionId: data.sessionId,
       hasVoiceData: data.hasVoiceData,
       hasGaitData: data.hasGaitData,
+      voiceFileId: data.voiceFileId,
       voiceDataJson: data.voiceDataJson,
       gaitDataJson: data.gaitDataJson,
       waveformDataJson: data.waveformDataJson,
@@ -440,6 +442,7 @@ export class ApiService {
     userId?: number;
     status?: string;
     testResult?: string;
+    testType?: string;
   } = {}): Observable<PagedResult<UserTestRecord>> {
     let httpParams = new HttpParams();
 
@@ -463,6 +466,9 @@ export class ApiService {
     }
     if (params.testResult) {
       httpParams = httpParams.set('testResult', params.testResult);
+    }
+    if (params.testType) {
+      httpParams = httpParams.set('testType', params.testType);
     }
 
     return this.http.get<PagedResult<UserTestRecord>>(`${this.apiUrl}/testrecords`, { params: httpParams });

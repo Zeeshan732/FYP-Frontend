@@ -173,7 +173,18 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
       this.error = '';
     } catch (error: any) {
       console.error('Error accessing microphone:', error);
-      this.error = 'Unable to access microphone. Please check permissions and try again.';
+      const name = error?.name ?? '';
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        this.error =
+          'Microphone access was blocked (browser or Windows). ' +
+          'Allow the microphone for this site in Chrome (lock icon in the address bar → Site settings), ' +
+          'and in Windows: Settings → Privacy & security → Microphone → allow apps and desktop apps. ' +
+          'Or use "Upload File" instead of recording.';
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        this.error = 'No microphone was found. Connect a mic or use "Upload File" to submit a voice sample.';
+      } else {
+        this.error = 'Unable to access microphone. Please check permissions and try again.';
+      }
     }
   }
 
@@ -428,7 +439,8 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
             this.apiService.processAnalysis({
               sessionId: sessionId, // MUST match upload sessionId
               hasVoiceData: true,
-              hasGaitData: false
+              hasGaitData: false,
+              voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
             }).subscribe({
               next: (analysisResponse: AnalysisResult) => {
                 console.log('✅ Analysis complete:', analysisResponse);
@@ -857,7 +869,8 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
             this.apiService.processAnalysis({
               sessionId: sessionId,
               hasVoiceData: true,
-              hasGaitData: false
+              hasGaitData: false,
+              voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
             }).subscribe({
               next: (analysisResponse: AnalysisResult) => {
                 console.log('✅ Analysis complete:', analysisResponse);
