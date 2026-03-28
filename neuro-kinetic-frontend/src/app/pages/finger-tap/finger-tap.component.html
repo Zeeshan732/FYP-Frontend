@@ -186,8 +186,28 @@
         <div class="ftr-header-sub">
           This is a screening tool, not a clinical diagnosis
         </div>
+        <p class="ftr-report-hint" *ngIf="reportDownloadError">{{ reportDownloadError }}</p>
+        <p class="ftr-report-hint" *ngIf="!isLoggedIn">
+          Sign in to save this result and download PDF/CSV reports.
+        </p>
       </div>
       <div class="ftr-header-actions">
+        <button
+          type="button"
+          class="ftr-btn-ghost"
+          [disabled]="pdfDownloading || savedTestRecordId == null"
+          (click)="downloadPdfReport()"
+          title="{{ savedTestRecordId == null ? 'Sign in — your result is saved to Test Records first' : 'Download PDF report' }}">
+          {{ pdfDownloading ? 'Preparing…' : '📄 PDF' }}
+        </button>
+        <button
+          type="button"
+          class="ftr-btn-ghost"
+          [disabled]="csvDownloading || savedTestRecordId == null"
+          (click)="downloadCsvReport()"
+          title="{{ savedTestRecordId == null ? 'Sign in — your result is saved to Test Records first' : 'Download CSV report' }}">
+          {{ csvDownloading ? 'Preparing…' : '📊 CSV' }}
+        </button>
         <button class="ftr-btn-ghost" (click)="resetTest()">
           <svg width="12" height="12" viewBox="0 0 24 24"
                fill="none" stroke="currentColor" stroke-width="2">

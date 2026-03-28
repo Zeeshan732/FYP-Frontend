@@ -312,6 +312,10 @@ export interface UserTestRecordRequest {
   status?: 'Completed' | 'Pending' | 'Failed';
   voiceRecordingUrl?: string;
   analysisNotes?: string;
+  /** Backend: creates linked AnalysisResult for Test Records category (fingertapping | gait). */
+  modality?: 'fingertapping' | 'gait';
+  /** Model probability / risk 0–1; required with modality for correct test type in list. */
+  predictionScore0To1?: number;
 }
 
 // Admin Dashboard Analytics

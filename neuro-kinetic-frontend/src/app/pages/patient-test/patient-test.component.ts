@@ -507,6 +507,10 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.testCompleted = true;
                     this.isProcessing = false;
 
+                    this.apiService.linkAnalysisToTestRecord(sessionId, record.id).subscribe({
+                      error: (e) => console.warn('Could not link analysis to test record', e)
+                    });
+
                     // Load extra details (explanations, features)
                     if (this.currentSessionId) {
                       this.loadResultDetails();
@@ -928,6 +932,10 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.testResult = record;
                     this.testCompleted = true;
                     this.isProcessing = false;
+
+                    this.apiService.linkAnalysisToTestRecord(sessionId, record.id).subscribe({
+                      error: (e) => console.warn('Could not link analysis to test record', e)
+                    });
 
                     // Load extra details
                     if (this.currentSessionId) {

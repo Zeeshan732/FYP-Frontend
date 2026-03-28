@@ -1,6 +1,9 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
+import { UserTestRecord, UserTestRecordRequest } from '../../models/api.models';
 
 type ScreenState =
   | 'instructions'
@@ -43,6 +46,12 @@ export class FingerTapComponent implements OnDestroy {
   selectedFile: File | null = null;
   result: FingerTapResult | null = null;
 
+  /** Set after a successful save to Test Records — required for PDF/CSV download. */
+  savedTestRecordId: number | null = null;
+  reportDownloadError = '';
+  pdfDownloading = false;
+  csvDownloading = false;
+
   // Camera / MediaRecorder
   private stream: MediaStream | null = null;
   private mediaRecorder: MediaRecorder | null = null;
@@ -79,7 +88,11 @@ export class FingerTapComponent implements OnDestroy {
 
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private apiService: ApiService,
+    private authService: AuthService
+  ) {}
 
   // ── Derived values ─────────────────────────
 
@@ -88,6 +101,10 @@ export class FingerTapComponent implements OnDestroy {
       this._blobUrl = URL.createObjectURL(this.recordedBlob);
     }
     return this._blobUrl ?? '';
+  }
+
+  get isLoggedIn(): boolean {
+    return !!this.authService.getCurrentUser()?.id;
   }
 
   get formattedElapsed(): string {
@@ -191,6 +208,8 @@ export class FingerTapComponent implements OnDestroy {
 
   resetTest(): void {
     this.result = null;
+    this.savedTestRecordId = null;
+    this.reportDownloadError = '';
     this.selectedFile = null;
     this.recordedBlob = null;
     this.recordedChunks = [];
@@ -242,6 +261,7 @@ export class FingerTapComponent implements OnDestroy {
       if (result) {
         this.result = result;
         this.currentState = 'result';
+        this.persistFingerTapTestRecord(result);
       } else {
         this.apiError = 'No result returned from analysis.';
         this.currentState = 'error';
@@ -376,6 +396,86 @@ export class FingerTapComponent implements OnDestroy {
     });
     this.selectedFile = file;
     await this.analyzeVideo();
+  }
+
+  /** Save to Test Records with correct modality (requires authenticated user). */
+  private persistFingerTapTestRecord(result: FingerTapResult): void {
+    const user = this.authService.getCurrentUser();
+    if (!user?.id) {
+      return;
+    }
+
+    const req: UserTestRecordRequest = {
+      userId: user.id,
+      userName: user.email || `${user.firstName} ${user.lastName}`.trim() || 'User',
+      status: 'Completed',
+      testResult: result.riskPercent >= 50 ? 'Positive' : 'Negative',
+      accuracy: result.riskPercent,
+      analysisNotes: `Finger tap screening. ${result.label}`,
+      modality: 'fingertapping',
+      predictionScore0To1: result.probability
+    };
+
+    this.apiService.createUserTestRecord(req).subscribe({
+      next: (record: UserTestRecord) => {
+        this.savedTestRecordId = record.id;
+      },
+      error: (e) => console.warn('Failed to save finger-tap test record', e)
+    });
+  }
+
+  downloadPdfReport(): void {
+    this.reportDownloadError = '';
+    if (this.savedTestRecordId == null) {
+      this.reportDownloadError =
+        'Sign in and complete the test to save a report. PDF download is available after your result is saved to Test Records.';
+      return;
+    }
+    this.pdfDownloading = true;
+    this.apiService.downloadPdfReportByTestRecordId(this.savedTestRecordId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `NeuroSync_FingerTap_${this.savedTestRecordId}_${Date.now()}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        this.pdfDownloading = false;
+      },
+      error: () => {
+        this.pdfDownloading = false;
+        this.reportDownloadError = 'Failed to download PDF report. Please try again.';
+      }
+    });
+  }
+
+  downloadCsvReport(): void {
+    this.reportDownloadError = '';
+    if (this.savedTestRecordId == null) {
+      this.reportDownloadError =
+        'Sign in and complete the test to save a report. CSV download is available after your result is saved to Test Records.';
+      return;
+    }
+    this.csvDownloading = true;
+    this.apiService.downloadCsvReportByTestRecordId(this.savedTestRecordId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `NeuroSync_FingerTap_${this.savedTestRecordId}_${Date.now()}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        this.csvDownloading = false;
+      },
+      error: () => {
+        this.csvDownloading = false;
+        this.reportDownloadError = 'Failed to download CSV report. Please try again.';
+      }
+    });
   }
 
   private getSupportedVideoMimeType(): string {
