@@ -530,6 +530,44 @@
   .ft-root {
     padding-inline: 1rem;
   }
+
+  .ft-actions-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ft-actions-row .ft-btn-primary,
+  .ft-actions-row .ft-btn-secondary {
+    width: 100%;
+  }
+
+  .ft-file-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+  }
+
+  .ft-upload-label {
+    width: 100%;
+    text-align: center;
+  }
+
+  .ftr-header-actions {
+    width: 100%;
+  }
+
+  .ftr-btn-ghost {
+    flex: 1 1 180px;
+    justify-content: center;
+  }
+
+  .ftr-badge {
+    align-items: flex-start;
+  }
+
+  .ftr-mini-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
@@ -545,5 +583,21 @@
   .ftr-rec-row { grid-template-columns: 1fr; }
   .ftr-big-num { font-size: 44px; }
   .ftr-card { padding: 20px !important; }
+
+  .ftr-mini-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .ftr-breakdown-row {
+    flex-wrap: wrap;
+  }
+
+  .ftr-sig-name {
+    width: auto;
+  }
+
+  .ftr-sig-val {
+    width: auto;
+  }
 }
 
