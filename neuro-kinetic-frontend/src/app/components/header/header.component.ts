@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
@@ -16,6 +16,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   currentRoute: string = '';
   currentUser: any = null;
   sidebarCollapsed = false;
+  isCompactViewport = false;
   isLandingPage: boolean = false;
   unreadCount = 0;
   
@@ -50,6 +51,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.syncViewportState();
+
     // Subscribe to router events
     this.routerSubscription = this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
@@ -109,6 +112,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.unreadSubscription.unsubscribe();
     }
     this.notificationsService.stopRealtime();
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.syncViewportState();
+  }
+
+  private syncViewportState(): void {
+    this.isCompactViewport = window.innerWidth <= 1024;
   }
 
   updateBreadcrumb() {
@@ -207,4 +219,3 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/notifications']);
   }
 }
-

@@ -12,3 +12,25 @@
   background: var(--color-sky);
   color: var(--color-blue);
 }
+
+@media (max-width: 1024px) {
+  .neuro-header {
+    left: 0 !important;
+    width: 100% !important;
+  }
+
+  .header-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .header-breadcrumb {
+    max-width: 46vw;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-breadcrumb {
+    display: none;
+  }
+}
