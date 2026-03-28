@@ -165,7 +165,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   toggleSidebar() {
     this.sidebarService.toggleSidebar();
-    this.mobileSidebarOpen = !this.mobileSidebarOpen;
+    if (this.isMobile) {
+      this.mobileSidebarOpen = !this.mobileSidebarOpen;
+    }
   }
 
   closeMobileSidebar() {
@@ -175,7 +177,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   private syncSidebarForViewport() {
-    this.isMobile = window.innerWidth <= 768;
+    this.isMobile = window.innerWidth <= 1024;
     if (this.isMobile) {
       this.mobileSidebarOpen = false;
       this.sidebarService.setSidebarCollapsed(true);
