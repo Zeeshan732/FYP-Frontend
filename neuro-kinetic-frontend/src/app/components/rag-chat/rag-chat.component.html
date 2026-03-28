@@ -18,11 +18,10 @@
         <div class="rag-msg-text">{{ msg.text }}</div>
       </div>
     </div>
-    <!-- Typing indicator (left side) – no loader, no green -->
     <div *ngIf="loading" class="rag-msg rag-msg--loader">
       <div class="rag-msg-bubble rag-msg-bubble--typing">
         <span class="rag-msg-sender">NeuroSync</span>
-        <span class="rag-typing">typing....</span>
+        <app-loader variant="dots" signal="default"></app-loader>
       </div>
     </div>
   </div>
@@ -37,7 +36,6 @@
           placeholder="Ask anything"
           [disabled]="loading"
           class="rag-input rag-input--inside" />
-        
       </div>
 
       <button type="button" (click)="sendMessage()" [disabled]="loading || !inputMessage.trim()" class="rag-input-icon rag-input-icon--send" aria-label="Send">
@@ -53,7 +51,8 @@
         [disabled]="loading"
         class="rag-input" />
       <button type="button" (click)="sendMessage()" [disabled]="loading" class="rag-send">
-        {{ loading ? '…' : 'Send' }}
+        <app-loader *ngIf="loading" variant="button" signal="default" title="Sending..."></app-loader>
+        <ng-container *ngIf="!loading">Send</ng-container>
       </button>
     </ng-container>
   </div>

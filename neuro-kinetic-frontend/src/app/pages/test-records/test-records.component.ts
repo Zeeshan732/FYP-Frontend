@@ -31,6 +31,7 @@ export class TestRecordsComponent implements OnInit {
   // Filters
   filterStatus: string = '';
   filterResult: string = '';
+  filterTestType: string = '';
   sortBy: string = 'testDate';
   sortOrder: 'asc' | 'desc' = 'desc';
 
@@ -47,6 +48,13 @@ export class TestRecordsComponent implements OnInit {
     { label: 'Positive', value: 'Positive' },
     { label: 'Negative', value: 'Negative' },
     { label: 'Uncertain', value: 'Uncertain' }
+  ];
+
+  testTypeFilterOptions = [
+    { label: 'All Categories', value: '' },
+    { label: 'voice', value: 'voice' },
+    { label: 'gait', value: 'gait' },
+    { label: 'fingertapping', value: 'fingertapping' }
   ];
 
   sortOptions = [
@@ -134,6 +142,9 @@ export class TestRecordsComponent implements OnInit {
     if (this.filterResult) {
       params.testResult = this.filterResult;
     }
+    if (this.filterTestType) {
+      params.testType = this.filterTestType;
+    }
 
     this.apiService.getUserTestRecords(params).subscribe({
       next: (response: PagedResult<UserTestRecord>) => {
@@ -182,6 +193,7 @@ export class TestRecordsComponent implements OnInit {
   clearFilters() {
     this.filterStatus = '';
     this.filterResult = '';
+    this.filterTestType = '';
     this.currentPage = 1;
     this.loadRecords();
   }
@@ -335,8 +347,21 @@ export class TestRecordsComponent implements OnInit {
     }
   }
 
+  getTestCategoryLabel(testType?: string): string {
+    switch (testType) {
+      case 'voice':
+        return 'voice';
+      case 'gait':
+        return 'gait';
+      case 'fingertapping':
+        return 'fingertapping';
+      default:
+        return '—';
+    }
+  }
+
   hasActiveFilters(): boolean {
-    return !!(this.filterStatus || this.filterResult);
+    return !!(this.filterStatus || this.filterResult || this.filterTestType);
   }
 
   // Helper for template

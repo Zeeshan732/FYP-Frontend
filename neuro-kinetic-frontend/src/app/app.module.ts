@@ -27,7 +27,6 @@ import { CollaborationComponent } from './pages/collaboration/collaboration.comp
 import { LandingComponent } from './pages/landing/landing.component';
 import { ServicesComponent } from './pages/services/services.component';
 import { ContactComponent } from './pages/contact/contact.component';
-import { LoginComponent } from './pages/login/login.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { SignupComponent } from './pages/signup/signup.component';
 import { NavigationComponent } from './components/navigation/navigation.component';
@@ -49,6 +48,7 @@ import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.co
 import { LiveVoiceMonitorComponent } from './pages/live-voice-monitor/live-voice-monitor.component';
 import { ConsultationComponent } from './pages/consultation/consultation.component';
 import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
+import { FingerTapComponent } from './pages/finger-tap/finger-tap.component';
 import { AboutComponent } from './pages/about/about.component';
 import { BlogComponent } from './pages/blog/blog.component';
 import { ArticleCardComponent } from './components/blog/article-card/article-card.component';
@@ -56,6 +56,7 @@ import { SectionRowComponent } from './components/blog/section-row/section-row.c
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { NbThemeModule } from '@nebular/theme';
 import { NbChatModule } from '@nebular/theme';
+import { SharedModule } from './shared/shared.module';
 @NgModule({
   declarations: [
     AppComponent,
@@ -65,7 +66,6 @@ import { NbChatModule } from '@nebular/theme';
     LandingComponent,
     ServicesComponent,
     ContactComponent,
-    LoginComponent,
     ForgotPasswordComponent,
     SignupComponent,
     NavigationComponent,
@@ -87,6 +87,7 @@ import { NbChatModule } from '@nebular/theme';
     LiveVoiceMonitorComponent,
     ConsultationComponent,
     AnalyticsDashboardComponent,
+    FingerTapComponent,
     AboutComponent,
     BlogComponent,
     ArticleCardComponent,
@@ -112,6 +113,7 @@ import { NbChatModule } from '@nebular/theme';
     TooltipModule,
     TagModule,
     ProgressBarModule,
+    SharedModule,
     NbThemeModule.forRoot({ name: 'default' }),
     NbChatModule,
   ],

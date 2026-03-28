@@ -10,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent implements OnInit {
   email = '';
   password = '';
+  showPassword = false;
   error = '';
   loading = false;
   info = '';

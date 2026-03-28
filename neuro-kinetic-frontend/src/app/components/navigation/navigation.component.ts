@@ -28,7 +28,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   isAuthenticated = false;
   isAdmin = false;
+  isClinician = false;
+  isPatient = false;
   roleLabel = '';
+  userRole = '';
   currentRoute: string = '';
   isLandingPage: boolean = false;
   showNotifications = false;
@@ -62,8 +65,13 @@ export class NavigationComponent implements OnInit, OnDestroy {
     this.userSubscription = this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       this.isAuthenticated = !!user;
-      this.isAdmin = user?.role === 'Admin';
-      this.roleLabel = user?.role || '';
+      const rawRole = user?.role ?? '';
+      const normalizedRole = String(rawRole).toLowerCase();
+      this.userRole = normalizedRole;
+      this.isAdmin = normalizedRole === 'admin';
+      this.isClinician = normalizedRole === 'clinician' || normalizedRole === 'medicalprofessional';
+      this.isPatient = !!user && !this.isAdmin && !this.isClinician;
+      this.roleLabel = rawRole || '';
       if (user && this.authService.isAuthenticated()) {
         this.showNotifications = true;
         this.notificationsService.startRealtime();

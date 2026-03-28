@@ -96,6 +96,21 @@
                 placeholder="All Results">
               </p-dropdown>
             </div>
+
+            <!-- Test Category -->
+            <div>
+              <label class="block text-sm font-medium text-app-text-primary mb-2">
+                Test Category
+              </label>
+              <p-dropdown
+                [(ngModel)]="filterTestType"
+                [options]="testTypeFilterOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full test-records-filter-dropdown"
+                placeholder="All Categories">
+              </p-dropdown>
+            </div>
           </div>
 
           <!-- Sort -->
@@ -141,10 +156,12 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="max-w-[1600px] mx-auto text-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-app-primary mx-auto mb-4"></div>
-      <p class="text-app-text-primary">Loading test records...</p>
-    </div>
+    <app-skeleton
+      *ngIf="loading"
+      variant="table"
+      [rows]="6"
+      [cols]="8">
+    </app-skeleton>
 
         <!-- Records Table -->
     <div *ngIf="!loading && records.length > 0" class="max-w-[1600px] mx-auto mb-8">
@@ -170,6 +187,9 @@
                       {{ getSortIcon('testDate') }}
                     </span>
                   </div>
+                </th>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-app-primary">
+                  Test Category
                 </th>
                 <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('testResult')">
@@ -214,6 +234,7 @@
               <tr *ngFor="let record of records" class="transition-colors">
                 <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.userName }}</td>
                 <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.testDate | date:'short' }}</td>
+                <td class="px-6 py-4 text-sm text-app-text-primary">{{ getTestCategoryLabel(record.testType) }}</td>
                 <td class="px-6 py-4 text-center">
                   <span [class]="'px-3 py-1 rounded text-xs font-semibold border ' + getResultBadgeColor(record.testResult)">
                     {{ record.testResult }}
@@ -370,8 +391,12 @@
       </div>
     </ng-template>
     <div *ngIf="loadingTrends" class="text-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-      <p class="text-app-text-primary">Loading trend data...</p>
+      <app-loader
+        variant="page"
+        signal="default"
+        title="Loading trend data..."
+        subtitle="Preparing progression summaries for this patient.">
+      </app-loader>
     </div>
     <div *ngIf="!loadingTrends && trendData" class="space-y-6">
       <!-- Summary -->
@@ -441,8 +466,12 @@
       </div>
     </ng-template>
     <div *ngIf="loadingComparison" class="text-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-      <p class="text-app-text-primary">Loading comparison...</p>
+      <app-loader
+        variant="page"
+        signal="default"
+        title="Loading comparison..."
+        subtitle="Comparing selected test records and calculating differences.">
+      </app-loader>
     </div>
     <div *ngIf="!loadingComparison && !comparisonData" class="space-y-4">
       <p class="text-app-text-primary">Select two records from the table to compare.</p>
@@ -510,4 +539,3 @@
     </ng-template>
   </p-dialog>
 </section>
-

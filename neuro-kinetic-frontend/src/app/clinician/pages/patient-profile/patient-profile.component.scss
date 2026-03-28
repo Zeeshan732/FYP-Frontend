@@ -1,0 +1,237 @@
+.pp-page {
+  max-width: 1200px;
+  margin: 64px auto 0;
+  padding: 24px 32px 48px;
+}
+
+.pp-back {
+  background: transparent;
+  border: none;
+  color: #2E86DE;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.pp-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #112240;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+
+.pp-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pp-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pp-name {
+  font-size: 20px;
+  color: #fff;
+  margin: 0 0 4px;
+}
+
+.pp-meta {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+}
+
+.pp-status-badge {
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.b-healthy { background:rgba(29,158,117,0.12); color:#1D9E75; }
+.b-risk { background:rgba(240,165,0,0.12); color:#F0A500; }
+.b-high { background:rgba(224,82,82,0.12); color:#E05252; }
+
+.pp-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pp-btn-ghost,
+.pp-btn-primary,
+.pp-btn-ghost-sm,
+.pp-btn-teal-sm {
+  border-radius: 8px;
+  font-size: 13px;
+  height: 36px;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 0 12px;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pp-btn-primary {
+  background: #2E86DE;
+  border-color: #2E86DE;
+}
+
+.pp-btn-teal-sm {
+  background: #1D9E75;
+  border-color: #1D9E75;
+}
+
+.pp-signals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pp-signal-card,
+.pp-combined-card,
+.pp-history-card,
+.pp-notes-card {
+  background: #112240;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.pp-signal-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+}
+
+.pp-signal-score {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 6px 0;
+}
+
+.pp-signal-bar {
+  height: 7px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pp-signal-fill {
+  height: 100%;
+}
+
+.pp-signal-date {
+  margin-top: 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+}
+
+.pp-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pp-combined-card {
+  border-left: 3px solid #2E86DE;
+}
+
+.pp-combined-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+
+.pp-combined-score {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.pp-combined-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+
+.pp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.pp-timeline-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.pp-timeline-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.pp-timeline-type { font-size: 13px; color: #fff; }
+.pp-timeline-score { font-size: 13px; font-weight: 600; }
+.pp-timeline-date { font-size: 11px; color: rgba(255,255,255,0.38); }
+.pp-empty-timeline { font-size: 12px; color: rgba(255,255,255,0.35); }
+
+.pp-note-item {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.pp-note-item:last-child {
+  border-bottom: none;
+}
+
+.pp-note-meta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 4px;
+}
+
+.pp-note-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+}
+
+.pp-note-input {
+  width: 100%;
+  background: #0A1628;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #E8EBF0;
+  padding: 10px;
+  resize: vertical;
+}
+
+.pp-note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (max-width: 1024px) {
+  .pp-signals-grid {
+    grid-template-columns: 1fr;
+  }
+  .pp-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}

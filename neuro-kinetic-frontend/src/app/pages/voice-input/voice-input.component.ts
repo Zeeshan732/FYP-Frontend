@@ -191,7 +191,8 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       const analysisResponse = await this.apiService.processAnalysis({
         sessionId: this.sessionId,  // ⚠️ MUST match upload sessionId
         hasVoiceData: true,
-        hasGaitData: false
+        hasGaitData: false,
+        voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
       }).toPromise();
 
       console.log('✅ Analysis complete:', analysisResponse);
@@ -515,7 +516,8 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       const analysisResponse = await this.apiService.processAnalysis({
         sessionId: this.sessionId,  // ⚠️ MUST match upload sessionId
         hasVoiceData: true,
-        hasGaitData: false
+        hasGaitData: false,
+        voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
       }).toPromise();
 
       console.log('✅ Analysis complete:', analysisResponse);
@@ -767,9 +769,18 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
 
-      // Note: Linking AnalysisResult to UserTestRecord would require backend endpoint
-      // For now, the sessionId ensures they can be linked via backend logic
-      console.log(`✅ Test record ${this.existingTestRecordId} linked to analysis session ${analysisResponse.sessionId}`);
+      if (analysisResponse.sessionId && this.existingTestRecordId) {
+        try {
+          await this.apiService
+            .linkAnalysisToTestRecord(analysisResponse.sessionId, this.existingTestRecordId)
+            .toPromise();
+          console.log(
+            `✅ Test record ${this.existingTestRecordId} linked to analysis session ${analysisResponse.sessionId}`
+          );
+        } catch (linkErr) {
+          console.warn('Could not link analysis to test record', linkErr);
+        }
+      }
 
     } catch (error: any) {
       console.error('❌ Error creating/updating test record:', error);

@@ -194,6 +194,7 @@ export interface ValidationResponse {
 
 // File Upload Response
 export interface FileUploadResponse {
+  fileId: number;
   fileName: string;
   filePath: string;
   fileUrl: string;
@@ -293,6 +294,8 @@ export interface UserTestRecord {
   /** Risk percentage 0–100 from screening (when provided by backend). */
   riskPercent?: number;
   status: 'Completed' | 'Pending' | 'Failed';
+  /** Test modality/category for UI filtering and display: 'voice' | 'gait' | 'fingertapping' */
+  testType?: 'voice' | 'gait' | 'fingertapping';
   voiceRecordingUrl?: string;
   analysisNotes?: string;
   createdAt: string;
@@ -309,6 +312,10 @@ export interface UserTestRecordRequest {
   status?: 'Completed' | 'Pending' | 'Failed';
   voiceRecordingUrl?: string;
   analysisNotes?: string;
+  /** Backend: creates linked AnalysisResult for Test Records category (fingertapping | gait). */
+  modality?: 'fingertapping' | 'gait';
+  /** Model probability / risk 0–1; required with modality for correct test type in list. */
+  predictionScore0To1?: number;
 }
 
 // Admin Dashboard Analytics
@@ -524,18 +531,16 @@ export interface RagAskResponse {
 
 // ========== Voice Predict (FastAPI /api/voice/predict) ==========
 
-/** Request body for POST /api/voice/predict. Exactly these 10 keys (same names as backend/FastAPI). */
+/** Request body for POST /api/voice/predict. Matches Python ML service: { features: [22 numbers in fixed order] }. */
 export interface VoicePredictRequest {
-  spread1: number;
-  PPE: number;
-  MDVP_APQ: number;
-  MDVP_Flo: number;
-  MDVP_Fo: number;
-  Shimmer_dB: number;
-  APQ5: number;
-  Shimmer: number;
-  spread2: number;
-  RAP: number;
+  /**
+   * Voice feature vector in the exact training order:
+   * [MDVP:Fo(Hz), MDVP:Fhi(Hz), MDVP:Flo(Hz), MDVP:Jitter(%), MDVP:Jitter(Abs),
+   *  MDVP:RAP, MDVP:PPQ, Jitter:DDP, MDVP:Shimmer, MDVP:Shimmer(dB),
+   *  Shimmer:APQ3, Shimmer:APQ5, MDVP:APQ, Shimmer:DDA, NHR, HNR,
+   *  RPDE, DFA, spread1, spread2, D2, PPE]
+   */
+  features: number[];
 }
 
 /** Success response from POST /api/voice/predict (e.g. prediction, probability, class). */

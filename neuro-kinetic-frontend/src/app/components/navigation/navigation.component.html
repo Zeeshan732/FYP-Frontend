@@ -5,8 +5,7 @@
      [class.scrolled]="isScrolled">
   <div class="navbar-inner">
     <a routerLink="/landing" class="navbar-brand">
-      <span class="brand-dot"></span>
-      NeuroSync
+      <img src="assets/logos/brand/logo.png" alt="NeuroSync" class="brand-logo-img">
     </a>
     <div class="navbar-links">
       <a routerLink="/landing" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
@@ -62,7 +61,9 @@
     <div class="flex items-center p-4 border-b border-white/10 relative">
       <div class="flex items-center space-x-3" [class.opacity-0]="sidebarCollapsed" [class.w-0]="sidebarCollapsed" [class.overflow-hidden]="sidebarCollapsed">
         <div class="flex flex-col">
-          <div class="sidebar-logo text-xl font-medium whitespace-nowrap">NeuroSync</div>
+          <div class="sidebar-logo whitespace-nowrap">
+            <img src="assets/logos/brand/logo.png" alt="NeuroSync" class="sidebar-logo-img">
+          </div>
           <div *ngIf="roleLabel" class="sidebar-role text-[11px] uppercase tracking-wide">{{ roleLabel }}</div>
         </div>
       </div>
@@ -77,81 +78,111 @@
       </div>
     </div>
 
-    <!-- Navigation Links: single flat list, role-based visibility -->
+    <!-- Navigation Links: role-based visibility -->
     <nav class="flex-1 overflow-y-auto p-4 space-y-2">
-      <a [routerLink]="isAdmin ? '/admin-dashboard' : '/home'" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         [routerLinkActiveOptions]="{exact: true}"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'Home' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Home</span>
-      </a>
+      <!-- Patient -->
+      <ng-container *ngIf="isPatient">
+        <a routerLink="/home" 
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           [routerLinkActiveOptions]="{exact: true}"
+           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'Home' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Home</span>
+        </a>
 
-      <a routerLink="/patient-test" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'Take Test' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Take Test</span>
-      </a>
+        <a routerLink="/patient-test" 
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'Take Test' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Take Test</span>
+        </a>
 
-      <a routerLink="/test-records" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'My Tests' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">My Tests</span>
-      </a>
+        <a routerLink="/test-records" 
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'My Tests' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">My Tests</span>
+        </a>
 
-      <a routerLink="/analytics-dashboard" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'Analytics' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Analytics</span>
-      </a>
+        <button type="button"
+                (click)="openAskResultsDialog()"
+                class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group text-left"
+                [title]="sidebarCollapsed ? 'Ask about your results' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Ask about your results</span>
+        </button>
+      </ng-container>
 
-      <a *ngIf="!isAdmin" routerLink="/live-voice-monitor" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'Live Voice Monitor' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Live Monitor</span>
-      </a>
+      <!-- Clinician -->
+      <ng-container *ngIf="isClinician">
+        <a routerLink="/clinician"
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           [routerLinkActiveOptions]="{exact: true}"
+           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'Dashboard' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
+        </a>
 
-      <a routerLink="/notifications"
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'Notifications' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Notifications</span>
-      </a>
+        <a routerLink="/clinician/patients"
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'My Patients' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">My Patients</span>
+        </a>
 
-      <button type="button"
-              (click)="openAskResultsDialog()"
-              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group text-left"
-              [title]="sidebarCollapsed ? 'Ask about your results' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Ask about your results</span>
-      </button>
+        <a routerLink="/clinician/results"
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'Test Results' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Test Results</span>
+        </a>
 
-      <!-- Admin only -->
-      <a *ngIf="isAdmin" routerLink="/admin-dashboard" 
+        <a routerLink="/clinician/analytics"
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'Analytics' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0h6" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Analytics</span>
+        </a>
+
+        <a routerLink="/notifications"
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'Notifications' : ''">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Notifications</span>
+        </a>
+      </ng-container>
+
+      <!-- Admin -->
+      <ng-container *ngIf="isAdmin">
+        <a routerLink="/admin-dashboard" 
          routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
          class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
          [title]="sidebarCollapsed ? 'Admin Dashboard' : ''">
@@ -178,6 +209,7 @@
         </svg>
         <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">All Users</span>
       </a>
+      </ng-container>
 
       <a routerLink="/contact" 
          routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
@@ -205,4 +237,3 @@
 
   <!-- Notification dropdown removed per request -->
 </aside>
-

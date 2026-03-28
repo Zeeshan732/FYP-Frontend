@@ -2,12 +2,22 @@
 
 .patient-test-hero {
   background: var(--color-page-bg);
+  .max-w-5xl {
+    max-width: 96rem;
+  }
 }
 
 .patient-test-card {
   transition: box-shadow 0.2s ease;
+  border-radius: 14px !important;
   &:hover {
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  }
+  .p-8 {
+    padding: 2.25rem !important;
+  }
+  .sm\:p-10 {
+    padding: 2.5rem !important;
   }
 }
 
@@ -27,6 +37,209 @@
 
 .patient-test-steps {
   p {
-    line-height: 1.5;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+}
+
+/* Test type section */
+.test-type-section {
+  max-width: 920px;
+  margin: 0 auto 34px;
+}
+
+.test-type-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.test-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.test-type-card {
+  background: #112240;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 28px 22px;
+  min-height: 212px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+  position: relative;
+
+  &:hover {
+    border-color: rgba(255,255,255,0.2);
+  }
+}
+
+.ttc-active-voice {
+  border: 2px solid #2E86DE !important;
+  background: rgba(46,134,222,0.06) !important;
+}
+
+.ttc-active-gait {
+  border: 2px solid #7F77DD !important;
+  background: rgba(127,119,221,0.06) !important;
+}
+
+.ttc-active-tap {
+  border: 2px solid #1D9E75 !important;
+  background: rgba(29,158,117,0.06) !important;
+}
+
+.ttc-tap-highlight {
+  border-color: rgba(29,158,117,0.2);
+}
+
+.ttc-new-badge {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1D9E75;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 3px 12px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.ttc-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.ttc-icon-voice { background: rgba(46,134,222,0.12); }
+.ttc-icon-gait  { background: rgba(127,119,221,0.12); }
+.ttc-icon-tap   { background: rgba(29,158,117,0.12); }
+
+.ttc-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.ttc-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.65;
+  margin-bottom: 12px;
+}
+
+.ttc-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 3px 11px;
+}
+
+.ttc-badge-voice {
+  background: rgba(46,134,222,0.1);
+  color: #2E86DE;
+}
+
+.ttc-badge-gait {
+  background: rgba(127,119,221,0.1);
+  color: #7F77DD;
+}
+
+.ttc-badge-tap {
+  background: rgba(29,158,117,0.1);
+  color: #1D9E75;
+}
+
+.mode-btn-tap-active {
+  background: rgba(29,158,117,0.1) !important;
+  border-color: #1D9E75 !important;
+  color: #fff !important;
+}
+
+.step-num-tap {
+  background: #1D9E75 !important;
+}
+
+.start-btn-tap {
+  background: #1D9E75 !important;
+  color: #fff !important;
+  &:hover { background: #0F6E56 !important; }
+}
+
+.ft-hint-bar {
+  background: rgba(29,158,117,0.07);
+  border: 1px solid rgba(29,158,117,0.18);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  line-height: 1.6;
+
+  strong {
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+  }
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    stroke: #1D9E75;
+  }
+}
+
+.mode-btn-finger-tap-pill {
+  background: rgba(29,158,117,0.05);
+  border-color: rgba(29,158,117,0.25);
+  color: #1D9E75;
+  font-size: 14px;
+}
+
+.new-inline-badge {
+  background: rgba(29,158,117,0.15);
+  color: #1D9E75;
+  border: 1px solid rgba(29,158,117,0.3);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+  margin-left: 4px;
+}
+
+.test-card-tap-mode {
+  border-color: rgba(29,158,117,0.25) !important;
+}
+
+@media (max-width: 640px) {
+  .test-type-grid {
+    grid-template-columns: 1fr;
+  }
+  .test-type-card {
+    min-height: auto;
+  }
+  .ttc-name {
+    font-size: 15px;
+  }
+  .ttc-desc {
+    font-size: 13px;
   }
 }

@@ -1,0 +1,438 @@
+<section class="ft-root">
+  <!-- Instructions -->
+  <div *ngIf="currentState === 'instructions'" class="ft-container">
+    <h1 class="ft-title">Finger-Tapping Test</h1>
+    <p class="ft-subtitle">
+      Upload a pre-recorded video or record live with your device camera to analyze your finger-tapping pattern.
+    </p>
+    <button class="ft-btn-primary" (click)="goToModeSelect()">
+      Upload Finger-Tapping Video
+    </button>
+  </div>
+
+  <!-- Mode select -->
+  <div class="ft-container" *ngIf="currentState === 'mode-select'">
+    <div class="ft-mode-header">
+      <h2 class="ft-mode-title">Choose how to submit your test</h2>
+      <p class="ft-mode-desc">
+        Upload a pre-recorded video or record directly using your device camera.
+      </p>
+    </div>
+
+    <div class="ft-mode-grid">
+      <!-- Upload card -->
+      <div class="ft-mode-card"
+           [class.ft-mode-selected]="inputMode === 'upload'"
+           (click)="inputMode = 'upload'">
+        <div class="ft-mode-badge" *ngIf="inputMode === 'upload'">Selected</div>
+        <div class="ft-mode-card-title">Upload a video</div>
+        <div class="ft-mode-card-desc">
+          Upload a pre-recorded finger-tapping video (MP4, MOV, AVI, MKV, WEBM - Max 100 MB).
+        </div>
+      </div>
+
+      <!-- Live card -->
+      <div class="ft-mode-card"
+           [class.ft-mode-selected]="inputMode === 'live'"
+           (click)="inputMode = 'live'">
+        <div class="ft-mode-badge" *ngIf="inputMode === 'live'">Selected</div>
+        <div class="ft-mode-card-title">Record live</div>
+        <div class="ft-mode-card-desc">
+          Use your device camera to record directly in the browser. No app needed.
+        </div>
+      </div>
+    </div>
+
+    <div class="ft-mode-actions">
+      <button class="ft-btn-primary" (click)="selectMode(inputMode)">
+        Continue with {{ inputMode === 'upload' ? 'video upload' : 'live recording' }} ->
+      </button>
+      <button class="ft-btn-secondary" (click)="currentState = 'instructions'">
+        <- Back
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload state -->
+  <div class="ft-container" *ngIf="currentState === 'upload'">
+    <h2 class="ft-section-title">Upload finger-tapping video</h2>
+
+    <div class="ft-upload-area">
+      <label class="ft-upload-label">
+        <input type="file"
+               (change)="onFileSelected($event)"
+               accept=".mp4,.mov,.avi,.mkv,.webm,video/*"
+               hidden>
+        <span>Click to choose file</span>
+      </label>
+
+      <div *ngIf="selectedFile" class="ft-file-info">
+        <div class="ft-file-name">{{ selectedFile.name }}</div>
+        <button class="ft-btn-secondary" (click)="clearFile()">Remove</button>
+      </div>
+    </div>
+
+    <div class="ft-actions-row">
+      <button class="ft-btn-primary"
+              [disabled]="!selectedFile || isProcessing"
+              (click)="analyzeVideo()">
+        Analyze Video
+      </button>
+      <button class="ft-btn-secondary" (click)="currentState = 'mode-select'">
+        <- Back to mode select
+      </button>
+    </div>
+  </div>
+
+  <!-- Camera permission -->
+  <div class="ft-container" *ngIf="currentState === 'cam-permission'">
+    <h2 class="ft-section-title">Camera access required</h2>
+    <p class="ft-text">
+      To record your finger-tapping test live, NeuroSync needs permission to access your camera.
+    </p>
+    <div class="ft-actions-row">
+      <button class="ft-btn-primary" (click)="requestCameraAccess()">
+        Allow camera access
+      </button>
+      <button class="ft-btn-secondary" (click)="switchToUpload()">
+        Use upload instead
+      </button>
+    </div>
+  </div>
+
+  <!-- Camera ready -->
+  <div class="ft-container" *ngIf="currentState === 'cam-ready'">
+    <h2 class="ft-section-title">Position your hand and start recording</h2>
+    <div class="ft-cam-viewport">
+      <video #videoPreview autoplay muted playsinline class="ft-video"></video>
+      <div class="ft-guide-box">Position hand here</div>
+    </div>
+    <div class="ft-actions-row">
+      <button class="ft-btn-primary" (click)="startRecording()">
+        Start Recording
+      </button>
+      <button class="ft-btn-secondary" (click)="switchToUpload()">
+        Stop camera and use upload
+      </button>
+    </div>
+  </div>
+
+  <!-- Recording -->
+  <div class="ft-container" *ngIf="currentState === 'cam-recording'">
+    <h2 class="ft-section-title">Recording...</h2>
+    <div class="ft-cam-viewport">
+      <video #videoPreview autoplay muted playsinline class="ft-video"></video>
+      <div class="ft-rec-pill">REC - {{ formattedElapsed }}</div>
+    </div>
+    <div class="ft-waveform">
+      <div class="ft-wave-bar" *ngFor="let h of waveformBars" [style.height.%]="h || 5"></div>
+    </div>
+    <p class="ft-text">
+      {{ tapCount }} taps detected - remaining {{ formattedRemaining }}
+    </p>
+    <div class="ft-actions-row">
+      <button class="ft-btn-primary" (click)="stopRecording()">Stop Recording</button>
+    </div>
+  </div>
+
+  <!-- Review -->
+  <div class="ft-container" *ngIf="currentState === 'cam-review'">
+    <h2 class="ft-section-title">Review your recording</h2>
+    <div class="ft-cam-viewport">
+      <video [src]="recordedBlobUrl" controls class="ft-video"></video>
+    </div>
+    <p class="ft-text">
+      Duration: {{ formattedDuration }} - Taps detected: {{ tapCount }} - Rhythm variance: {{ rhythmVariance }}
+    </p>
+    <div class="ft-actions-row">
+      <button class="ft-btn-primary" (click)="analyzeLiveRecording()">
+        Analyze Recording
+      </button>
+      <button class="ft-btn-secondary" (click)="reRecord()">
+        Re-record
+      </button>
+    </div>
+  </div>
+
+  <!-- Processing -->
+  <div class="ft-container ft-centered" *ngIf="currentState === 'processing'">
+    <app-loader
+      variant="page"
+      signal="tap"
+      title="Analyzing finger-tapping pattern"
+      subtitle="We are extracting hand motion landmarks and evaluating movement regularity. This may take a few seconds."
+      [steps]="processingSteps"
+      [showCancel]="true"
+      (cancelClick)="resetTest()">
+    </app-loader>
+  </div>
+
+  <!-- Result -->
+  <div class="ftr-wrap" *ngIf="currentState === 'result' && result">
+    <div class="ftr-header">
+      <div class="ftr-header-left">
+        <div class="ftr-header-title">
+          <svg width="15" height="15" viewBox="0 0 24 24"
+               fill="none" stroke="#1D9E75" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 11V6a2 2 0 00-2-2 2 2 0 00-2 2"/>
+            <path d="M14 10V4a2 2 0 00-2-2 2 2 0 00-2 2v2"/>
+            <path d="M10 10.5V6a2 2 0 00-2-2 2 2 0 00-2 2v8"/>
+            <path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2
+                     a8 8 0 01-8-8 2 2 0 114 0"/>
+          </svg>
+          Finger-Tapping Test Result
+        </div>
+        <div class="ftr-header-sub">
+          This is a screening tool, not a clinical diagnosis
+        </div>
+        <p class="ftr-report-hint" *ngIf="reportDownloadError">{{ reportDownloadError }}</p>
+        <p class="ftr-report-hint" *ngIf="!isLoggedIn">
+          Sign in to save this result and download PDF/CSV reports.
+        </p>
+      </div>
+      <div class="ftr-header-actions">
+        <button
+          type="button"
+          class="ftr-btn-ghost"
+          [disabled]="pdfDownloading || savedTestRecordId == null"
+          (click)="downloadPdfReport()"
+          title="{{ savedTestRecordId == null ? 'Sign in — your result is saved to Test Records first' : 'Download PDF report' }}">
+          {{ pdfDownloading ? 'Preparing…' : '📄 PDF' }}
+        </button>
+        <button
+          type="button"
+          class="ftr-btn-ghost"
+          [disabled]="csvDownloading || savedTestRecordId == null"
+          (click)="downloadCsvReport()"
+          title="{{ savedTestRecordId == null ? 'Sign in — your result is saved to Test Records first' : 'Download CSV report' }}">
+          {{ csvDownloading ? 'Preparing…' : '📊 CSV' }}
+        </button>
+        <button class="ftr-btn-ghost" (click)="resetTest()">
+          <svg width="12" height="12" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+          </svg>
+          Test again
+        </button>
+        <button class="ftr-btn-ghost" routerLink="/dashboard">Dashboard</button>
+      </div>
+    </div>
+
+    <div class="ftr-card">
+      <div class="ftr-badge"
+           [style.background]="riskBg"
+           [style.border-color]="riskBorder">
+        <div class="ftr-badge-icon" [style.background]="riskIconBg">
+          <svg *ngIf="isHealthy" width="18" height="18"
+               viewBox="0 0 24 24" fill="none"
+               [attr.stroke]="riskColor"
+               stroke-width="2.5" stroke-linecap="round"
+               stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <svg *ngIf="!isHealthy" width="18" height="18"
+               viewBox="0 0 24 24" fill="none"
+               [attr.stroke]="riskColor"
+               stroke-width="2" stroke-linecap="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3
+                     h16.94a2 2 0 001.71-3L13.71 3.86
+                     a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="ftr-badge-text">
+          <div class="ftr-badge-title" [style.color]="riskColor">
+            {{ isHealthy
+              ? 'Healthy movement pattern detected'
+              : 'Parkinsonian movement pattern detected' }}
+          </div>
+          <div class="ftr-badge-sub">
+            AI model confidence · finger-tapping modality
+          </div>
+        </div>
+        <div class="ftr-risk-pill"
+             [style.background]="riskIconBg"
+             [style.border-color]="riskBorder"
+             [style.color]="riskColor">
+          {{ riskLabel }}
+        </div>
+      </div>
+
+      <div class="ftr-main-row">
+        <div class="ftr-big-num-wrap">
+          <div class="ftr-big-num" [style.color]="riskColor">
+            {{ riskPercentInt }}<span class="ftr-dec">{{ riskPercentDec }}</span><span class="ftr-pct">%</span>
+          </div>
+          <div class="ftr-big-num-label">Parkinson's risk score</div>
+        </div>
+
+        <div class="ftr-right-col">
+          <div class="ftr-bar-section">
+            <div class="ftr-bar-header">
+              <span>Risk level</span>
+              <span [style.color]="riskColor" style="font-weight:500">
+                {{ riskPercentFormatted }}%
+              </span>
+            </div>
+            <div class="ftr-bar-track">
+              <div class="ftr-bar-fill"
+                   [style.width.%]="result.riskPercent"
+                   [style.background]="barGradient">
+              </div>
+            </div>
+            <div class="ftr-bar-legend">
+              <span>0% Low</span>
+              <span>50% Moderate</span>
+              <span>100% High</span>
+            </div>
+          </div>
+
+          <div class="ftr-mini-stats">
+            <div class="ftr-mini-stat">
+              <div class="ftr-mini-val">{{ probabilityFormatted }}</div>
+              <div class="ftr-mini-label">Probability</div>
+            </div>
+            <div class="ftr-mini-stat">
+              <div class="ftr-mini-val" [style.color]="riskColor">
+                {{ riskLabel.split(' ')[0] }}
+              </div>
+              <div class="ftr-mini-label">Risk level</div>
+            </div>
+            <div class="ftr-mini-stat">
+              <div class="ftr-mini-val" style="color:#1D9E75">Tap</div>
+              <div class="ftr-mini-label">Modality</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ftr-divider"></div>
+
+      <div class="ftr-interp" [style.border-left-color]="riskColor">
+        <div class="ftr-interp-title">What this means</div>
+        <div class="ftr-interp-text" *ngIf="!isHealthy">
+          The AI model detected patterns in your finger tapping
+          that may be associated with Parkinson's-like bradykinesia
+          or rhythm irregularities. This result alone is
+          <strong>not a diagnosis</strong>. Please discuss with a
+          healthcare professional, especially if you have symptoms.
+        </div>
+        <div class="ftr-interp-text" *ngIf="isHealthy">
+          The AI model did not detect movement patterns strongly
+          associated with Parkinson's in this finger-tapping test.
+          If you have symptoms or concerns regardless of this result,
+          you should still consult a clinician for a full assessment.
+        </div>
+      </div>
+
+      <div class="ftr-rec-row">
+        <div class="ftr-rec-card"
+             [style.background]="isHealthy
+               ? 'rgba(29,158,117,0.06)'
+               : 'rgba(224,82,82,0.06)'"
+             [style.border-color]="isHealthy
+               ? 'rgba(29,158,117,0.15)'
+               : 'rgba(224,82,82,0.15)'">
+          <svg width="14" height="14" viewBox="0 0 24 24"
+               fill="none"
+               [attr.stroke]="riskColor"
+               stroke-width="2"
+               style="flex-shrink:0;margin-top:1px">
+            <circle *ngIf="!isHealthy" cx="12" cy="12" r="10"/>
+            <polyline *ngIf="!isHealthy" points="12 6 12 12 16 14"/>
+            <polyline *ngIf="isHealthy" points="20 6 9 17 4 12"/>
+          </svg>
+          <div>
+            <div class="ftr-rec-title" [style.color]="riskColor">
+              {{ isHealthy ? 'Good result' : 'Next step' }}
+            </div>
+            <div class="ftr-rec-text" *ngIf="isHealthy">
+              No Parkinsonian patterns found. Continue monitoring
+              if you have concerns.
+            </div>
+            <div class="ftr-rec-text" *ngIf="!isHealthy">
+              Schedule a consultation with a neurologist
+              to discuss these findings.
+            </div>
+          </div>
+        </div>
+
+        <div class="ftr-rec-card ftr-rec-blue">
+          <svg width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="#2E86DE" stroke-width="2"
+               style="flex-shrink:0;margin-top:1px">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <div>
+            <div class="ftr-rec-title" style="color:#2E86DE">
+              {{ isHealthy ? 'Complete the set' : 'Combine signals' }}
+            </div>
+            <div class="ftr-rec-text">
+              Take voice and gait tests for a complete
+              multi-signal assessment.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ftr-breakdown">
+        <div class="ftr-breakdown-label">Signal breakdown</div>
+        <div class="ftr-breakdown-rows">
+          <div class="ftr-breakdown-row">
+            <span class="ftr-sig-name">Finger tapping</span>
+            <div class="ftr-sig-track">
+              <div class="ftr-sig-fill"
+                   [style.width.%]="result.riskPercent"
+                   [style.background]="riskColor">
+              </div>
+            </div>
+            <span class="ftr-sig-val" [style.color]="riskColor">
+              {{ riskPercentFormatted }}%
+            </span>
+          </div>
+          <div class="ftr-breakdown-row">
+            <span class="ftr-sig-name ftr-sig-muted">Voice</span>
+            <div class="ftr-sig-track"></div>
+            <span class="ftr-sig-val ftr-sig-muted">-</span>
+          </div>
+          <div class="ftr-breakdown-row">
+            <span class="ftr-sig-name ftr-sig-muted">Gait</span>
+            <div class="ftr-sig-track"></div>
+            <span class="ftr-sig-val ftr-sig-muted">-</span>
+          </div>
+        </div>
+        <div class="ftr-breakdown-note">
+          Take all three tests for a complete multi-signal
+          risk assessment.
+        </div>
+      </div>
+    </div>
+
+    <div class="ftr-multimodal">
+      <svg width="13" height="13" viewBox="0 0 24 24"
+           fill="none" stroke="#2E86DE" stroke-width="2"
+           style="flex-shrink:0;margin-top:1px">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      Finger-tapping is one of three tests (voice, gait,
+      finger-tapping). Combining all three signals gives
+      a more accurate and complete picture of your risk profile.
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="ft-container" *ngIf="currentState === 'error'">
+    <h2 class="ft-section-title">Something went wrong</h2>
+    <p class="ft-text">{{ apiError }}</p>
+    <div class="ft-actions-row">
+      <button class="ft-btn-secondary" (click)="currentState = 'instructions'">
+        Start over
+      </button>
+    </div>
+  </div>
+</section>

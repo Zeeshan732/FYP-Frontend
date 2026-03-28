@@ -1,0 +1,9 @@
+<div class="section-row">
+  <div class="section-row-header">
+    <h2 class="section-row-title">{{ title }}</h2>
+    <a *ngIf="viewAllHref" [routerLink]="viewAllHref" class="section-row-viewall">View all →</a>
+  </div>
+  <div class="section-row-content">
+    <ng-content></ng-content>
+  </div>
+</div>

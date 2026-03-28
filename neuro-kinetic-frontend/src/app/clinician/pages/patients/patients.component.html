@@ -1,0 +1,104 @@
+<div class="cp-page">
+  <div class="cp-stats">
+    <div class="cp-stat-card cp-stat-blue">
+      <div class="cp-stat-label">Total patients</div>
+      <div class="cp-stat-value">{{ stats.total }}</div>
+    </div>
+    <div class="cp-stat-card cp-stat-red">
+      <div class="cp-stat-label">High risk</div>
+      <div class="cp-stat-value cp-val-red">{{ stats.highRisk }}</div>
+    </div>
+    <div class="cp-stat-card cp-stat-amber">
+      <div class="cp-stat-label">At risk</div>
+      <div class="cp-stat-value cp-val-amber">{{ stats.atRisk }}</div>
+    </div>
+    <div class="cp-stat-card cp-stat-teal">
+      <div class="cp-stat-label">Healthy</div>
+      <div class="cp-stat-value cp-val-teal">{{ stats.healthy }}</div>
+    </div>
+  </div>
+
+  <div class="cp-table-header">
+    <h2 class="cp-table-title">My Patients</h2>
+    <div class="cp-table-actions">
+      <div class="cp-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input class="cp-search" placeholder="Search patients..." [(ngModel)]="searchQuery" (input)="filterPatients()">
+      </div>
+
+      <div class="cp-filter-pills">
+        <button class="cp-pill" [class.active]="filterStatus === 'all'" (click)="filterStatus='all'; filterPatients()">All</button>
+        <button class="cp-pill cp-pill-red" [class.active]="filterStatus === 'high-risk'" (click)="filterStatus='high-risk'; filterPatients()">High risk</button>
+        <button class="cp-pill cp-pill-amber" [class.active]="filterStatus === 'at-risk'" (click)="filterStatus='at-risk'; filterPatients()">At risk</button>
+        <button class="cp-pill cp-pill-teal" [class.active]="filterStatus === 'healthy'" (click)="filterStatus='healthy'; filterPatients()">Healthy</button>
+      </div>
+
+      <button class="cp-btn-add" (click)="showAddModal = true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add patient
+      </button>
+    </div>
+  </div>
+
+  <app-skeleton *ngIf="isLoading" variant="table" [rows]="5" [cols]="5"></app-skeleton>
+
+  <div class="cp-table" *ngIf="!isLoading">
+    <div class="cp-table-head">
+      <span>Patient</span>
+      <span>Last test</span>
+      <span>Risk score</span>
+      <span>Status</span>
+      <span></span>
+    </div>
+
+    <div class="cp-table-row" *ngFor="let p of filteredPatients" (click)="navigateToProfile(p.id)">
+      <div class="cp-patient-cell">
+        <div class="cp-avatar"
+             [style.background]="riskColor(p.latestResult?.overallScore ?? 0) + '22'"
+             [style.color]="riskColor(p.latestResult?.overallScore ?? 0)">
+          {{ p.firstName[0] }}{{ p.lastName[0] }}
+        </div>
+        <div>
+          <div class="cp-patient-name">{{ p.firstName }} {{ p.lastName }}</div>
+          <div class="cp-patient-meta">{{ p.age }} y/o · {{ p.gender }}</div>
+        </div>
+      </div>
+
+      <span class="cp-cell-muted">{{ p.latestResult?.lastTestDate | date:'MMM d' }}</span>
+
+      <span class="cp-risk-score" [style.color]="riskColor(p.latestResult?.overallScore ?? 0)">
+        {{ p.latestResult?.overallScore?.toFixed(1) ?? '—' }}%
+      </span>
+
+      <span class="cp-badge" [ngClass]="labelBadgeClass(p.latestResult?.label ?? '')">
+        <span class="cp-badge-dot"></span>
+        {{ p.latestResult?.label ?? 'No tests' }}
+      </span>
+
+      <span class="cp-view-link">View →</span>
+    </div>
+
+    <div class="cp-empty" *ngIf="filteredPatients.length === 0">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 00-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 010 7.75"></path>
+      </svg>
+      <div class="cp-empty-title">No patients found</div>
+      <div class="cp-empty-sub">Try a different search or add a new patient.</div>
+    </div>
+  </div>
+</div>
+
+<app-add-patient-modal
+  *ngIf="showAddModal"
+  (close)="showAddModal = false"
+  (patientAdded)="onPatientAdded($event)">
+</app-add-patient-modal>

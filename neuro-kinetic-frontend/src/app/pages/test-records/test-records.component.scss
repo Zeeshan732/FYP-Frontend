@@ -67,10 +67,37 @@
 
 // Filter panel – align with app (no radius on inputs/buttons)
 ::ng-deep .test-records-filter-panel {
+  background: #112240 !important;
+  border: 1px solid rgba(255,255,255,0.09) !important;
+  border-radius: 12px !important;
+
+  // Fix “FILTERS” heading casing (HTML uses Tailwind `uppercase`)
+  .uppercase {
+    text-transform: none !important;
+    letter-spacing: normal !important;
+  }
+
   .p-dropdown {
     border-radius: 0 !important;
   }
   .p-dropdown-label {
     border-radius: 0;
+  }
+
+  // Cancel / Apply buttons row (styling only)
+  .border-t button:first-child {
+    background: transparent !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    color: rgba(255,255,255,0.65) !important;
+    border-radius: 8px !important;
+    height: 38px !important;
+  }
+
+  .border-t button:last-child {
+    background: #2E86DE !important;
+    border: none !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    height: 38px !important;
   }
 }

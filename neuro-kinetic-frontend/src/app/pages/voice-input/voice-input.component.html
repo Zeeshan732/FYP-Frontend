@@ -78,9 +78,9 @@
         [disabled]="!selectedFile || isUploading || isProcessing"
         class="submit-button w-full px-6 py-4 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg transition-colors font-semibold text-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
       >
+        <app-loader *ngIf="isUploading" variant="button" signal="voice" title="Uploading..."></app-loader>
+        <app-loader *ngIf="isProcessing && !isUploading" variant="button" signal="voice" title="Analyzing..."></app-loader>
         <span *ngIf="!isUploading && !isProcessing">Upload & Analyze</span>
-        <span *ngIf="isUploading">Uploading...</span>
-        <span *ngIf="isProcessing && !isUploading">Processing...</span>
       </button>
     </div>
 
@@ -127,9 +127,9 @@
             [disabled]="isUploading || isProcessing"
             class="submit-button w-full px-6 py-4 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg transition-colors font-semibold text-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
           >
+            <app-loader *ngIf="isUploading" variant="button" signal="voice" title="Uploading..."></app-loader>
+            <app-loader *ngIf="isProcessing && !isUploading" variant="button" signal="voice" title="Analyzing..."></app-loader>
             <span *ngIf="!isUploading && !isProcessing">Analyze Recording</span>
-            <span *ngIf="isUploading">Uploading...</span>
-            <span *ngIf="isProcessing && !isUploading">Processing...</span>
           </button>
         </div>
       </div>
@@ -147,7 +147,7 @@
         <!-- Risk Display -->
         <div class="risk-display my-6">
           <div class="risk-percentage text-5xl font-bold mb-2" [ngClass]="getRiskClass(riskPercent)">
-            {{ riskPercent !== undefined ? (riskPercent | number:'1.0-1') : 'N/A' }}%
+            {{ riskPercent !== undefined ? riskPercent.toFixed(1) : 'N/A' }}%
           </div>
           <div class="risk-level text-lg text-gray-300" *ngIf="riskLevel">
             {{ riskLevel }} Risk
@@ -157,7 +157,7 @@
         <!-- Confidence Score -->
         <div class="confidence-score bg-white/5 rounded-lg p-4" *ngIf="confidence !== undefined">
           <p class="text-sm text-gray-400 mb-1">Model Confidence</p>
-          <p class="text-2xl font-semibold text-app-primary">{{ confidence | number:'1.0-1' }}%</p>
+          <p class="text-2xl font-semibold text-app-primary">{{ confidence.toFixed(1) }}%</p>
         </div>
 
         <!-- Model Info -->
@@ -203,4 +203,3 @@
     </div>
   </div>
 </section>
-

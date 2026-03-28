@@ -1,0 +1,64 @@
+<article class="article-card">
+  <div class="article-card-thumb" [style.background]="thumbBg">
+    <div class="article-card-thumb-icon" [style.color]="tagColor">
+      <!-- Voice: microphone -->
+      <ng-container *ngIf="iconType === 'voice'">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.4">
+          <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+          <line x1="8" y1="22" x2="16" y2="22"/>
+        </svg>
+      </ng-container>
+      <!-- Gait: walking figure -->
+      <ng-container *ngIf="iconType === 'gait'">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.4">
+          <path d="M12 18V4"/>
+          <path d="m8 8 4-4 4 4"/>
+          <path d="M8 12h8"/>
+          <path d="M8 16h8"/>
+          <path d="M8 20h8"/>
+        </svg>
+      </ng-container>
+      <!-- Tap: 4-dot grid -->
+      <ng-container *ngIf="iconType === 'tap'">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.4">
+          <circle cx="6" cy="6" r="2.5"/>
+          <circle cx="18" cy="6" r="2.5"/>
+          <circle cx="6" cy="18" r="2.5"/>
+          <circle cx="18" cy="18" r="2.5"/>
+        </svg>
+      </ng-container>
+      <!-- Research: bar chart -->
+      <ng-container *ngIf="iconType === 'research'">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.4">
+          <line x1="12" y1="20" x2="12" y2="10"/>
+          <line x1="18" y1="20" x2="18" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </ng-container>
+      <!-- Case study: 2x2 grid squares -->
+      <ng-container *ngIf="iconType === 'case-study'">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.4">
+          <rect x="3" y="3" width="8" height="8" rx="1"/>
+          <rect x="13" y="3" width="8" height="8" rx="1"/>
+          <rect x="3" y="13" width="8" height="8" rx="1"/>
+          <rect x="13" y="13" width="8" height="8" rx="1"/>
+        </svg>
+      </ng-container>
+    </div>
+    <span class="article-card-thumb-label" *ngIf="thumbLabel">{{ thumbLabel }}</span>
+  </div>
+  <div class="article-card-body">
+    <span class="article-card-tag" *ngIf="tag" [style.color]="tagColor">{{ tag }}</span>
+    <h3 class="article-card-title">{{ title }}</h3>
+    <p class="article-card-desc">{{ desc }}</p>
+    <div class="article-card-meta" *ngIf="metaOverride">{{ metaOverride }}</div>
+    <div class="article-card-meta" *ngIf="!metaOverride && (author || date)">
+      <span class="article-card-avatar" *ngIf="author" [style.background]="author.colorBg" [style.color]="author.color">{{ author.initials }}</span>
+      <span class="article-card-author" *ngIf="author">{{ author.name }}</span>
+      <span class="article-card-sep" *ngIf="author && date">·</span>
+      <span class="article-card-date" *ngIf="date">{{ date }}</span>
+    </div>
+  </div>
+</article>

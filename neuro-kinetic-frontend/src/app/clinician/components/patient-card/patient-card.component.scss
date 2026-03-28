@@ -1,0 +1,32 @@
+.pc-card {
+  background: #112240;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.pc-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pc-name {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pc-meta {
+  color: rgba(255,255,255,0.45);
+  font-size: 11px;
+}

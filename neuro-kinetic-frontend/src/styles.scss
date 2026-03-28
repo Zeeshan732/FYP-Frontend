@@ -172,6 +172,28 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px var(--color-sky);
 }
 
+/* Native <select> dark theme: avoid browser default white styling */
+select {
+  background-color: #0A1628 !important;
+  color: #E8EBF0 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: var(--radius-input) !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  padding-right: 36px !important;
+}
+
+select option {
+  background: #112240 !important;
+  color: #E8EBF0 !important;
+}
+
+select option:hover {
+  background: rgba(46,134,222,0.15) !important;
+  color: #ffffff !important;
+}
+
 /* ========== FIX 2 — Page & layout (dark theme) ========== */
 body, #root, .app-container, .admin-dashboard-wrap, section.min-h-screen {
   background-color: var(--color-page-bg);
@@ -434,6 +456,56 @@ button,
   border-color: var(--color-blue) !important;
 }
 
+/* PrimeNG p-dropdown dark theme overrides (fix white overlay list) */
+.p-dropdown {
+  background: #0A1628 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: var(--radius-input) !important;
+}
+
+.p-dropdown .p-dropdown-label {
+  background: transparent !important;
+  color: #E8EBF0 !important;
+}
+
+.p-dropdown .p-dropdown-trigger {
+  color: rgba(255,255,255,0.45) !important;
+}
+
+/* Overlay panel shown when dropdown is open */
+.p-dropdown-panel {
+  background: #112240 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 9px !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  background: transparent !important;
+  color: rgba(255,255,255,0.75) !important;
+  font-size: 13px !important;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:last-child {
+  border-bottom: none !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:hover {
+  background: rgba(46,134,222,0.1) !important;
+  color: #ffffff !important;
+}
+
+/* Selected item highlight (fix light-blue theme highlight) */
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight:hover {
+  background: rgba(46,134,222,0.15) !important;
+  color: #2E86DE !important;
+  font-weight: 600 !important;
+}
+
 a.text-app-primary,
 .text-app-primary {
   color: var(--color-blue);
@@ -673,4 +745,257 @@ app-contact {
   font-size: 17px;
   min-height: 100vh;
   display: block;
+}
+
+/* ===== Global Scale Reset ===== */
+html {
+  font-size: 16px;
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-size: 36px; font-weight: 600; line-height: 1.15; }
+h2 { font-size: 26px; font-weight: 500; line-height: 1.2; }
+h3 { font-size: 20px; font-weight: 500; line-height: 1.25; }
+h4 { font-size: 17px; font-weight: 500; line-height: 1.3; }
+h5 { font-size: 15px; font-weight: 500; }
+h6 { font-size: 13px; font-weight: 500; }
+p { font-size: 15px; line-height: 1.7; }
+
+.label-sm { font-size: 13px; }
+.label-xs { font-size: 12px; }
+.caption { font-size: 11px; letter-spacing: 0.02em; }
+
+/* Shared card / typography scale */
+.card,
+[class*="-card"],
+[class*="card-"] {
+  border-radius: 12px;
+}
+
+.section-tag,
+[class*="section-tag"] {
+  font-size: 12px !important;
+  letter-spacing: 0.1em !important;
+  margin-bottom: 10px !important;
+}
+
+.section-title,
+[class*="section-title"] {
+  font-size: 26px !important;
+  font-weight: 500 !important;
+  margin-bottom: 14px !important;
+}
+
+.section-body,
+.about-body,
+[class*="-desc"],
+[class*="-text"]:not(button):not(input) {
+  font-size: 15px !important;
+  line-height: 1.75 !important;
+}
+
+[class*="-label"],
+[class*="-sub"],
+[class*="-meta"] {
+  font-size: 13px !important;
+}
+
+[class*="-badge"],
+[class*="-tag"],
+[class*="-pill"] {
+  font-size: 12px !important;
+  padding: 3px 10px !important;
+}
+
+button svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+[class*="btn-p"],
+[class*="btn-primary"],
+button[class*="primary"] {
+  font-size: 15px !important;
+  padding: 12px 28px !important;
+  height: 48px !important;
+  border-radius: 9px !important;
+  gap: 8px !important;
+}
+
+[class*="btn-ghost"],
+[class*="btn-o"],
+button[class*="ghost"],
+button[class*="outline"] {
+  font-size: 14px !important;
+  padding: 11px 24px !important;
+  height: 46px !important;
+  border-radius: 9px !important;
+}
+
+/* Dashboard stat cards */
+.stat-card,
+.metric-card,
+[class*="stat-card"] {
+  padding: 22px 24px !important;
+  border-radius: 12px !important;
+}
+
+.stat-card .value,
+.stat-card h2,
+.stat-card .number,
+[class*="stat-value"] {
+  font-size: 36px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  margin-bottom: 6px !important;
+}
+
+.stat-card .label,
+.stat-card p,
+[class*="stat-label"] {
+  font-size: 14px !important;
+}
+
+.stat-card .sublabel,
+[class*="stat-sub"] {
+  font-size: 13px !important;
+}
+
+.chart-card h3,
+.chart-title,
+[class*="chart-title"] {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+.chart-card .chart-subtitle,
+[class*="chart-sub"] {
+  font-size: 13px !important;
+}
+
+/* Tables */
+th,
+[class*="th"],
+.table-header {
+  font-size: 13px !important;
+  padding: 14px 16px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
+}
+
+td,
+[class*="td"],
+.table-cell {
+  font-size: 14px !important;
+  padding: 14px 16px !important;
+  line-height: 1.5 !important;
+}
+
+td [class*="badge"],
+td [class*="tag"],
+td [class*="pill"] {
+  font-size: 12px !important;
+  padding: 3px 10px !important;
+}
+
+/* Form inputs globally */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+select,
+textarea {
+  font-size: 15px !important;
+  padding: 12px 16px !important;
+  height: 48px !important;
+  border-radius: 9px !important;
+}
+
+textarea {
+  height: auto !important;
+  min-height: 140px !important;
+}
+
+label,
+.form-label,
+[class*="form-label"] {
+  font-size: 14px !important;
+  margin-bottom: 8px !important;
+  font-weight: 400 !important;
+}
+
+.form-group,
+[class*="form-group"] {
+  margin-bottom: 22px !important;
+}
+
+/* Page hero / container spacing */
+.container,
+[class*="-container"],
+.main-content {
+  padding-left: 48px !important;
+  padding-right: 48px !important;
+}
+
+.main,
+[class*="main-area"],
+[class*="page-content"] {
+  padding: 36px 48px 80px !important;
+}
+
+/* Responsive scale tuning */
+@media (max-width: 1200px) {
+  .main,
+  [class*="main-area"] {
+    padding: 28px 36px 64px !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar,
+  [class*="sidebar-wrap"] {
+    width: 220px !important;
+    min-width: 220px !important;
+  }
+
+  h1 { font-size: 30px !important; }
+  h2 { font-size: 22px !important; }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px !important;
+    min-width: 200px !important;
+  }
+
+  .main,
+  [class*="main-area"] {
+    padding: 20px !important;
+  }
+
+  h1 { font-size: 26px !important; }
+  h2 { font-size: 20px !important; }
+}
+
+/* Top loading bar — appears on route change */
+.ns-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1D9E75, #2E86DE);
+  border-radius: 0 2px 2px 0;
+  z-index: 9999;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(46,134,222,0.4);
+}
+
+.ns-progress-bar.ns-progress-done {
+  opacity: 0;
+  transition: opacity 0.3s ease 0.2s;
 }

@@ -1,0 +1,28 @@
+<div class="cm-overlay" (click)="close.emit()">
+  <div class="cm-modal" (click)="$event.stopPropagation()">
+    <div class="cm-header">
+      <h3>Request test</h3>
+      <button type="button" (click)="close.emit()">×</button>
+    </div>
+
+    <div class="cm-body">
+      <div class="cm-patient">Patient: {{ patient.firstName }} {{ patient.lastName }}</div>
+
+      <div class="cm-test-grid">
+        <button class="cm-test-btn" [class.active]="selectedTest==='voice'" (click)="selectedTest='voice'" type="button">Voice</button>
+        <button class="cm-test-btn" [class.active]="selectedTest==='gait'" (click)="selectedTest='gait'" type="button">Gait</button>
+        <button class="cm-test-btn" [class.active]="selectedTest==='fingertap'" (click)="selectedTest='fingertap'" type="button">Finger tap</button>
+      </div>
+
+      <textarea rows="3" [(ngModel)]="message" placeholder="Optional message for patient"></textarea>
+    </div>
+
+    <div class="cm-footer">
+      <button class="cm-btn cm-btn-ghost" type="button" (click)="close.emit()">Cancel</button>
+      <button class="cm-btn cm-btn-primary" type="button" [disabled]="!selectedTest || isSubmitting" (click)="submit()">
+        <app-loader *ngIf="isSubmitting" variant="button" title="Requesting..."></app-loader>
+        <ng-container *ngIf="!isSubmitting">Send request</ng-container>
+      </button>
+    </div>
+  </div>
+</div>

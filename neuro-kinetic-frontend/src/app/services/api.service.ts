@@ -261,21 +261,31 @@ export class ApiService {
     sessionId: string;
     hasVoiceData?: boolean;
     hasGaitData?: boolean;
+    voiceFileId?: number;
     voiceDataJson?: string;
     gaitDataJson?: string;
     waveformDataJson?: string;
     skeletonDataJson?: string;
+    /** When set, analysis is stored with FK to this test record (voice/gait flow). */
+    testRecordId?: number;
   }): Observable<AnalysisResult> {
     // Direct call to /api/analysis/process as per backend API
     return this.http.post<AnalysisResult>(`${this.apiUrl}/analysis/process`, {
       sessionId: data.sessionId,
       hasVoiceData: data.hasVoiceData,
       hasGaitData: data.hasGaitData,
+      voiceFileId: data.voiceFileId,
       voiceDataJson: data.voiceDataJson,
       gaitDataJson: data.gaitDataJson,
       waveformDataJson: data.waveformDataJson,
-      skeletonDataJson: data.skeletonDataJson
+      skeletonDataJson: data.skeletonDataJson,
+      testRecordId: data.testRecordId
     });
+  }
+
+  /** Attach analysis session row to a test record so Test Records shows correct modality and risk. */
+  linkAnalysisToTestRecord(sessionId: string, testRecordId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/analysis/link-test-record`, { sessionId, testRecordId });
   }
 
   getAnalysisResult(id: number): Observable<AnalysisResult> {
@@ -440,6 +450,7 @@ export class ApiService {
     userId?: number;
     status?: string;
     testResult?: string;
+    testType?: string;
   } = {}): Observable<PagedResult<UserTestRecord>> {
     let httpParams = new HttpParams();
 
@@ -463,6 +474,9 @@ export class ApiService {
     }
     if (params.testResult) {
       httpParams = httpParams.set('testResult', params.testResult);
+    }
+    if (params.testType) {
+      httpParams = httpParams.set('testType', params.testType);
     }
 
     return this.http.get<PagedResult<UserTestRecord>>(`${this.apiUrl}/testrecords`, { params: httpParams });
@@ -667,6 +681,19 @@ export class ApiService {
       `${this.apiUrl}/reports/session/${encodeURIComponent(sessionId)}/csv`,
       { responseType: 'blob' }
     );
+  }
+
+  /** PDF when the run was saved as a UserTestRecord (e.g. finger-tapping). Requires auth. */
+  downloadPdfReportByTestRecordId(testRecordId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reports/test-record/${testRecordId}/pdf`, {
+      responseType: 'blob'
+    });
+  }
+
+  downloadCsvReportByTestRecordId(testRecordId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reports/test-record/${testRecordId}/csv`, {
+      responseType: 'blob'
+    });
   }
 
   // ========== TREND ANALYSIS ==========
