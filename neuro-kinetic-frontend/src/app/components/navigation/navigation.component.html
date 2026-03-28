@@ -17,7 +17,19 @@
       <button type="button" (click)="openLoginModal()" class="btn-ghost">Login</button>
       <button type="button" (click)="openSignupModal()" class="btn-primary">Sign Up</button>
     </div>
-    <button type="button" class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Menu">☰</button>
+    <button
+      type="button"
+      class="mobile-menu-btn"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="mobileMenuOpen"
+      aria-label="Toggle menu"
+    >
+      <span class="hamburger" [class.open]="mobileMenuOpen" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </button>
   </div>
   <!-- Mobile menu dropdown -->
   <div *ngIf="mobileMenuOpen" class="navbar-mobile-menu">
@@ -237,3 +249,4 @@
 
   <!-- Notification dropdown removed per request -->
 </aside>
+

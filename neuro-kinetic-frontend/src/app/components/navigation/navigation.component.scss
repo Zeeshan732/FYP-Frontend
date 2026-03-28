@@ -116,13 +116,47 @@
 
 .navbar .mobile-menu-btn {
   display: none;
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   color: #ffffff;
-  font-size: 20px;
   cursor: pointer;
   margin-left: auto;
-  padding: 8px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger {
+  position: relative;
+  width: 18px;
+  height: 14px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 999px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 .navbar.scrolled {
@@ -161,7 +195,22 @@
   margin-top: 8px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .navbar {
+    height: 64px;
+  }
+
+  .navbar-inner {
+    gap: 12px;
+    padding: 0 14px;
+  }
+
+  .navbar .brand-logo-img {
+    height: 42px;
+  }
+}
+
+@media (max-width: 1024px) {
   .navbar-links {
     display: none;
   }
@@ -171,7 +220,7 @@
   }
 
   .navbar .mobile-menu-btn {
-    display: block;
+    display: inline-flex;
   }
 
   .navbar-mobile-menu {
@@ -306,7 +355,7 @@ aside button[title]:not([title=""]):hover::after {
 }
 
 // Responsive adjustments
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   aside {
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
