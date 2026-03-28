@@ -3,13 +3,13 @@
 
 <!-- Patient Test Section -->
 <section class="min-h-screen patient-test-hero text-app-text-primary pt-24 pb-20">
-  <div class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-12">
+  <div class="patient-test-shell w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-12">
     <!-- Header -->
     <div class="text-center mb-12">
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-app-primary via-app-primary-hover to-app-primary bg-clip-text text-transparent tracking-tight">
+      <h1 class="patient-test-title text-4xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-app-primary via-app-primary-hover to-app-primary bg-clip-text text-transparent tracking-tight">
         NeuroSync Test
       </h1>
-      <p class="text-lg sm:text-xl text-app-text-muted max-w-2xl mx-auto">
+      <p class="patient-test-subtitle text-lg sm:text-xl text-app-text-muted max-w-2xl mx-auto">
         Record your voice to analyze neurological patterns. The test takes approximately 30-60 seconds.
       </p>
     </div>
@@ -106,7 +106,7 @@
         
           <!-- Mode Toggle -->
           <!-- Voice/Gait mode buttons (existing behavior preserved) -->
-          <div class="flex gap-3 sm:gap-4 mb-8" *ngIf="selectedTest !== 'fingertap'">
+          <div class="mode-switch flex gap-3 sm:gap-4 mb-8" *ngIf="selectedTest !== 'fingertap'">
             <button 
               (click)="selectMode('record'); selectedFile = null; error = ''"
               class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
@@ -148,7 +148,7 @@
           </div>
 
           <!-- Finger-tap mode buttons -->
-          <div class="flex gap-3 sm:gap-4 mb-8" *ngIf="selectedTest === 'fingertap'">
+          <div class="mode-switch flex gap-3 sm:gap-4 mb-8" *ngIf="selectedTest === 'fingertap'">
             <button 
               (click)="selectMode('live')"
               class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
@@ -315,7 +315,7 @@
             <p class="text-app-text-primary mb-4">File ready: {{ selectedFile.name }}</p>
             <p class="text-sm text-app-text-muted mb-4">Size: {{ formatFileSize(selectedFile.size) }}</p>
             
-            <div class="flex gap-4 justify-center">
+            <div class="record-actions flex gap-4 justify-center">
               <button 
                 (click)="testStarted = false"
                 class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"
@@ -391,7 +391,7 @@
               <audio [src]="audioUrl" controls class="w-full"></audio>
             </div>
 
-            <div class="flex gap-4 justify-center">
+            <div class="record-actions flex gap-4 justify-center">
               <button 
                 (click)="startRecording()"
                 class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"
@@ -538,7 +538,7 @@
           <!-- Download Reports -->
           <div *ngIf="currentSessionId" class="app-card bg-app-surface rounded-2xl border border-app-border p-4">
             <p class="text-sm text-app-text-muted mb-3">Download Reports</p>
-            <div class="flex gap-3">
+            <div class="report-actions flex gap-3">
               <button 
                 (click)="downloadPdfReport()"
                 class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl transition-colors font-semibold text-sm"
@@ -555,7 +555,7 @@
           </div>
 
           <!-- Actions -->
-          <div class="flex gap-4 justify-center pt-4">
+          <div class="result-actions flex gap-4 justify-center pt-4">
             <button 
               (click)="startNewTest()"
               class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"

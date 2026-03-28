@@ -2,8 +2,8 @@
 <app-navigation></app-navigation>
 
 <!-- Test Records Section -->
-<section class="min-h-screen bg-pagebg pb-20">
-  <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
+<section class="test-records-shell min-h-screen bg-pagebg pb-20">
+  <div class="test-records-inner w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
     <!-- Header -->
     <!-- <div class="text-center mb-12">
       <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-6xl font-bold mb-4 bg-gradient-to-r from-app-primary to-app-primary-hover bg-clip-text text-transparent">
@@ -15,8 +15,8 @@
     </div> -->
 
     <!-- Filters and Controls -->
-    <div class="max-w-[1600px] mx-auto mb-6 relative">
-      <div class="flex items-center justify-between">
+    <div class="test-records-controls max-w-[1600px] mx-auto mb-6 relative">
+      <div class="test-records-controls-row flex items-center justify-between">
         <div class="flex flex-col gap-1">
           <span class="text-xs font-semibold uppercase tracking-wide text-app-text-muted">
             Test Records
@@ -26,12 +26,12 @@
           </span>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="test-records-controls-actions flex items-center gap-2">
           <!-- Filter icon button -->
           <button
             type="button"
             (click)="toggleFilterMenu()"
-            class="inline-flex items-center justify-center h-10 w-10 rounded-full border border-app-primary/60 bg-app-primary/10 text-app-primary hover:bg-app-primary/20 transition-colors"
+            class="test-records-icon-btn inline-flex items-center justify-center h-10 w-10 rounded-full border border-app-primary/60 bg-app-primary/10 text-app-primary hover:bg-app-primary/20 transition-colors"
             title="Filter records"
           >
             <i class="pi pi-filter text-sm"></i>
@@ -40,7 +40,7 @@
           <!-- Take new test -->
           <button
             (click)="takeNewTest()"
-            class="inline-flex items-center justify-center bg-app-primary hover:bg-app-primary-hover text-white px-5 py-2.5 rounded-app-lg transition-colors font-semibold text-sm whitespace-nowrap"
+            class="test-records-primary-btn inline-flex items-center justify-center bg-app-primary hover:bg-app-primary-hover text-white px-5 py-2.5 rounded-app-lg transition-colors font-semibold text-sm whitespace-nowrap"
           >
             Take New Test
           </button>
@@ -50,7 +50,7 @@
       <!-- Small filter menu (icon dropdown) -->
       <div
         *ngIf="showFilterMenu"
-        class="absolute right-0 mt-3 z-30 w-full sm:w-[420px]"
+        class="test-records-filter-menu absolute right-0 mt-3 z-30 w-full sm:w-[420px]"
       >
         <div class="test-records-filter-panel app-card bg-app-surface shadow-app p-5">
           <div class="flex items-center justify-between border-b border-app-border pb-3 mb-4">
@@ -166,7 +166,7 @@
         <!-- Records Table -->
     <div *ngIf="!loading && records.length > 0" class="max-w-[1600px] mx-auto mb-8">
       <div class="bg-app-surface border border-app-border rounded-lg overflow-hidden shadow-sm">
-        <div class="overflow-x-auto">
+        <div class="test-records-table-wrap overflow-x-auto">
           <table class="w-full neuro-table">
             <thead class="border-b border-border">
               <tr>
@@ -306,7 +306,7 @@
 
     <!-- Pagination -->
     <div *ngIf="!loading && totalPages > 0" class="max-w-[1600px] mx-auto">
-      <div class="bg-app-surface border border-app-border rounded-lg p-4 shadow-sm">
+      <div class="test-records-pagination bg-app-surface border border-app-border rounded-lg p-4 shadow-sm">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="text-sm text-app-text-primary">
             Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} records

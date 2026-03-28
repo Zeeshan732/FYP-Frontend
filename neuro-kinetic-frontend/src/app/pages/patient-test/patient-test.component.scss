@@ -243,3 +243,81 @@
     font-size: 13px;
   }
 }
+
+@media (max-width: 1024px) {
+  .patient-test-hero .max-w-5xl,
+  .patient-test-shell {
+    max-width: 100%;
+  }
+
+  .test-type-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-test-shell {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .patient-test-card .p-8,
+  .patient-test-card .sm\:p-10 {
+    padding: 1.25rem !important;
+  }
+
+  .mode-switch {
+    flex-direction: column;
+  }
+
+  .mode-switch .patient-test-mode-btn {
+    width: 100%;
+  }
+
+  .upload-button {
+    padding: 1rem !important;
+  }
+
+  .file-info {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+  }
+
+  .file-info .file-details {
+    width: 100%;
+  }
+
+  .file-info .remove-button,
+  .record-actions button,
+  .report-actions button,
+  .result-actions button {
+    width: 100%;
+  }
+
+  .record-actions,
+  .report-actions,
+  .result-actions {
+    flex-direction: column;
+  }
+
+  .waveform-wrap canvas {
+    height: 84px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .patient-test-title {
+    font-size: 2rem !important;
+    line-height: 1.15;
+  }
+
+  .patient-test-subtitle {
+    font-size: 0.95rem !important;
+  }
+
+  .ft-hint-bar {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
