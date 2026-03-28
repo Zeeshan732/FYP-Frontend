@@ -999,3 +999,109 @@ label,
   opacity: 0;
   transition: opacity 0.3s ease 0.2s;
 }
+
+/* ===== App-wide responsive foundation ===== */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+app-root {
+  display: block;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+table {
+  width: 100%;
+}
+
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+:root {
+  --app-inline-space: clamp(0.875rem, 2vw, 2.5rem);
+}
+
+.container,
+.contact-container,
+.blog-container,
+.home-container,
+.main-content {
+  padding-left: var(--app-inline-space) !important;
+  padding-right: var(--app-inline-space) !important;
+}
+
+@media (max-width: 1024px) {
+  .ml-64,
+  .ml-20 {
+    margin-left: 0 !important;
+  }
+
+  .main,
+  [class*="main-area"],
+  [class*="page-content"] {
+    padding: 20px !important;
+  }
+
+  .container,
+  [class*="-container"],
+  .main-content {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .container,
+  [class*="-container"],
+  .main-content {
+    padding-left: 0.875rem !important;
+    padding-right: 0.875rem !important;
+  }
+
+  .page-section,
+  .page-section-alt {
+    padding: 48px 0;
+  }
+
+  [class*="btn-p"],
+  [class*="btn-primary"],
+  button[class*="primary"],
+  [class*="btn-ghost"],
+  [class*="btn-o"],
+  button[class*="ghost"],
+  button[class*="outline"] {
+    min-height: 44px !important;
+    height: auto !important;
+    padding: 10px 16px !important;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  select,
+  textarea {
+    min-height: 44px !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .container,
+  [class*="-container"],
+  .main-content {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}

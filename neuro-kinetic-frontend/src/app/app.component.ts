@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -15,6 +15,7 @@ export class AppComponent implements OnInit, OnDestroy {
   title = "NeuroSync-frontend";
   isAuthenticated = false;
   sidebarCollapsed = false;
+  isCompactViewport = false;
   currentRoute: string = '';
   askResultsDialogState: AskResultsDialogState = { visible: false, riskPercent: null, mode: 'voice' };
   private authSubscription?: Subscription;
@@ -30,6 +31,8 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.syncViewportState();
+
     // Subscribe to authentication state
     this.authSubscription = this.authService.currentUser$.subscribe(user => {
       this.isAuthenticated = !!user;
@@ -56,6 +59,15 @@ export class AppComponent implements OnInit, OnDestroy {
     this.askResultsDialogSubscription = this.modalService.askResultsDialog$.subscribe(state => {
       this.askResultsDialogState = state;
     });
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.syncViewportState();
+  }
+
+  private syncViewportState(): void {
+    this.isCompactViewport = window.innerWidth <= 1024;
   }
 
   onAskResultsDialogClose(): void {
