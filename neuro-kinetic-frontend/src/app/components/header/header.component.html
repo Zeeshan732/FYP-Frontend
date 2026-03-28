@@ -1,20 +1,20 @@
 <div *ngIf="currentUser && !isLandingPage" 
      class="neuro-header fixed top-0 z-40 backdrop-blur-md shadow-sm transition-all duration-300 ease-in-out h-16"
-     [class.left-64]="!sidebarCollapsed"
-     [class.left-20]="sidebarCollapsed"
+     [class.left-64]="!sidebarCollapsed && !isCompactViewport"
+     [class.left-20]="sidebarCollapsed && !isCompactViewport"
      [class.right-0]="true"
-     [style.width]="!sidebarCollapsed ? 'calc(100% - 256px)' : 'calc(100% - 80px)'">
-  <div class="flex items-center justify-between px-6 py-4 h-16">
+     [style.width]="isCompactViewport ? '100%' : (!sidebarCollapsed ? 'calc(100% - 256px)' : 'calc(100% - 80px)')">
+  <div class="header-inner flex items-center justify-between px-4 sm:px-6 py-4 h-16">
     <!-- Breadcrumb Path -->
     <div class="flex items-center space-x-2 flex-1 min-w-0">
       <svg class="w-5 h-5 text-blue flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
       </svg>
-      <span class="text-ink text-sm truncate">{{ breadcrumbPath }}</span>
+      <span class="header-breadcrumb text-ink text-sm truncate">{{ breadcrumbPath }}</span>
     </div>
 
     <!-- Actions + User Badge -->
-    <div class="flex items-center space-x-3 ml-4">
+    <div class="flex items-center space-x-2 sm:space-x-3 ml-3 sm:ml-4">
       <!-- Notifications -->
       <button
         class="neuro-header-icon relative p-2 rounded-lg transition-colors"
@@ -31,7 +31,7 @@
 
       <!-- User Info + Avatar -->
       <div class="flex items-center space-x-3">
-        <div class="text-right" [class.hidden]="sidebarCollapsed">
+        <div class="text-right" [class.hidden]="sidebarCollapsed || isCompactViewport">
           <div class="text-ink text-sm font-medium truncate max-w-[150px]">{{ getUserDisplayName() }}</div>
           <!-- <div class="text-gray-400 text-xs truncate max-w-[150px]">{{ currentUser?.email }}</div> -->
           <div *ngIf="isAdmin()" class="mt-0.5">
@@ -54,4 +54,3 @@
     </div>
   </div>
 </div>
-
