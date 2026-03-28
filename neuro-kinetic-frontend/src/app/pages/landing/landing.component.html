@@ -39,37 +39,62 @@
       </div>
     </div>
   </div>
-</section>
-
-    <!-- Our Technology Section -->
+</section>    <!-- Our Technology Section -->
     <section class="technology-section">
       <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="section-title scroll-animate">Our Technology</h2>
         <p class="section-subtitle scroll-animate">Cutting-edge AI-powered analysis for precise neurological insights</p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="tech-card card-voice scroll-animate delay-100">
-            <div class="text-4xl">🎤</div>
+            <div class="tech-icon tech-icon-voice" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z"></path>
+                <path d="M19 11v1a7 7 0 01-14 0v-1"></path>
+                <path d="M12 19v3"></path>
+                <path d="M9 22h6"></path>
+              </svg>
+            </div>
             <h3 class="tech-card-title">Voice Analysis</h3>
             <p class="tech-card-desc">
               Advanced speech pattern recognition to detect neurological conditions through voice biomarkers
             </p>
-            <a routerLink="/voice-analysis" class="tech-card-link">Learn More →</a>
+            <a routerLink="/voice-analysis" class="tech-card-link">Learn More -></a>
           </div>
+
           <div class="tech-card card-gait scroll-animate delay-200">
-            <div class="text-4xl">🚶</div>
+            <div class="tech-icon tech-icon-gait" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="4.5" r="2"></circle>
+                <path d="M12 7v5l-3 4"></path>
+                <path d="M12 12l3 4"></path>
+                <path d="M8.5 20h3"></path>
+                <path d="M12.5 20h3"></path>
+              </svg>
+            </div>
             <h3 class="tech-card-title">Gait Analysis</h3>
             <p class="tech-card-desc">
               Movement pattern analysis using computer vision to assess neurological motor functions
             </p>
-            <a routerLink="/gait-analysis" class="tech-card-link">Learn More →</a>
+            <a routerLink="/gait-analysis" class="tech-card-link">Learn More -></a>
           </div>
+
           <div class="tech-card card-tap scroll-animate delay-300">
-            <div class="text-4xl">🧠</div>
+            <div class="tech-icon tech-icon-ai" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+                <path d="M8 12h8"></path>
+                <path d="M12 8v8"></path>
+                <circle cx="7" cy="7" r="1"></circle>
+                <circle cx="17" cy="7" r="1"></circle>
+                <circle cx="7" cy="17" r="1"></circle>
+                <circle cx="17" cy="17" r="1"></circle>
+              </svg>
+            </div>
             <h3 class="tech-card-title">AI Integration</h3>
             <p class="tech-card-desc">
               Machine learning algorithms that provide accurate, real-time neurological assessments
             </p>
-            <a routerLink="/services" class="tech-card-link">Learn More →</a>
+            <a routerLink="/services" class="tech-card-link">Learn More -></a>
           </div>
         </div>
       </div>
@@ -217,3 +242,4 @@
 
 <!-- Footer -->
 <app-footer></app-footer>
+
