@@ -1,7 +1,7 @@
-<section class="voice-input-container min-h-screen bg-app-surface-muted text-app-text-primary py-12 px-4">
+<section class="voice-input-container min-h-screen bg-app-surface-muted text-app-text-primary py-6 sm:py-8 md:py-12 px-3 sm:px-4">
   <div class="max-w-4xl mx-auto">
-    <h2 class="text-3xl font-bold text-app-primary mb-8 text-center">Voice Input Analysis</h2>
-    
+    <h2 class="text-2xl sm:text-3xl font-bold text-app-primary mb-6 sm:mb-8 text-center">Voice Input Analysis</h2>
+
     <!-- Error Message -->
     <div *ngIf="error" class="mb-6 bg-red-500/20 border border-red-500/40 rounded-lg p-4">
       <p class="text-red-200 text-sm">{{ error }}</p>
@@ -10,73 +10,71 @@
     <!-- Simulation Warning -->
     <div *ngIf="isSimulation && analysisResult" class="mb-6 bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-4">
       <p class="text-yellow-200 text-sm">
-        ⚠️ <strong>ML service unavailable.</strong> Results shown are simulated. Please ensure the ML service is running for accurate analysis.
+        Warning: <strong>ML service unavailable.</strong> Results shown are simulated. Please ensure the ML service is running for accurate analysis.
       </p>
     </div>
 
     <!-- Mode Toggle -->
-    <div class="input-mode-toggle flex gap-4 mb-8">
-      <button 
+    <div class="input-mode-toggle flex gap-3 sm:gap-4 mb-6 sm:mb-8">
+      <button
         (click)="inputMode = 'upload'; resetComponent()"
-        class="mode-button flex-1 px-6 py-3 rounded-lg border-2 transition-all font-semibold"
+        class="mode-button flex-1 px-4 sm:px-6 py-3 rounded-lg border-2 transition-all font-semibold text-sm sm:text-base"
         [ngClass]="{
           'bg-app-primary border-app-primary text-white': inputMode === 'upload',
           'bg-white/10 border-white/20 text-gray-200': inputMode !== 'upload'
         }"
       >
-        <span class="mr-2">📁</span>
-        Upload File
+        <span class="mr-2">[Upload]</span> Upload File
       </button>
-      <button 
+      <button
         (click)="inputMode = 'record'; resetComponent()"
-        class="mode-button flex-1 px-6 py-3 rounded-lg border-2 transition-all font-semibold"
+        class="mode-button flex-1 px-4 sm:px-6 py-3 rounded-lg border-2 transition-all font-semibold text-sm sm:text-base"
         [ngClass]="{
           'bg-app-primary border-app-primary text-white': inputMode === 'record',
           'bg-white/10 border-white/20 text-gray-200': inputMode !== 'record'
         }"
       >
-        <span class="mr-2">🎤</span>
-        Record Voice
+        <span class="mr-2">[Record]</span> Record Voice
       </button>
     </div>
 
     <!-- Upload Section -->
-    <div *ngIf="inputMode === 'upload'" class="upload-section bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
+    <div *ngIf="inputMode === 'upload'" class="upload-section bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 sm:p-6 md:p-8">
       <div class="upload-area mb-6">
-        <label for="voiceFileInput" class="upload-button flex flex-col items-center justify-center p-12 border-2 border-dashed border-white/30 rounded-lg bg-white/5 cursor-pointer transition-all hover:border-app-primary hover:bg-white/10">
-          <span class="text-5xl mb-4">📁</span>
-          <span class="text-lg font-semibold mb-2">Choose Voice File</span>
-          <small class="text-gray-400 text-sm">Supported: WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS</small>
+        <label for="voiceFileInput" class="upload-button flex flex-col items-center justify-center p-6 sm:p-10 md:p-12 border-2 border-dashed border-white/30 rounded-lg bg-white/5 cursor-pointer transition-all hover:border-app-primary hover:bg-white/10">
+          <span class="text-2xl sm:text-3xl mb-3 sm:mb-4">[Audio]</span>
+          <span class="text-base sm:text-lg font-semibold mb-2 text-center">Choose Voice File</span>
+          <small class="text-gray-400 text-xs sm:text-sm text-center">Supported: WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS</small>
         </label>
-        <input 
-          type="file" 
-          id="voiceFileInput" 
+        <input
+          type="file"
+          id="voiceFileInput"
           accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg,.webm,.aac,.opus"
           (change)="onFileSelected($event)"
           class="hidden"
         />
       </div>
-      
-      <div *ngIf="selectedFile" class="file-info flex justify-between items-center p-4 bg-white/5 rounded-lg mb-6">
+
+      <div *ngIf="selectedFile" class="file-info flex justify-between items-center gap-3 p-3 sm:p-4 bg-white/5 rounded-lg mb-6">
         <div class="file-details flex items-center gap-4">
-          <span class="text-2xl">📄</span>
+          <span class="text-lg sm:text-xl shrink-0">[File]</span>
           <div>
-            <strong class="block">{{ selectedFile.name }}</strong>
+            <strong class="block break-all">{{ selectedFile.name }}</strong>
             <span class="file-size text-gray-400 text-sm">{{ formatFileSize(selectedFile.size) }}</span>
           </div>
         </div>
-        <button 
-          (click)="removeFile()" 
-          class="remove-button px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-semibold"
+        <button
+          (click)="removeFile()"
+          class="remove-button px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-semibold shrink-0"
         >
           Remove
         </button>
       </div>
-      
-      <button 
-        (click)="uploadAndProcess()" 
+
+      <button
+        (click)="uploadAndProcess()"
         [disabled]="!selectedFile || isUploading || isProcessing"
-        class="submit-button w-full px-6 py-4 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg transition-colors font-semibold text-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
+        class="submit-button w-full px-4 sm:px-6 py-3 sm:py-4 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg transition-colors font-semibold text-base sm:text-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
       >
         <app-loader *ngIf="isUploading" variant="button" signal="voice" title="Uploading..."></app-loader>
         <app-loader *ngIf="isProcessing && !isUploading" variant="button" signal="voice" title="Analyzing..."></app-loader>
@@ -85,47 +83,46 @@
     </div>
 
     <!-- Record Section -->
-    <div *ngIf="inputMode === 'record'" class="record-section bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
+    <div *ngIf="inputMode === 'record'" class="record-section bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 sm:p-6 md:p-8">
       <div class="recording-controls">
-        <button 
-          *ngIf="!isRecording && !recordedAudio" 
-          (click)="startRecording()" 
-          class="record-button start w-full px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-semibold text-lg disabled:bg-gray-600 disabled:cursor-not-allowed mb-4"
+        <button
+          *ngIf="!isRecording && !recordedAudio"
+          (click)="startRecording()"
+          class="record-button start w-full px-4 sm:px-6 py-3 sm:py-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-semibold text-base sm:text-lg disabled:bg-gray-600 disabled:cursor-not-allowed mb-4"
           [disabled]="isProcessing"
         >
-          <span class="mr-2">🎤</span>
-          Start Recording
+          <span class="mr-2">[Mic]</span> Start Recording
         </button>
-        
-        <div *ngIf="isRecording" class="recording-status text-center p-8">
-          <div class="recording-indicator flex items-center justify-center gap-2 mb-4 text-xl font-bold text-red-400">
+
+        <div *ngIf="isRecording" class="recording-status text-center p-4 sm:p-8">
+          <div class="recording-indicator flex items-center justify-center gap-2 mb-4 text-lg sm:text-xl font-bold text-red-400">
             <span class="pulse w-3 h-3 bg-red-400 rounded-full"></span>
             <span>Recording...</span>
           </div>
-          <div class="recording-time text-4xl font-bold mb-4 text-app-primary">{{ formatTime(recordingTime) }}</div>
-          <button 
-            (click)="stopRecording()" 
+          <div class="recording-time text-3xl sm:text-4xl font-bold mb-4 text-app-primary">{{ formatTime(recordingTime) }}</div>
+          <button
+            (click)="stopRecording()"
             class="record-button stop px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-semibold"
           >
             Stop Recording
           </button>
         </div>
-        
-        <div *ngIf="recordedAudio && !isRecording" class="audio-preview p-6 bg-white/5 rounded-lg">
-          <div class="preview-header flex justify-between items-center mb-4">
-            <h4 class="text-lg font-semibold">Recording Preview</h4>
-            <button 
-              (click)="deleteRecording()" 
-              class="delete-button px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-semibold"
+
+        <div *ngIf="recordedAudio && !isRecording" class="audio-preview p-4 sm:p-6 bg-white/5 rounded-lg">
+          <div class="preview-header flex justify-between items-center gap-3 mb-4">
+            <h4 class="text-base sm:text-lg font-semibold">Recording Preview</h4>
+            <button
+              (click)="deleteRecording()"
+              class="delete-button px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-semibold shrink-0"
             >
               Delete
             </button>
           </div>
           <audio [src]="recordedAudioUrl" controls class="audio-player w-full mb-4"></audio>
-          <button 
-            (click)="uploadRecordedAudio()" 
+          <button
+            (click)="uploadRecordedAudio()"
             [disabled]="isUploading || isProcessing"
-            class="submit-button w-full px-6 py-4 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg transition-colors font-semibold text-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
+            class="submit-button w-full px-4 sm:px-6 py-3 sm:py-4 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg transition-colors font-semibold text-base sm:text-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
           >
             <app-loader *ngIf="isUploading" variant="button" signal="voice" title="Uploading..."></app-loader>
             <app-loader *ngIf="isProcessing && !isUploading" variant="button" signal="voice" title="Analyzing..."></app-loader>
@@ -136,17 +133,17 @@
     </div>
 
     <!-- Results Section -->
-    <div *ngIf="analysisResult" class="results-section mt-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
-      <h3 class="text-2xl font-bold text-app-primary mb-6 text-center">Analysis Results</h3>
+    <div *ngIf="analysisResult" class="results-section mt-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 sm:p-6 md:p-8">
+      <h3 class="text-xl sm:text-2xl font-bold text-app-primary mb-6 text-center">Analysis Results</h3>
       <div class="result-card text-center space-y-6">
         <!-- Prediction Badge -->
-        <div class="prediction-badge inline-block px-8 py-4 rounded-lg text-xl font-bold mb-4" [ngClass]="getPredictionClass(prediction)">
+        <div class="prediction-badge inline-block px-4 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-xl font-bold mb-4 max-w-full break-words" [ngClass]="getPredictionClass(prediction)">
           {{ getPredictionText(prediction) }}
         </div>
 
         <!-- Risk Display -->
         <div class="risk-display my-6">
-          <div class="risk-percentage text-5xl font-bold mb-2" [ngClass]="getRiskClass(riskPercent)">
+          <div class="risk-percentage text-4xl sm:text-5xl font-bold mb-2" [ngClass]="getRiskClass(riskPercent)">
             {{ riskPercent !== undefined ? riskPercent.toFixed(1) : 'N/A' }}%
           </div>
           <div class="risk-level text-lg text-gray-300" *ngIf="riskLevel">
@@ -169,7 +166,7 @@
         <!-- Voice Feature Extraction (Chart) -->
         <div *ngIf="voiceFeatures" class="bg-white/5 rounded-lg p-4">
           <p class="text-sm font-semibold text-app-primary mb-3">Voice Feature Extraction</p>
-          <div class="h-64">
+          <div class="h-56 sm:h-64">
             <canvas #voiceFeaturesChart class="w-full h-full"></canvas>
           </div>
         </div>
@@ -177,24 +174,24 @@
         <!-- Simulation Badge -->
         <div *ngIf="isSimulation !== undefined" class="mt-4">
           <div *ngIf="isSimulation" class="inline-block px-4 py-2 bg-yellow-500/20 border border-yellow-500 text-yellow-300 rounded-lg text-sm">
-            ⚠️ Simulation Mode
+            Simulation Mode
           </div>
           <div *ngIf="!isSimulation && modelVersion" class="inline-block px-4 py-2 bg-app-primary/20 border border-app-primary text-app-primary rounded-lg text-sm">
-            ✅ ML Model v{{ modelVersion }}
+            ML Model v{{ modelVersion }}
           </div>
         </div>
 
         <!-- Actions -->
-        <div class="flex gap-4 justify-center pt-6">
-          <button 
+        <div class="results-actions flex gap-3 sm:gap-4 justify-center pt-6">
+          <button
             (click)="resetComponent()"
-            class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors font-semibold"
+            class="px-4 sm:px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors font-semibold"
           >
             New Analysis
           </button>
-          <button 
+          <button
             (click)="navigateToTestRecords()"
-            class="px-6 py-3 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg transition-colors font-semibold"
+            class="px-4 sm:px-6 py-3 bg-app-primary hover:bg-app-primary-hover text-white rounded-lg transition-colors font-semibold"
           >
             View All Tests
           </button>
@@ -203,3 +200,4 @@
     </div>
   </div>
 </section>
+
