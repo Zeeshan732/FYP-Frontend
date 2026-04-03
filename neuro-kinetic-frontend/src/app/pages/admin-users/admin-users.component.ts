@@ -30,7 +30,6 @@ export class AdminUsersComponent implements OnInit {
   roleOptions = [
     { label: 'All Roles', value: '' },
     { label: 'Public', value: 'Public' },
-    { label: 'Researcher', value: 'Researcher' },
     { label: 'Medical Professional', value: 'MedicalProfessional' },
     { label: 'Admin', value: 'Admin' }
   ];
@@ -136,8 +135,6 @@ export class AdminUsersComponent implements OnInit {
     switch (role) {
       case 'Admin':
         return 'bg-purple-500/20 border-purple-500 text-purple-400';
-      case 'Researcher':
-        return 'bg-blue-500/20 border-blue-500 text-blue-400';
       case 'MedicalProfessional':
         return 'bg-cyan-500/20 border-cyan-500 text-cyan-400';
       case 'Public':

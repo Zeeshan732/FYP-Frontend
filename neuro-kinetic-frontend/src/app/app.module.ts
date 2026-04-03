@@ -23,12 +23,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ClinicalUseComponent } from './pages/clinical-use/clinical-use.component';
-import { CollaborationComponent } from './pages/collaboration/collaboration.component';
 import { LandingComponent } from './pages/landing/landing.component';
 import { ServicesComponent } from './pages/services/services.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
-import { SignupComponent } from './pages/signup/signup.component';
 import { NavigationComponent } from './components/navigation/navigation.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { LoginModalComponent } from './components/modals/login-modal/login-modal.component';
@@ -62,12 +60,10 @@ import { SharedModule } from './shared/shared.module';
     AppComponent,
     HomeComponent,
     ClinicalUseComponent,
-    CollaborationComponent,
     LandingComponent,
     ServicesComponent,
     ContactComponent,
     ForgotPasswordComponent,
-    SignupComponent,
     NavigationComponent,
     FooterComponent,
     LoginModalComponent,

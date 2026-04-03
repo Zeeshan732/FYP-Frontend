@@ -9,3 +9,14 @@
   max-width: 100%;
   overflow-x: clip;
 }
+
+/* Keep content centered inside the visible area when desktop sidebar shifts layout */
+@media (min-width: 1025px) {
+  .app-shell.ml-64 {
+    width: calc(100% - 16rem);
+  }
+
+  .app-shell.ml-20 {
+    width: calc(100% - 5rem);
+  }
+}

@@ -80,26 +80,6 @@ export interface PagedResult<T> {
   hasNext: boolean;
 }
 
-// Performance Metric
-export interface PerformanceMetric {
-  id: number;
-  metricName?: string;
-  dataset: string;
-  model?: string;
-  accuracy: number;
-  precision: number;
-  recall: number;
-  f1Score: number;
-  specificity?: number;
-  sensitivity?: number;
-  domainAdaptationDrop?: number;
-  validationMethod?: string;
-  notes?: string;
-  modelVersion?: string;
-  foldNumber?: number;
-  createdAt: string;
-}
-
 // Dataset
 export interface Dataset {
   id: number;
@@ -165,20 +145,6 @@ export interface CrossValidationResult {
   createdAt: string;
 }
 
-// Collaboration Request
-export interface CollaborationRequest {
-  id: number;
-  institutionName: string;
-  contactName: string;
-  contactEmail: string;
-  contactPhone?: string;
-  proposalDescription?: string;
-  collaborationType?: string;
-  status: 'Pending' | 'Approved' | 'Rejected' | 'UnderReview';
-  responseNotes?: string;
-  createdAt: string;
-}
-
 // Error Response
 export interface ErrorResponse {
   message?: string;
@@ -224,39 +190,6 @@ export interface HealthCheckResponse {
   status: 'Healthy' | 'Unhealthy' | 'Degraded';
   totalDuration: number;
   entries: HealthCheckEntry[];
-}
-
-// Metrics Dashboard Aggregated DTO
-export interface MetricsDashboardDto {
-  totalMetrics: number;
-  averageAccuracy: number;
-  averagePrecision: number;
-  averageRecall: number;
-  averageF1Score: number;
-  bestAccuracy: number;
-  worstAccuracy: number;
-  metricsByDataset: MetricsByDataset[];
-  recentMetrics: PerformanceMetric[];
-  trends: MetricsTrends;
-}
-
-export interface MetricsByDataset {
-  dataset: string;
-  count: number;
-  averageAccuracy: number;
-  bestAccuracy: number;
-}
-
-export interface MetricsTrends {
-  accuracyOverTime: TrendDataPoint[];
-  improvement: number;
-  trendDirection: 'improving' | 'declining' | 'stable';
-}
-
-export interface TrendDataPoint {
-  date: string;
-  value: number;
-  label: string;
 }
 
 // Cross-Validation Aggregated DTO

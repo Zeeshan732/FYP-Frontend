@@ -6,7 +6,6 @@ import { ServicesComponent } from './pages/services/services.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ClinicalUseComponent } from './pages/clinical-use/clinical-use.component';
-import { CollaborationComponent } from './pages/collaboration/collaboration.component';
 import { PatientTestComponent } from './pages/patient-test/patient-test.component';
 import { TestRecordsComponent } from './pages/test-records/test-records.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
@@ -48,7 +47,6 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'blog', component: BlogComponent },
   { path: 'clinical-use', component: ClinicalUseComponent },
-  { path: 'collaboration', component: CollaborationComponent },
   { path: 'voice-analysis', loadChildren: () => import('./modules/voice-analysis/voice-analysis.module').then(m => m.VoiceAnalysisModule) },
   { path: 'gait-analysis', loadChildren: () => import('./modules/gait-analysis/gait-analysis.module').then(m => m.GaitAnalysisModule) },
   { path: 'clinician', loadChildren: () => import('./clinician/clinician.module').then(m => m.ClinicianModule) },

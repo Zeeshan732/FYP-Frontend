@@ -15,13 +15,12 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   lastName = '';
   email = '';
   institution = '';
-  role: 'Public' | 'Researcher' | 'MedicalProfessional' | 'Admin' = 'Public';
+  role: 'Public' | 'MedicalProfessional' = 'Public';
   password = '';
   confirmPassword = '';
   error = '';
   info = '';
   loading = false;
-  isAdminEmail = false;
   modalView: 'login' | 'signup' | 'forgot' | 'email-sent' = 'signup';
   selectedRole: 'patient' | 'clinician' = 'patient';
   showPassword = false;
@@ -31,16 +30,11 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   private previousBodyOverflow = '';
 
-  // Available roles for signup (Admin cannot be self-selected)
+  // Available roles for signup
   roleOptions = [
     { label: 'Public User', value: 'Public' },
-    { label: 'Researcher', value: 'Researcher' },
     { label: 'Medical Professional', value: 'MedicalProfessional' }
   ];
-
-  // Admin email pattern: admin1@domain.com, admin2@domain.com, etc.
-  // Can be configured to match your domain
-  private adminEmailPattern = /^admin\d+@/i;
 
   constructor(
     private modalService: ModalService,
@@ -70,7 +64,6 @@ export class SignupModalComponent implements OnInit, OnDestroy {
           this.error = '';
           this.info = '';
           this.loading = false;
-          this.isAdminEmail = false;
           this.modalView = 'signup';
           this.selectedRole = 'patient';
           this.showPassword = false;
@@ -103,19 +96,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   }
 
   onEmailChange() {
-    // Check if email matches admin pattern
-    this.isAdminEmail = this.adminEmailPattern.test(this.email);
-    
-    // If admin email detected, automatically set role to Admin
-    if (this.isAdminEmail) {
-      this.role = 'Admin';
-    } else {
-      // Reset to Public if not admin email
-      if (this.role === 'Admin') {
-        this.role = 'Public';
-      }
-      this.selectedRole = this.role === 'MedicalProfessional' ? 'clinician' : 'patient';
-    }
+    this.selectedRole = this.role === 'MedicalProfessional' ? 'clinician' : 'patient';
   }
 
   switchTo(view: 'login' | 'signup' | 'forgot' | 'email-sent'): void {
@@ -128,9 +109,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
 
   selectRole(role: 'patient' | 'clinician'): void {
     this.selectedRole = role;
-    if (!this.isAdminEmail) {
-      this.role = role === 'clinician' ? 'MedicalProfessional' : 'Public';
-    }
+    this.role = role === 'clinician' ? 'MedicalProfessional' : 'Public';
   }
 
   checkPasswordStrength(value: string): void {
@@ -173,39 +152,25 @@ export class SignupModalComponent implements OnInit, OnDestroy {
     this.info = '';
     this.loading = true;
 
-    // For admin emails, send role as Admin (backend will validate and enforce)
     const registrationData: any = {
       email: this.email,
       password: this.password,
       firstName: this.firstName,
       lastName: this.lastName,
       institution: this.institution || undefined,
-      researchFocus: undefined
+      researchFocus: undefined,
+      role: this.selectedRole === 'clinician' ? 'MedicalProfessional' : 'Public'
     };
-
-    // Only include role if it's Admin (backend will handle admin detection)
-    if (this.isAdminEmail) {
-      registrationData.role = 'Admin';
-    } else {
-      this.role = this.selectedRole === 'clinician' ? 'MedicalProfessional' : 'Public';
-      registrationData.role = this.role;
-    }
 
     this.authService.register(registrationData).subscribe({
       next: (response) => {
         this.loading = false;
         
-        // Check if this is an admin account (from email pattern or response)
-        const isAdminAccount = this.isAdminEmail || response.user?.role === 'Admin';
-        
         // Check if account was approved/activated
         const isApproved = response.status === 'Approved' || response.status === 'Activated';
-        const isLoggedIn = !!response.token && !!response.user && !isAdminAccount; // Admin accounts are NOT auto-logged in
+        const isLoggedIn = !!response.token && !!response.user;
         
-        if (isAdminAccount && isApproved) {
-          // Admin account is approved/activated but NOT logged in
-          this.info = response.message || 'Admin account created successfully. Please log in to continue.';
-        } else if (isApproved) {
+        if (isApproved) {
           // Other accounts are approved/activated and auto-logged in
           this.info = response.message || 'Account created successfully.';
         } else {
@@ -217,10 +182,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           this.modalService.closeSignupModal();
           
-          // Admin accounts always redirect to login page (they must log in manually)
-          if (isAdminAccount) {
-            this.router.navigate(['/login']);
-          } else if (isLoggedIn) {
+          if (isLoggedIn) {
             // Redirect based on role
             const createdRole = response.user?.role;
             if (createdRole === 'MedicalProfessional') {
