@@ -35,7 +35,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     'test-records': 'Test Records',
     'admin-dashboard': 'Admin Dashboard',
     'clinical-use': 'Clinical Use',
-    'collaboration': 'Collaboration',
     'voice-analysis': 'Voice Analysis',
     'gait-analysis': 'Gait Analysis',
     'login': 'Login',

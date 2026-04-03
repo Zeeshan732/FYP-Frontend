@@ -7,14 +7,11 @@ import { environment } from '../../environments/environment';
 import {
   PagedResult,
   Publication,
-  PerformanceMetric,
   Dataset,
   AnalysisRequest,
   AnalysisResult,
   CrossValidationResult,
-  CollaborationRequest,
   HealthCheckResponse,
-  MetricsDashboardDto,
   CrossValidationAggregatedDto,
   UserTestRecord,
   UserTestRecordRequest,
@@ -121,71 +118,6 @@ export class ApiService {
 
   deletePublication(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/publications/${id}`);
-  }
-
-  // ========== METRICS ==========
-
-  getMetrics(params: {
-    pageNumber?: number;
-    pageSize?: number;
-    sortBy?: string;
-    sortOrder?: string;
-  } = {}): Observable<PagedResult<PerformanceMetric>> {
-    let httpParams = new HttpParams();
-
-    if (params.pageNumber) {
-      httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
-    }
-    if (params.pageSize) {
-      httpParams = httpParams.set('pageSize', params.pageSize.toString());
-    }
-    if (params.sortBy) {
-      httpParams = httpParams.set('sortBy', params.sortBy);
-    }
-    if (params.sortOrder) {
-      httpParams = httpParams.set('sortOrder', params.sortOrder);
-    }
-
-    return this.http.get<PagedResult<PerformanceMetric>>(`${this.apiUrl}/metrics`, { params: httpParams });
-  }
-
-  getMetric(id: number): Observable<PerformanceMetric> {
-    return this.http.get<PerformanceMetric>(`${this.apiUrl}/metrics/${id}`);
-  }
-
-  getMetricsByDataset(datasetName: string, params: {
-    pageNumber?: number;
-    pageSize?: number;
-  } = {}): Observable<PagedResult<PerformanceMetric>> {
-    let httpParams = new HttpParams();
-
-    if (params.pageNumber) {
-      httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
-    }
-    if (params.pageSize) {
-      httpParams = httpParams.set('pageSize', params.pageSize.toString());
-    }
-
-    return this.http.get<PagedResult<PerformanceMetric>>(
-      `${this.apiUrl}/metrics/dataset/${encodeURIComponent(datasetName)}`,
-      { params: httpParams }
-    );
-  }
-
-  createMetric(data: Partial<PerformanceMetric>): Observable<PerformanceMetric> {
-    return this.http.post<PerformanceMetric>(`${this.apiUrl}/metrics`, data);
-  }
-
-  getAllMetrics(): Observable<PerformanceMetric[]> {
-    return this.http.get<PerformanceMetric[]>(`${this.apiUrl}/metrics/all`);
-  }
-
-  getMetricsDashboard(): Observable<PerformanceMetric[]> {
-    return this.http.get<PerformanceMetric[]>(`${this.apiUrl}/metrics/dashboard`);
-  }
-
-  getMetricsDashboardAggregated(): Observable<MetricsDashboardDto> {
-    return this.http.get<MetricsDashboardDto>(`${this.apiUrl}/metrics/dashboard/aggregated`);
   }
 
   // ========== DATASETS ==========
@@ -396,34 +328,6 @@ export class ApiService {
 
   createCrossValidationResult(data: Partial<CrossValidationResult>): Observable<CrossValidationResult> {
     return this.http.post<CrossValidationResult>(`${this.apiUrl}/crossvalidation`, data);
-  }
-
-  // ========== COLLABORATION ==========
-
-  createCollaborationRequest(data: {
-    institutionName: string;
-    contactName: string;
-    contactEmail: string;
-    contactPhone?: string;
-    proposalDescription?: string;
-    collaborationType?: string;
-  }): Observable<CollaborationRequest> {
-    return this.http.post<CollaborationRequest>(`${this.apiUrl}/collaboration`, data);
-  }
-
-  getCollaborationRequests(): Observable<CollaborationRequest[]> {
-    return this.http.get<CollaborationRequest[]>(`${this.apiUrl}/collaboration`);
-  }
-
-  getCollaborationRequest(id: number): Observable<CollaborationRequest> {
-    return this.http.get<CollaborationRequest>(`${this.apiUrl}/collaboration/${id}`);
-  }
-
-  updateCollaborationStatus(id: number, status: string, notes?: string): Observable<CollaborationRequest> {
-    return this.http.put<CollaborationRequest>(`${this.apiUrl}/collaboration/${id}/status`, {
-      status,
-      responseNotes: notes
-    });
   }
 
   // ========== HEALTH CHECKS ==========
