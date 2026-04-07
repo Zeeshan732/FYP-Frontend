@@ -1105,3 +1105,77 @@ table {
     padding-right: 0.75rem !important;
   }
 }
+
+/* ===== Unified app alignment layer (applied last) =====
+   Keeps route pages visually consistent regardless of local module CSS. */
+.app-shell {
+  --app-page-max-width: 1360px;
+  --app-page-inline: clamp(1rem, 2vw, 2rem);
+  --app-page-block-start: clamp(1rem, 1.6vw, 1.75rem);
+  --app-page-block-end: clamp(2rem, 4vw, 3.5rem);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+/* Route host elements rendered under router-outlet */
+.app-shell > * {
+  display: block;
+  width: 100%;
+  max-width: var(--app-page-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--app-page-inline) !important;
+  padding-right: var(--app-page-inline) !important;
+}
+
+/* Normalize inner wrappers so pages align to one grid */
+.app-shell .container,
+.app-shell .contact-container,
+.app-shell .blog-container,
+.app-shell .home-container,
+.app-shell .main-content,
+.app-shell [class*="page-content"],
+.app-shell [class*="main-area"] {
+  max-width: var(--app-page-max-width) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Consistent top/bottom rhythm for authenticated pages */
+.app-shell .main,
+.app-shell [class*="main-area"],
+.app-shell [class*="page-content"] {
+  padding-top: var(--app-page-block-start) !important;
+  padding-bottom: var(--app-page-block-end) !important;
+}
+
+/* Typography baseline (avoid per-page drift) */
+.app-shell h1 { font-size: clamp(2.1rem, 2.8vw, 2.75rem); line-height: 1.18; }
+.app-shell h2 { font-size: clamp(1.55rem, 2.1vw, 2rem); line-height: 1.22; }
+.app-shell h3 { font-size: clamp(1.2rem, 1.45vw, 1.5rem); line-height: 1.28; }
+.app-shell p,
+.app-shell li,
+.app-shell label,
+.app-shell input,
+.app-shell textarea,
+.app-shell select,
+.app-shell button {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Common page title/subtitle patterns used across modules */
+.app-shell [class*="page-title"],
+.app-shell [class*="ga-h1"],
+.app-shell [class*="voice-h1"] {
+  font-size: clamp(2.1rem, 2.8vw, 2.75rem) !important;
+  line-height: 1.18 !important;
+}
+
+.app-shell [class*="subtitle"],
+.app-shell [class*="page-subtitle"] {
+  font-size: clamp(1rem, 1.25vw, 1.15rem) !important;
+  line-height: 1.6 !important;
+}

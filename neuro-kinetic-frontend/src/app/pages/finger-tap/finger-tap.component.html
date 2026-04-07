@@ -1,55 +1,98 @@
 <section class="ft-root">
   <!-- Instructions -->
-  <div *ngIf="currentState === 'instructions'" class="ft-container">
-    <h1 class="ft-title">Finger-Tapping Test</h1>
-    <p class="ft-subtitle">
-      Upload a pre-recorded video or record live with your device camera to analyze your finger-tapping pattern.
-    </p>
-    <button class="ft-btn-primary" (click)="goToModeSelect()">
-      Upload Finger-Tapping Video
-    </button>
+  <div *ngIf="!embedded && currentState === 'instructions'" class="ft-container">
+    <div class="ft-hero app-card">
+      <h1 class="ft-title">Finger-Tapping Test</h1>
+      <p class="ft-subtitle">
+        Clinically inspired finger-tapping screening using either a live camera recording or a pre-recorded video.
+      </p>
+      <div class="ft-actions-row">
+        <button class="ft-btn-primary" (click)="goToModeSelect()">
+          Start Finger-Tapping Test
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start modal -->
+  <div class="ft-modal-overlay" *ngIf="!embedded && startModalOpen" (click)="closeStartModal()">
+    <div class="ft-modal app-card" (click)="$event.stopPropagation()">
+      <div class="ft-modal-head">
+        <h2>Choose how to submit your test</h2>
+        <button type="button" class="ft-modal-close" (click)="closeStartModal()">×</button>
+      </div>
+      <p class="ft-modal-sub">
+        Use a pre-recorded finger-tapping video or record directly using your device camera.
+      </p>
+
+      <div class="ft-mode-grid">
+        <div class="ft-mode-card"
+             [class.ft-mode-selected]="inputMode === 'upload'"
+             (click)="inputMode = 'upload'">
+          <div class="ft-mode-badge" *ngIf="inputMode === 'upload'">Selected</div>
+          <div class="ft-mode-card-title">Upload a video</div>
+          <div class="ft-mode-card-desc">
+            Upload MP4, MOV, AVI, MKV, or WEBM (max 100 MB).
+          </div>
+        </div>
+
+        <div class="ft-mode-card"
+             [class.ft-mode-selected]="inputMode === 'live'"
+             (click)="inputMode = 'live'">
+          <div class="ft-mode-badge" *ngIf="inputMode === 'live'">Selected</div>
+          <div class="ft-mode-card-title">Record live</div>
+          <div class="ft-mode-card-desc">
+            Use your device camera to record directly in the browser.
+          </div>
+        </div>
+      </div>
+
+      <div class="ft-mode-actions">
+        <button class="ft-btn-primary" (click)="continueFromStartModal()">
+          Continue with {{ inputMode === 'upload' ? 'video upload' : 'live recording' }}
+        </button>
+        <button class="ft-btn-secondary" (click)="closeStartModal()">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <!-- Mode select -->
-  <div class="ft-container" *ngIf="currentState === 'mode-select'">
-    <div class="ft-mode-header">
+  <div class="ft-container" *ngIf="currentState === 'mode-select'" [class.ft-container-embedded]="embedded">
+    <div class="ft-mode-header" [class.app-card]="!embedded" [class.ft-mode-header-embedded]="embedded">
       <h2 class="ft-mode-title">Choose how to submit your test</h2>
-      <p class="ft-mode-desc">
+      <p class="ft-mode-desc mb-4 mt-2">
         Upload a pre-recorded video or record directly using your device camera.
       </p>
-    </div>
+      <div class="ft-mode-grid">
+        <div class="ft-mode-card"
+             [class.ft-mode-selected]="inputMode === 'upload'"
+             (click)="inputMode = 'upload'">
+          <div class="ft-mode-badge" *ngIf="inputMode === 'upload'">Selected</div>
+          <div class="ft-mode-card-title">Upload a video</div>
+          <div class="ft-mode-card-desc">
+            Upload a pre-recorded finger-tapping video (MP4, MOV, AVI, MKV, WEBM - Max 100 MB).
+          </div>
+        </div>
 
-    <div class="ft-mode-grid">
-      <!-- Upload card -->
-      <div class="ft-mode-card"
-           [class.ft-mode-selected]="inputMode === 'upload'"
-           (click)="inputMode = 'upload'">
-        <div class="ft-mode-badge" *ngIf="inputMode === 'upload'">Selected</div>
-        <div class="ft-mode-card-title">Upload a video</div>
-        <div class="ft-mode-card-desc">
-          Upload a pre-recorded finger-tapping video (MP4, MOV, AVI, MKV, WEBM - Max 100 MB).
+        <div class="ft-mode-card"
+             [class.ft-mode-selected]="inputMode === 'live'"
+             (click)="inputMode = 'live'">
+          <div class="ft-mode-badge" *ngIf="inputMode === 'live'">Selected</div>
+          <div class="ft-mode-card-title">Record live</div>
+          <div class="ft-mode-card-desc">
+            Use your device camera to record directly in the browser. No app needed.
+          </div>
         </div>
       </div>
 
-      <!-- Live card -->
-      <div class="ft-mode-card"
-           [class.ft-mode-selected]="inputMode === 'live'"
-           (click)="inputMode = 'live'">
-        <div class="ft-mode-badge" *ngIf="inputMode === 'live'">Selected</div>
-        <div class="ft-mode-card-title">Record live</div>
-        <div class="ft-mode-card-desc">
-          Use your device camera to record directly in the browser. No app needed.
-        </div>
+      <div class="ft-mode-actions">
+        <button class="ft-btn-primary" (click)="selectMode(inputMode)">
+          Continue with {{ inputMode === 'upload' ? 'video upload' : 'live recording' }} ->
+        </button>
+        <button class="ft-btn-secondary" (click)="backFromModeSelect()">
+          {{ embedded ? 'Close' : '<- Back' }}
+        </button>
       </div>
-    </div>
-
-    <div class="ft-mode-actions">
-      <button class="ft-btn-primary" (click)="selectMode(inputMode)">
-        Continue with {{ inputMode === 'upload' ? 'video upload' : 'live recording' }} ->
-      </button>
-      <button class="ft-btn-secondary" (click)="currentState = 'instructions'">
-        <- Back
-      </button>
     </div>
   </div>
 

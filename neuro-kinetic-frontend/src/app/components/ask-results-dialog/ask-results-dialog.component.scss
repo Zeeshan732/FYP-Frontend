@@ -71,15 +71,15 @@
 }
 
 .action-btn-secondary {
-  background: var(--app-surface);
-  color: var(--app-secondary-border, #333333);
-  border: 1px solid var(--app-secondary-border, #333333);
+  background: #0f1d35;
+  color: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .action-btn-secondary:hover {
-  background: var(--app-surface-muted);
-  border-color: var(--app-secondary-border, #333333);
-  color: var(--color-ink);
+  background: #142748;
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #ffffff;
 }
 
 .action-btn-primary {

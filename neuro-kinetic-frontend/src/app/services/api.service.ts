@@ -28,8 +28,11 @@ import {
   RagTestRequest,
   RagTestResponse,
   RagAskResponse,
+  ChatConversation,
+  ChatMessage,
   VoicePredictRequest,
-  VoicePredictResponse
+  VoicePredictResponse,
+  GaitModelInfo
 } from '../models/api.models';
 
 @Injectable({
@@ -228,6 +231,11 @@ export class ApiService {
     return this.http.get<AnalysisResult>(`${this.apiUrl}/analysis/session/${encodeURIComponent(sessionId)}`);
   }
 
+  /** Gait-only: CVAME metrics + training history from ML service (proxied by API). Not used for voice/finger-tap. */
+  getGaitModelInfo(): Observable<GaitModelInfo> {
+    return this.http.get<GaitModelInfo>(`${this.apiUrl}/analysis/gait-model-info`);
+  }
+
   /**
    * Clinical Decision Support (RAG): ask a question about screening results.
    * POST /api/rag/test with { question, riskPercent, mode }.
@@ -242,9 +250,9 @@ export class ApiService {
   }
 
   /**
-   * POST /api/rag/ask – Python RAG knowledge-base Q&A (FAISS + Ollama).
+   * POST /api/rag/ask - backend Parkinson knowledge-base Q&A.
    * Use for general Parkinson questions when no screening result is available.
-   * Allow up to 3 minutes (backend may take 1–2 min for embeddings + LLM).
+   * Allow up to 3 minutes.
    */
   ragAsk(question: string): Observable<RagAskResponse> {
     return this.http.post<RagAskResponse>(`${this.apiUrl}/rag/ask`, { question }).pipe(
@@ -256,6 +264,36 @@ export class ApiService {
         throw err;
       })
     );
+  }
+
+  getChatConversations(params: {
+    pageNumber?: number;
+    pageSize?: number;
+    searchTerm?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}): Observable<PagedResult<ChatConversation>> {
+    let httpParams = new HttpParams();
+    if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+    if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+    if (params.searchTerm) httpParams = httpParams.set('searchTerm', params.searchTerm);
+    if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
+    return this.http.get<PagedResult<ChatConversation>>(`${this.apiUrl}/chat-history`, { params: httpParams });
+  }
+
+  createChatConversation(title?: string): Observable<ChatConversation> {
+    return this.http.post<ChatConversation>(`${this.apiUrl}/chat-history`, { title: title ?? null });
+  }
+
+  getChatMessages(conversationId: number): Observable<ChatMessage[]> {
+    return this.http.get<ChatMessage[]>(`${this.apiUrl}/chat-history/${conversationId}/messages`);
+  }
+
+  appendChatMessage(conversationId: number, role: 'user' | 'assistant', content: string): Observable<ChatMessage> {
+    return this.http.post<ChatMessage>(`${this.apiUrl}/chat-history/${conversationId}/messages`, { role, content });
+  }
+
+  deleteChatConversation(conversationId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/chat-history/${conversationId}`);
   }
 
   /**

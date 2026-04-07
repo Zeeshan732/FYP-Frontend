@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { GaitAnalysisRoutingModule } from './gait-analysis-routing.module';
 import { GaitVisualizerComponent } from './gait-visualizer/gait-visualizer.component';
@@ -11,6 +12,7 @@ import { GaitVisualizerComponent } from './gait-visualizer/gait-visualizer.compo
   ],
   imports: [
     CommonModule,
+    FormsModule,
     GaitAnalysisRoutingModule
   ]
 })

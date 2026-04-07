@@ -106,6 +106,17 @@ export interface AnalysisRequest {
   metadata?: Record<string, any>;
 }
 
+/** CVAME gait benchmark + training curves — only returned by GET /api/analysis/gait-model-info (gait UI). */
+export interface GaitModelInfo {
+  metrics: Record<string, unknown> | null;
+  training_history: {
+    train_task_loss?: number[];
+    train_domain_loss?: number[];
+    test_task_acc?: number[];
+  } | null;
+  source_files?: { metrics: string; training_history: string };
+}
+
 // Analysis Result
 export interface AnalysisResult {
   id: number;
@@ -460,6 +471,23 @@ export function isRagIrrelevant(r: RagTestResponse): r is RagIrrelevantResponse 
 /** Response from POST /api/rag/ask (Python RAG knowledge-base). */
 export interface RagAskResponse {
   answer: string;
+}
+
+export interface ChatConversation {
+  id: number;
+  title: string;
+  lastMessagePreview?: string;
+  messageCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatMessage {
+  id: number;
+  conversationId: number;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: string;
 }
 
 // ========== Voice Predict (FastAPI /api/voice/predict) ==========
