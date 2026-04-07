@@ -96,6 +96,34 @@ export class AuthService {
     return this.http.get<ValidationResponse>(`${this.apiUrl}/auth/validate`);
   }
 
+  getProfile(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/auth/me`);
+  }
+
+  updateProfile(data: {
+    firstName: string;
+    lastName: string;
+    institution?: string;
+    researchFocus?: string;
+  }): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/auth/profile`, data).pipe(
+      tap((user) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          localStorage.setItem('user', JSON.stringify(user));
+        }
+        this.currentUserSubject.next(user);
+      })
+    );
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/auth/change-password`, {
+      currentPassword,
+      newPassword
+    });
+  }
+
   // ========== OAUTH AUTHENTICATION ==========
 
   /**
