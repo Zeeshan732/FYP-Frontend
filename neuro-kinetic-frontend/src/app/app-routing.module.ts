@@ -19,6 +19,7 @@ import { ConsultationComponent } from './pages/consultation/consultation.compone
 import { FingerTapComponent } from './pages/finger-tap/finger-tap.component';
 import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
 import { ChatHistoryComponent } from './pages/chat-history/chat-history.component';
+import { ProfileSettingsComponent } from './pages/profile-settings/profile-settings.component';
 import { AboutComponent } from './pages/about/about.component';
 import { BlogComponent } from './pages/blog/blog.component';
 import { AuthGuard } from './guards/auth.guard';
@@ -39,6 +40,7 @@ const routes: Routes = [
   { path: 'live-voice-monitor', component: LiveVoiceMonitorComponent, canActivate: [AuthGuard] },
   { path: 'consultation', component: ConsultationComponent, canActivate: [AuthGuard] },
   { path: 'chat-history', component: ChatHistoryComponent, canActivate: [AuthGuard] },
+  { path: 'profile-settings', component: ProfileSettingsComponent, canActivate: [AuthGuard] },
   { path: 'finger-tap', component: FingerTapComponent, canActivate: [AuthGuard] },
   { path: 'analytics-dashboard', component: AnalyticsDashboardComponent, canActivate: [AuthGuard] },
   { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },

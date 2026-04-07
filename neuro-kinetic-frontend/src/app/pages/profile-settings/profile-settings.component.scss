@@ -1,0 +1,84 @@
+.profile-shell {
+  color: var(--app-text-primary);
+}
+
+.profile-header h1 {
+  margin: 0 0 0.35rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.profile-header p {
+  margin: 0;
+  color: var(--app-text-muted);
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.profile-card {
+  padding: 1rem;
+}
+
+.profile-card h3 {
+  margin: 0 0 0.85rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.form-grid.single {
+  grid-template-columns: 1fr;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+label span {
+  font-size: 0.82rem;
+  color: var(--app-text-muted);
+}
+
+input {
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+  border-radius: 0.55rem;
+  padding: 0.55rem 0.7rem;
+}
+
+input:disabled {
+  opacity: 0.7;
+}
+
+.actions {
+  margin-top: 1rem;
+}
+
+.primary {
+  border: none;
+  background: var(--app-primary);
+  color: #fff;
+  border-radius: 0.55rem;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+}
+
+@media (max-width: 960px) {
+  .profile-grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
