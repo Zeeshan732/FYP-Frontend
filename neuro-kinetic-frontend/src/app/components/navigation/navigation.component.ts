@@ -204,6 +204,21 @@ export class NavigationComponent implements OnInit, OnDestroy {
     }
   }
 
+  onConsultationClick(event: Event): void {
+    // Sidebar consultation should always navigate to chat page.
+    this.closeMobileMenu();
+    if (this.mobileSidebarOpen) {
+      this.closeMobileSidebar();
+    }
+  }
+
+  onChatHistoryClick(): void {
+    this.closeMobileMenu();
+    if (this.mobileSidebarOpen) {
+      this.closeMobileSidebar();
+    }
+  }
+
   logout() {
     this.authService.logout();
     this.sidebarService.setSidebarCollapsed(false);

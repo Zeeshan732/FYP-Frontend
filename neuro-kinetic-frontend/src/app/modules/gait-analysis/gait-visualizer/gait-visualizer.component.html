@@ -1,1 +1,259 @@
-<p>gait-visualizer works!</p>
+<section class="ga-page text-app-text-primary">
+  <div class="ga-inner pt-24 pb-16 px-4 sm:px-6 lg:px-10 max-w-6xl mx-auto">
+    <header class="ga-header mb-10" @fadeUp>
+      <h1 class="ga-h1 text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-app-primary via-[#7F77DD] to-app-primary-hover bg-clip-text text-transparent">
+        Gait Analysis
+      </h1>
+      <p class="ga-subtitle text-app-text-muted mt-2 max-w-2xl text-base sm:text-lg">
+        Screening workspace for clinically observed gait parameters.
+      </p>
+    </header>
+
+    <div class="ga-info-card app-card rounded-2xl border border-app-border/70 bg-app-surface shadow-lg shadow-black/20 p-6 sm:p-8 mb-8" @fadeUp>
+      <div class="flex gap-4">
+        <div class="ga-info-icon shrink-0 w-12 h-12 rounded-xl bg-app-primary/15 flex items-center justify-center text-app-primary">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="12" cy="4" r="2"/>
+            <path d="M12 6v6l-3 4M12 12l3 4M9 20l3-4 3 4"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-app-text-primary mb-2">About this assessment</h2>
+          <p class="text-app-text-muted leading-relaxed">
+            Gait analysis helps identify movement abnormalities commonly associated with Parkinson's disease.
+            Doctors can manually enter clinically observed gait values below to estimate neurological risk.
+            Results support clinical discussion only and are not a substitute for formal diagnosis.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ga-layout">
+      <!-- Main column: form -->
+      <div class="ga-col-main space-y-6" @fadeUp>
+        <div class="ga-card app-card rounded-2xl border border-app-border/70 bg-app-surface shadow-xl shadow-black/25 overflow-hidden">
+          <div class="ga-card-accent h-1 w-full bg-gradient-to-r from-app-primary via-[#7F77DD] to-emerald-500/80"></div>
+          <div class="p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+              <div>
+                <h2 class="text-xl font-bold text-app-text-primary">Clinical Gait Assessment</h2>
+                <p class="text-sm text-app-text-muted mt-1">Adjust sliders or type values. Use quick-fill for demos.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="ga-chip-btn" (click)="loadHealthyExample()" [disabled]="isProcessing">
+                  Load Healthy Example
+                </button>
+                <button type="button" class="ga-chip-btn ga-chip-btn-warn" (click)="loadParkinsonExample()" [disabled]="isProcessing">
+                  Load Parkinson Example
+                </button>
+              </div>
+            </div>
+
+            <div class="ga-fields-grid">
+              <!-- Gait Velocity -->
+              <div class="ga-field">
+                <div class="ga-field-head">
+                  <span class="ga-field-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                  </span>
+                  <label class="ga-label" for="gv">Gait Velocity (m/s)</label>
+                </div>
+                <div class="ga-slider-row">
+                  <input id="gv" type="range" class="ga-range" min="0" max="2.5" step="0.05" [(ngModel)]="form.gaitVelocity" (ngModelChange)="onFieldEdited()"/>
+                  <input type="number" class="ga-num" [(ngModel)]="form.gaitVelocity" step="0.01" min="0" max="4"/>
+                </div>
+                <p class="ga-helper">Normal range ≈ 1.0 – 1.4 m/s</p>
+              </div>
+
+              <!-- Stride Length -->
+              <div class="ga-field">
+                <div class="ga-field-head">
+                  <span class="ga-field-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12l4-4M4 12l4 4M20 12l-4-4M20 12l-4 4"/></svg>
+                  </span>
+                  <label class="ga-label" for="sl">Stride Length (m)</label>
+                </div>
+                <div class="ga-slider-row">
+                  <input id="sl" type="range" class="ga-range" min="0.3" max="2" step="0.02" [(ngModel)]="form.strideLength" (ngModelChange)="onFieldEdited()"/>
+                  <input type="number" class="ga-num" [(ngModel)]="form.strideLength" step="0.01" min="0.05" max="3"/>
+                </div>
+                <p class="ga-helper">Normal range ≈ 1.0 – 1.5 m</p>
+              </div>
+
+              <!-- Cadence -->
+              <div class="ga-field">
+                <div class="ga-field-head">
+                  <span class="ga-field-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v6M6 9h12M8 21l4-4 4 4M12 17V9"/></svg>
+                  </span>
+                  <label class="ga-label" for="cd">Cadence (steps/min)</label>
+                </div>
+                <div class="ga-slider-row">
+                  <input id="cd" type="range" class="ga-range" min="40" max="160" step="1" [(ngModel)]="form.cadence" (ngModelChange)="onFieldEdited()"/>
+                  <input type="number" class="ga-num" [(ngModel)]="form.cadence" step="1" min="20" max="220"/>
+                </div>
+                <p class="ga-helper">Normal range ≈ 100 – 120 steps/min</p>
+              </div>
+
+              <!-- Step Time Variability -->
+              <div class="ga-field">
+                <div class="ga-field-head">
+                  <span class="ga-field-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 5-7"/></svg>
+                  </span>
+                  <label class="ga-label" for="stv">Step Time Variability</label>
+                </div>
+                <div class="ga-slider-row">
+                  <input id="stv" type="range" class="ga-range" min="0" max="0.5" step="0.01" [(ngModel)]="form.stepTimeVariability" (ngModelChange)="onFieldEdited()"/>
+                  <input type="number" class="ga-num" [(ngModel)]="form.stepTimeVariability" step="0.01" min="0" max="1"/>
+                </div>
+                <p class="ga-helper">Lower is more regular. Typical screening values often &lt; 0.15.</p>
+              </div>
+
+              <!-- Force Asymmetry -->
+              <div class="ga-field">
+                <div class="ga-field-head">
+                  <span class="ga-field-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18"/><path d="M8 8h8M8 16h8"/></svg>
+                  </span>
+                  <label class="ga-label" for="fa">Force Asymmetry</label>
+                </div>
+                <div class="ga-slider-row">
+                  <input id="fa" type="range" class="ga-range" min="0" max="0.6" step="0.01" [(ngModel)]="form.forceAsymmetry" (ngModelChange)="onFieldEdited()"/>
+                  <input type="number" class="ga-num" [(ngModel)]="form.forceAsymmetry" step="0.01" min="0" max="1"/>
+                </div>
+                <p class="ga-helper">0 = symmetric loading. Higher values suggest lateral imbalance.</p>
+              </div>
+
+              <!-- Balance Score -->
+              <div class="ga-field">
+                <div class="ga-field-head">
+                  <span class="ga-field-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+                  </span>
+                  <label class="ga-label" for="bs">Balance Score</label>
+                </div>
+                <div class="ga-slider-row">
+                  <input id="bs" type="range" class="ga-range" min="0" max="100" step="1" [(ngModel)]="form.balanceScore" (ngModelChange)="onFieldEdited()"/>
+                  <input type="number" class="ga-num" [(ngModel)]="form.balanceScore" step="1" min="0" max="100"/>
+                </div>
+                <p class="ga-helper">Clinical scale 0–100; higher indicates better observed balance.</p>
+              </div>
+
+              <!-- Walking Speed -->
+              <div class="ga-field">
+                <div class="ga-field-head">
+                  <span class="ga-field-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-2"/><path d="M12 12V7"/></svg>
+                  </span>
+                  <label class="ga-label" for="ws">Walking Speed (m/s)</label>
+                </div>
+                <div class="ga-slider-row">
+                  <input id="ws" type="range" class="ga-range" min="0" max="2.5" step="0.05" [(ngModel)]="form.walkingSpeed" (ngModelChange)="onFieldEdited()"/>
+                  <input type="number" class="ga-num" [(ngModel)]="form.walkingSpeed" step="0.01" min="0" max="4"/>
+                </div>
+                <p class="ga-helper">Normal range ≈ 1.0 – 1.4 m/s (often similar to gait velocity).</p>
+              </div>
+
+              <!-- Step Length Difference -->
+              <div class="ga-field">
+                <div class="ga-field-head">
+                  <span class="ga-field-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h8M8 8v8M16 8v8"/></svg>
+                  </span>
+                  <label class="ga-label" for="sld">Step Length Difference (m)</label>
+                </div>
+                <div class="ga-slider-row">
+                  <input id="sld" type="range" class="ga-range" min="-0.4" max="0.4" step="0.01" [(ngModel)]="form.stepLengthDifference" (ngModelChange)="onFieldEdited()"/>
+                  <input type="number" class="ga-num" [(ngModel)]="form.stepLengthDifference" step="0.01" min="-1" max="1"/>
+                </div>
+                <p class="ga-helper">Magnitude of left–right step length difference (absolute asymmetry).</p>
+              </div>
+            </div>
+
+            <div class="ga-notes mt-8">
+              <label class="ga-label block mb-2" for="cn">Clinical Notes <span class="text-app-text-muted font-normal">(optional)</span></label>
+              <textarea id="cn" class="ga-textarea-notes" rows="3" [(ngModel)]="clinicalNotes"
+                placeholder="Observations, test conditions, assistive devices, etc."></textarea>
+            </div>
+
+            <p class="ga-error" *ngIf="error" role="alert">{{ error }}</p>
+
+            <button type="button"
+              class="ga-cta mt-8 w-full sm:w-auto min-w-[240px] px-8 py-4 rounded-xl font-semibold text-base text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              [disabled]="isProcessing"
+              (click)="analyzeGaitPattern()">
+              <span class="ga-spinner" *ngIf="isProcessing" aria-hidden="true"></span>
+              {{ isProcessing ? 'Analyzing…' : 'Analyze Gait Pattern' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side column: results -->
+      <aside class="ga-col-side" @fadeUp>
+        <div class="ga-card app-card rounded-2xl border border-app-border/70 bg-app-surface shadow-xl shadow-black/25 overflow-hidden ga-result-sticky">
+          <div class="h-1 w-full bg-gradient-to-r from-emerald-500/60 via-app-primary to-[#7F77DD]"></div>
+          <div class="p-6 sm:p-7">
+            <h3 class="text-lg font-bold text-app-text-primary mb-1">Assessment outcome</h3>
+            <p class="text-sm text-app-text-muted mb-6">Results appear after analysis completes.</p>
+
+            <ng-container *ngIf="!analysisResult && !isProcessing">
+              <div class="ga-placeholder rounded-xl border border-dashed border-app-border p-8 text-center text-app-text-muted text-sm">
+                Enter gait parameters and select <strong>Analyze Gait Pattern</strong> to view the predicted pattern and risk estimate.
+              </div>
+            </ng-container>
+
+            <div *ngIf="isProcessing" class="ga-loading flex flex-col items-center justify-center py-12 gap-3 text-app-text-muted">
+              <span class="ga-spinner ga-spinner-lg" aria-hidden="true"></span>
+              <span>Processing assessment…</span>
+            </div>
+
+            <div *ngIf="analysisResult" class="ga-result-body space-y-5" @pulseSoft>
+              <div>
+                <p class="text-xs uppercase tracking-wide text-app-text-muted font-semibold mb-1">Predicted pattern</p>
+                <p class="text-2xl font-bold"
+                   [class.text-emerald-400]="outcomeIsHealthy"
+                   [class.text-amber-200]="outcomeIsMild"
+                   [class.text-amber-300]="outcomeIsParkinson">
+                  {{ displayPredictedLabel }}
+                </p>
+              </div>
+
+              <div *ngIf="displayConfidencePercent != null" class="space-y-1">
+                <div class="flex items-baseline gap-2">
+                  <p class="text-xs uppercase tracking-wide text-app-text-muted font-semibold">Model certainty</p>
+                  <p class="text-xl font-semibold text-app-text-primary">{{ displayConfidencePercent }}%</p>
+                </div>
+                <p class="text-xs text-app-text-muted leading-snug max-w-md">
+                  How decisively the screening model leans toward the shown pattern (not the same as clinical certainty). Values near 100% usually mean estimated risk is far from a 50/50 split.
+                </p>
+              </div>
+
+              <div *ngIf="analysisResult.riskPercent != null" class="flex flex-wrap items-center gap-3">
+                <span class="text-xs uppercase tracking-wide text-app-text-muted font-semibold">Risk estimate</span>
+                <span class="text-lg font-semibold text-app-text-primary">{{ analysisResult.riskPercent | number:'1.0-1' }}%</span>
+                <span [class]="riskBadgeClass()">{{ riskBadgeLabel() }}</span>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-wide text-app-text-muted font-semibold mb-2">Important contributing factors</p>
+                <p class="text-xs text-app-text-muted mb-2 max-w-md">
+                  Based on common reference ranges for the values you entered. This checklist can highlight deviations even when the model above estimates lower neurological risk.
+                </p>
+                <ul class="ga-factor-list text-sm text-app-text-primary space-y-2">
+                  <li *ngFor="let factor of contributingFactors">• {{ factor }}</li>
+                </ul>
+              </div>
+
+              <div class="ga-interpret rounded-xl bg-app-primary/5 border border-app-border/80 p-4">
+                <p class="text-xs uppercase tracking-wide text-app-text-muted font-semibold mb-2">Clinical interpretation</p>
+                <p class="text-sm leading-relaxed text-app-text-primary">{{ clinicalInterpretation }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

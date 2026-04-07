@@ -1,0 +1,132 @@
+<app-navigation></app-navigation>
+
+<section class="chat-history-shell min-h-screen bg-pagebg pb-20">
+  <div class="chat-history-inner w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-10">
+    <div class="chat-history-controls max-w-[1600px] mx-auto mb-6">
+      <div class="chat-history-controls-row">
+        <div class="chat-history-title-wrap">
+          <span class="chat-history-eyebrow">Chat History</span>
+          <span class="chat-history-sub">View, filter and manage previous conversations</span>
+        </div>
+
+        <div class="chat-history-actions">
+          <button
+            *ngIf="items.length > 0"
+            type="button"
+            class="chat-action-btn"
+            (click)="toggleSelectAll()">
+            <i class="pi" [ngClass]="isAllSelected ? 'pi-check-square' : 'pi-square'"></i>
+            {{ isAllSelected ? 'Unselect all' : 'Select all' }}
+          </button>
+
+          <button
+            *ngIf="items.length > 0"
+            type="button"
+            class="chat-action-btn chat-action-btn--danger"
+            [disabled]="!hasAnySelection || bulkDeleting"
+            (click)="deleteSelected()">
+            <i class="pi pi-trash"></i>
+           
+          </button>
+
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (keydown.enter)="applyFilter()"
+            placeholder="Search title or message..."
+            class="chat-search-input" />
+          <button type="button" class="chat-action-btn" (click)="applyFilter()">
+            <i class="pi pi-search"></i>
+          </button>
+          <button type="button" class="chat-action-btn" (click)="clearFilter()">
+            <i class="pi pi-times"></i>
+          </button>
+          <button type="button" class="chat-sort-btn" (click)="toggleSortOrder()">
+            <i class="pi pi-sort-alt"></i>
+            {{ sortOrder === 'desc' ? 'Newest' : 'Oldest' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="error" class="max-w-[1600px] mx-auto mb-5">
+      <div class="chat-error">{{ error }}</div>
+    </div>
+
+    <app-skeleton *ngIf="loading" variant="table" [rows]="6" [cols]="5"></app-skeleton>
+
+    <div *ngIf="!loading && items.length > 0" class="max-w-[1600px] mx-auto mb-8">
+      <div class="table-wrap">
+        <table class="w-full neuro-table">
+          <thead>
+            <tr>
+              <th class="text-center select-col">
+                <input
+                  type="checkbox"
+                  [checked]="isAllSelected"
+                  (change)="toggleSelectAll()"
+                  aria-label="Select all chats" />
+              </th>
+              <th>Title</th>
+              <th>Last Message</th>
+              <th class="text-center">Messages</th>
+              <th class="text-center">Updated</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of items">
+              <td class="text-center select-col">
+                <input
+                  type="checkbox"
+                  [checked]="selectedIds.has(item.id)"
+                  (change)="toggleSelection(item.id)"
+                  aria-label="Select chat row" />
+              </td>
+              <td class="title-cell">{{ item.title }}</td>
+              <td class="preview-cell">{{ item.lastMessagePreview || '—' }}</td>
+              <td class="text-center">{{ item.messageCount }}</td>
+              <td class="text-center">{{ item.updatedAt | date:'short' }}</td>
+              <td class="text-center">
+                <div class="actions-cell">
+                  <p-button icon="pi pi-eye" (onClick)="openConversation(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View chat" tooltipPosition="top"></p-button>
+                  <p-button icon="pi pi-trash" [loading]="deletingId === item.id" (onClick)="deleteConversation(item)" severity="danger" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="Delete chat" tooltipPosition="top"></p-button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && items.length === 0" class="max-w-[1600px] mx-auto empty-state">
+      <p>No chats found.</p>
+      <button type="button" (click)="openConsultation()">Open Consultation</button>
+    </div>
+
+    <div *ngIf="!loading && totalPages > 0" class="max-w-[1600px] mx-auto">
+      <div class="chat-pagination">
+        <div class="chat-pagination-info">
+          Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} chats
+        </div>
+        <div class="chat-pagination-actions">
+          <div class="rows-select">
+            <span>Rows:</span>
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="20">20</option>
+              <option [ngValue]="25">25</option>
+              <option [ngValue]="50">50</option>
+            </select>
+          </div>
+          <div class="pager">
+            <p-button icon="pi pi-chevron-left" [outlined]="true" [rounded]="true" (onClick)="previousPage()" [disabled]="!hasPrevious"></p-button>
+            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+            <p-button icon="pi pi-chevron-right" [outlined]="true" [rounded]="true" (onClick)="nextPage()" [disabled]="!hasNext"></p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+

@@ -1,7 +1,5 @@
-<app-navigation></app-navigation>
-
 <section class="notifications-shell">
-  <div class="notifications-card">
+  <div class="notifications-card app-card">
     <div class="header-row">
       <div class="title-block">
         <h1>Notifications</h1>
@@ -28,7 +26,9 @@
         title="Loading notifications...">
       </app-loader>
     </div>
-    <div class="state" *ngIf="!loading && notifications.length === 0">No notifications.</div>
+    <div class="state state-empty app-card" *ngIf="!loading && notifications.length === 0">
+      No notifications yet.
+    </div>
 
     <div class="list" *ngIf="!loading && notifications.length > 0">
       <div

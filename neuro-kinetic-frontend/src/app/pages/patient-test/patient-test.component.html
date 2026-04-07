@@ -7,7 +7,15 @@
         NeuroSync Test
       </h1>
       <p class="patient-test-subtitle text-lg sm:text-xl text-app-text-muted max-w-2xl mx-auto">
-        Record your voice to analyze neurological patterns. The test takes approximately 30-60 seconds.
+        <ng-container *ngIf="selectedTest === 'voice'">
+          Record your voice to analyze neurological patterns. The test takes approximately 30-60 seconds.
+        </ng-container>
+        <ng-container *ngIf="selectedTest === 'gait'">
+          Gait screening uses walking-stride features. Open the gait workspace to submit your feature vector and view your risk score.
+        </ng-container>
+        <ng-container *ngIf="selectedTest === 'fingertap'">
+          Record or upload a finger-tapping video for movement analysis.
+        </ng-container>
       </p>
     </div>
 
@@ -93,17 +101,35 @@
         <div class="p-8 sm:p-10">
           <h2 class="text-xl font-bold text-app-text-primary mb-1 flex items-center gap-2">
             <span class="w-8 h-8 rounded-lg bg-app-primary/10 flex items-center justify-center text-app-primary text-sm font-extrabold">1</span>
-            {{ selectedTest === 'fingertap' ? 'Finger-Tapping Screening' : 'Before You Begin' }}
+            {{ selectedTest === 'fingertap' ? 'Finger-Tapping Screening' : (selectedTest === 'gait' ? 'Gait screening' : 'Before You Begin') }}
           </h2>
           <p class="text-app-text-muted text-sm mb-6">
-            {{ selectedTest === 'fingertap'
-                ? 'Choose how to record your finger-tapping test.'
-                : 'Choose how you’d like to provide your voice sample.' }}
+            <ng-container *ngIf="selectedTest === 'fingertap'">Choose how to record your finger-tapping test.</ng-container>
+            <ng-container *ngIf="selectedTest === 'voice'">Choose how you’d like to provide your voice sample.</ng-container>
+            <ng-container *ngIf="selectedTest === 'gait'">
+              Continue to the <strong>Gait analysis</strong> page. There you can submit a JSON array of gait features (typically 17 values from your pose/stride pipeline). A walking video is processed elsewhere to produce those numbers — this app runs the risk model on the features.
+            </ng-container>
           </p>
+
+          <!-- Gait: dedicated flow -->
+          <div *ngIf="selectedTest === 'gait'" class="patient-test-steps space-y-4 mb-8">
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-bold" style="background:#7F77DD">1</span>
+              <p class="text-app-text-primary pt-0.5">Film a side or front view of level walking (your usual speed), a few strides.</p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-bold" style="background:#7F77DD">2</span>
+              <p class="text-app-text-primary pt-0.5">Extract stride, cadence, timing, and related features (17 dimensions) with your processing tool — then paste or load them on the next screen.</p>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-bold" style="background:#7F77DD">3</span>
+              <p class="text-app-text-primary pt-0.5">Click <strong>Continue to Gait Analysis</strong> to run the model and see risk, plus training benchmark charts.</p>
+            </div>
+          </div>
         
           <!-- Mode Toggle -->
-          <!-- Voice/Gait mode buttons (existing behavior preserved) -->
-          <div class="mode-switch flex gap-3 sm:gap-4 mb-8" *ngIf="selectedTest !== 'fingertap'">
+          <!-- Voice only (not gait / not finger-tap) -->
+          <div class="mode-switch flex gap-3 sm:gap-4 mb-8" *ngIf="selectedTest === 'voice'">
             <button 
               (click)="selectMode('record'); selectedFile = null; error = ''"
               class="patient-test-mode-btn flex-1 px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
@@ -173,7 +199,7 @@
           </div>
 
           <!-- Record Mode Instructions (voice) -->
-          <div *ngIf="selectedTest !== 'fingertap' && inputMode === 'record'" class="patient-test-steps space-y-4 mb-8">
+          <div *ngIf="selectedTest === 'voice' && inputMode === 'record'" class="patient-test-steps space-y-4 mb-8">
             <div class="flex items-start gap-4">
               <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">1</span>
               <p class="text-app-text-primary pt-0.5">Find a quiet environment with minimal background noise.</p>
@@ -193,7 +219,7 @@
           </div>
 
           <!-- Upload Mode Instructions (voice) -->
-          <div *ngIf="selectedTest !== 'fingertap' && inputMode === 'upload'" class="patient-test-steps space-y-4 mb-8">
+          <div *ngIf="selectedTest === 'voice' && inputMode === 'upload'" class="patient-test-steps space-y-4 mb-8">
             <div class="flex items-start gap-4">
               <span class="patient-test-step-num flex-shrink-0 w-8 h-8 rounded-full bg-app-primary text-white flex items-center justify-center text-sm font-bold">1</span>
               <p class="text-app-text-primary pt-0.5">Select an audio file from your device (WAV, MP3, M4A, FLAC, OGG, WEBM, AAC, OPUS).</p>
@@ -248,7 +274,7 @@
           </div>
 
         <!-- Upload Section (shown when in upload mode) -->
-        <div *ngIf="inputMode === 'upload' && selectedTest !== 'fingertap'" class="mb-6">
+        <div *ngIf="inputMode === 'upload' && selectedTest === 'voice'" class="mb-6">
           <div class="upload-area mb-4">
             <label for="voiceFileInput" class="upload-button flex flex-col items-center justify-center p-8 border-2 border-dashed border-app-border rounded-xl bg-surface-2 cursor-pointer transition-all duration-200 hover:border-app-primary hover:bg-app-primary/5">
               <span class="text-4xl mb-3">📁</span>
@@ -283,10 +309,11 @@
         
         <button 
           (click)="startTest()"
-          [disabled]="selectedTest !== 'fingertap' && inputMode === 'upload' && !selectedFile"
+          [disabled]="selectedTest === 'voice' && inputMode === 'upload' && !selectedFile"
           class="w-full bg-app-primary hover:bg-app-primary-hover text-white px-8 py-4 rounded-xl transition-all duration-200 font-semibold text-lg shadow-md shadow-app-primary/20 hover:shadow-lg hover:shadow-app-primary/25 disabled:bg-[var(--color-hint)] disabled:shadow-none disabled:cursor-not-allowed"
+          [class.pt-start-gait]="selectedTest === 'gait'"
         >
-          {{ selectedTest === 'fingertap' ? 'Start Finger-Tapping Test' : 'Start Test' }}
+          {{ selectedTest === 'fingertap' ? 'Start Finger-Tapping Test' : (selectedTest === 'gait' ? 'Continue to Gait Analysis' : 'Start Test') }}
         </button>
         </div>
       </div>
@@ -636,3 +663,13 @@
     </div>
   </div>
 </section>
+
+<!-- Finger-tap modal (opens instead of navigating away) -->
+<div class="pt-ft-modal-overlay" *ngIf="showFingerTapModal" (click)="closeFingerTapModal()">
+  <div class="pt-ft-modal" (click)="$event.stopPropagation()">
+    <button type="button" class="pt-ft-close pt-ft-close-floating" (click)="closeFingerTapModal()">×</button>
+    <div class="pt-ft-modal-body">
+      <app-finger-tap [embedded]="true" (requestClose)="closeFingerTapModal()"></app-finger-tap>
+    </div>
+  </div>
+</div>

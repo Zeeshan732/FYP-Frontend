@@ -18,6 +18,7 @@ import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.co
 import { ConsultationComponent } from './pages/consultation/consultation.component';
 import { FingerTapComponent } from './pages/finger-tap/finger-tap.component';
 import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
+import { ChatHistoryComponent } from './pages/chat-history/chat-history.component';
 import { AboutComponent } from './pages/about/about.component';
 import { BlogComponent } from './pages/blog/blog.component';
 import { AuthGuard } from './guards/auth.guard';
@@ -37,6 +38,7 @@ const routes: Routes = [
   { path: 'voice-input', component: VoiceInputComponent, canActivate: [AuthGuard] },
   { path: 'live-voice-monitor', component: LiveVoiceMonitorComponent, canActivate: [AuthGuard] },
   { path: 'consultation', component: ConsultationComponent, canActivate: [AuthGuard] },
+  { path: 'chat-history', component: ChatHistoryComponent, canActivate: [AuthGuard] },
   { path: 'finger-tap', component: FingerTapComponent, canActivate: [AuthGuard] },
   { path: 'analytics-dashboard', component: AnalyticsDashboardComponent, canActivate: [AuthGuard] },
   { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },
@@ -48,7 +50,8 @@ const routes: Routes = [
   { path: 'blog', component: BlogComponent },
   { path: 'clinical-use', component: ClinicalUseComponent },
   { path: 'voice-analysis', loadChildren: () => import('./modules/voice-analysis/voice-analysis.module').then(m => m.VoiceAnalysisModule) },
-  { path: 'gait-analysis', loadChildren: () => import('./modules/gait-analysis/gait-analysis.module').then(m => m.GaitAnalysisModule) },
+  { path: 'gait-test', redirectTo: 'gait-analysis', pathMatch: 'full' },
+  { path: 'gait-analysis', loadChildren: () => import('./modules/gait-analysis/gait-analysis.module').then(m => m.GaitAnalysisModule), canActivate: [AuthGuard] },
   { path: 'clinician', loadChildren: () => import('./clinician/clinician.module').then(m => m.ClinicianModule) },
   { path: '**', redirectTo: '/landing' }
 ];

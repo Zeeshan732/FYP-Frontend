@@ -1,9 +1,9 @@
 <div class="rag-chat" [class.rag-chat--light]="theme === 'light'">
-  <div class="rag-chat-header">
-    <div *ngIf="riskPercent == null && theme !== 'light'" class="rag-notice">
+  <div *ngIf="theme !== 'light' && (showNewChatButton || riskPercent == null)" class="rag-chat-header">
+    <div *ngIf="riskPercent == null" class="rag-notice">
       For personalized guidance, complete a screening first. You can still ask general questions here.
     </div>
-    <button type="button" class="rag-btn-new-chat" (click)="newChat()" title="Start a new conversation">
+    <button *ngIf="showNewChatButton" type="button" class="rag-btn-new-chat" (click)="newChat()" title="Start a new conversation">
       <span class="rag-btn-new-chat-icon" aria-hidden="true">+</span>
       New chat
     </button>
@@ -28,6 +28,16 @@
 
   <div class="rag-form" [class.rag-form--light]="theme === 'light'">
     <ng-container *ngIf="theme === 'light'">
+      <button
+        *ngIf="showNewChatButton"
+        type="button"
+        (click)="newChat()"
+        class="rag-input-icon rag-input-icon--plus"
+        aria-label="New chat"
+        title="New chat">
+        <span>+</span>
+      </button>
+
       <div class="rag-input-wrap">
         <input
           type="text"
@@ -58,5 +68,5 @@
   </div>
 
   <div *ngIf="error" class="rag-error">{{ error }}</div>
-  <button *ngIf="messages.length > 0" type="button" (click)="newChat()" class="rag-clear">New chat</button>
+  <button *ngIf="showNewChatButton && messages.length > 0" type="button" (click)="newChat()" class="rag-clear">New chat</button>
 </div>

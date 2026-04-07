@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import {
   RagTestResponse,
@@ -6,7 +6,7 @@ import {
   isRagIrrelevant
 } from '../../models/api.models';
 
-const RAG_CHAT_STORAGE_KEY = 'neurosync_rag_chat_messages';
+const DEFAULT_RAG_CHAT_STORAGE_KEY = 'neurosync_rag_chat_messages';
 
 export interface ChatMessage {
   type: 'text';
@@ -34,11 +34,21 @@ interface StoredChatMessage {
   templateUrl: './rag-chat.component.html',
   styleUrls: ['./rag-chat.component.scss']
 })
-export class RagChatComponent implements OnInit {
+export class RagChatComponent implements OnInit, OnChanges {
   @Input() riskPercent: number | null = null;
   @Input() mode: 'voice' | 'gait' | 'multimodal' = 'voice';
   /** When 'light', uses centered empty state and compact input matching the rest of the app. */
   @Input() theme: 'default' | 'light' = 'default';
+  /** Storage key for persisted chat thread (supports multi-thread history). */
+  @Input() chatStorageKey: string = DEFAULT_RAG_CHAT_STORAGE_KEY;
+  /** Hide internal "New chat" button when parent provides its own history controls. */
+  @Input() showNewChatButton = true;
+  @Input() conversationId: number | null = null;
+  @Input() useLocalDraftFallback = true;
+  @Output() messageSent = new EventEmitter<string>();
+  @Output() chatCleared = new EventEmitter<void>();
+  @Output() conversationCreated = new EventEmitter<number>();
+  @Output() conversationUnavailable = new EventEmitter<void>();
 
   messages: ChatMessage[] = [];
   loading = false;
@@ -51,12 +61,78 @@ export class RagChatComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (this.conversationId) {
+      this.loadChatFromServer();
+      return;
+    }
+    if (!this.useLocalDraftFallback) {
+      this.messages = [];
+      this.error = '';
+      return;
+    }
     this.loadChatFromStorage();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['conversationId'] && !changes['conversationId'].firstChange) {
+      if (this.conversationId) {
+        // When a new conversation is created from first send, keep optimistic messages.
+        // Reload only if there is no in-memory chat to avoid wiping the first message.
+        if (this.messages.length === 0) {
+          this.loadChatFromServer();
+        }
+      } else {
+        this.messages = [];
+        this.error = '';
+        this.loading = false;
+        this.inputMessage = '';
+        this.cdr.detectChanges();
+      }
+      return;
+    }
+    if (changes['chatStorageKey'] && !changes['chatStorageKey'].firstChange) {
+      if (!this.useLocalDraftFallback) {
+        this.messages = [];
+        this.error = '';
+        this.loading = false;
+        this.inputMessage = '';
+        this.cdr.detectChanges();
+        return;
+      }
+      this.loadChatFromStorage();
+    }
+  }
+
+  private loadChatFromServer(): void {
+    if (!this.conversationId) return;
+    this.messages = [];
+    this.error = '';
+    this.apiService.getChatMessages(this.conversationId).subscribe({
+      next: (items) => {
+        this.messages = items.map((m) => ({
+          type: 'text',
+          text: m.content,
+          reply: m.role === 'user',
+          sender: m.role === 'user' ? 'You' : 'NeuroSync',
+          date: new Date(m.createdAt)
+        }));
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.messages = [];
+        this.error = 'Unable to load this chat. Please try again.';
+        this.conversationId = null;
+        this.conversationUnavailable.emit();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   private loadChatFromStorage(): void {
+    this.messages = [];
+    this.error = '';
     try {
-      const raw = localStorage.getItem(RAG_CHAT_STORAGE_KEY);
+      const raw = localStorage.getItem(this.chatStorageKey || DEFAULT_RAG_CHAT_STORAGE_KEY);
       if (!raw) return;
       const stored: StoredChatMessage[] = JSON.parse(raw);
       if (Array.isArray(stored) && stored.length > 0) {
@@ -75,6 +151,7 @@ export class RagChatComponent implements OnInit {
   }
 
   private saveChatToStorage(): void {
+    if (this.conversationId) return;
     try {
       const toStore: StoredChatMessage[] = this.messages.map(m => ({
         type: 'text',
@@ -83,7 +160,7 @@ export class RagChatComponent implements OnInit {
         sender: m.sender,
         date: m.date instanceof Date ? m.date.toISOString() : new Date().toISOString()
       }));
-      localStorage.setItem(RAG_CHAT_STORAGE_KEY, JSON.stringify(toStore));
+      localStorage.setItem(this.chatStorageKey || DEFAULT_RAG_CHAT_STORAGE_KEY, JSON.stringify(toStore));
     } catch {
       // Quota or other; ignore
     }
@@ -101,7 +178,26 @@ export class RagChatComponent implements OnInit {
       ...this.messages,
       { type: 'text', text: q, reply: true, sender: 'You', date: new Date() }
     ];
+    this.messageSent.emit(q);
+    if (!this.conversationId) {
+      this.apiService.createChatConversation().subscribe({
+        next: (conversation) => {
+          this.conversationId = conversation.id;
+          this.conversationCreated.emit(conversation.id);
+          this.apiService.appendChatMessage(conversation.id, 'user', q).subscribe({ error: () => void 0 });
+        },
+        error: () => void 0
+      });
+    }
     this.saveChatToStorage();
+    if (this.conversationId) {
+      this.apiService.appendChatMessage(this.conversationId, 'user', q).subscribe({
+        error: () => {
+          this.conversationId = null;
+          this.conversationUnavailable.emit();
+        }
+      });
+    }
     this.cdr.detectChanges();
 
     const setReply = (text: string) => {
@@ -111,6 +207,9 @@ export class RagChatComponent implements OnInit {
         { type: 'text', text, reply: false, sender: 'NeuroSync', date: new Date() }
       ];
       this.saveChatToStorage();
+      if (this.conversationId) {
+        this.apiService.appendChatMessage(this.conversationId, 'assistant', text).subscribe({ error: () => void 0 });
+      }
       this.cdr.detectChanges();
     };
     const setError = (err: any) => {
@@ -120,7 +219,7 @@ export class RagChatComponent implements OnInit {
       const errMsg = err?.status === 400
         ? (backendMessage || 'Please enter a valid question.')
         : err?.status === 502
-          ? (backendMessage || 'The knowledge-base service is not responding. Start the RAG service (port 8100) and Ollama, then try again.')
+          ? (backendMessage || 'The knowledge-base service is not responding. Please check backend RAG configuration and try again.')
           : err?.status === 503 || err?.status === 500
             ? (backendMessage || 'Service temporarily unavailable. Please try again later.')
             : (backendMessage || 'Something went wrong. Please try again.');
@@ -132,7 +231,7 @@ export class RagChatComponent implements OnInit {
       this.cdr.detectChanges();
     };
 
-    // No screening result: use Python RAG knowledge-base (FAISS + Ollama).
+    // No screening result: use backend Parkinson knowledge-base Q&A (/api/rag/ask).
     if (this.riskPercent == null) {
       this.apiService.ragAsk(q).subscribe({
         next: (res) => setReply(res.answer || 'No answer returned.'),
@@ -191,13 +290,24 @@ export class RagChatComponent implements OnInit {
 
   /** Start a new chat: clear messages and persisted history. */
   newChat(): void {
+    if (this.conversationId) {
+      // Optimistically clear UI; parent will reset cid and route state.
+      this.messages = [];
+      this.error = '';
+      this.loading = false;
+      this.inputMessage = '';
+      this.chatCleared.emit();
+      this.cdr.detectChanges();
+      return;
+    }
     this.messages = [];
     this.error = '';
     try {
-      localStorage.removeItem(RAG_CHAT_STORAGE_KEY);
+      localStorage.removeItem(this.chatStorageKey || DEFAULT_RAG_CHAT_STORAGE_KEY);
     } catch {
       // ignore
     }
+    this.chatCleared.emit();
     this.cdr.detectChanges();
   }
 

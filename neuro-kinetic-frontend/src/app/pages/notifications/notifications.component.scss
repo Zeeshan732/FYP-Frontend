@@ -5,21 +5,21 @@
 }
 
 .notifications-shell {
-  min-height: 100vh;
-  padding: 120px 24px 48px;
-  background: var(--app-surface-muted);
+  min-height: calc(100vh - 64px);
+  padding: clamp(1rem, 2vw, 1.75rem) clamp(1rem, 2.2vw, 2rem) clamp(2rem, 3vw, 3rem);
+  background: var(--color-page-bg);
   display: flex;
   justify-content: center;
   box-sizing: border-box;
 }
 
 .notifications-card {
-  width: min(1080px, calc(100% - 32px));
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-lg);
-  box-shadow: var(--app-shadow);
-  padding: 24px 28px 28px;
+  width: min(1120px, 100%);
+  background: #112240;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.22);
+  padding: 22px 24px 24px;
 }
 
 .header-row {
@@ -31,16 +31,16 @@
 }
 
 .title-block h1 {
-  font-size: 24px;
-  font-weight: 500;
-  color: var(--app-text-primary);
+  font-size: clamp(1.55rem, 2.1vw, 2rem);
+  font-weight: 600;
+  color: #ffffff;
   margin: 0 0 4px;
 }
 
 .title-block p {
   margin: 0;
-  color: var(--app-text-muted);
-  font-size: 13px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.95rem;
 }
 
 .toolbar {
@@ -51,11 +51,11 @@
 
 .tabs {
   display: inline-flex;
-  background: var(--app-surface-muted);
-  border-radius: 12px;
+  background: #0f1d35;
+  border-radius: 11px;
   padding: 4px;
   gap: 4px;
-  border: 1px solid var(--app-border);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .tab-btn {
@@ -65,27 +65,27 @@
   border-radius: 10px;
   font-weight: 500;
   font-size: 13px;
-  color: var(--app-text-muted);
+  color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .tab-btn:hover {
-  color: var(--app-text-primary);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .tab-btn.active {
-  background: var(--app-primary);
-  color: var(--app-primary-foreground);
-  box-shadow: 0 2px 8px rgba(55, 65, 81, 0.25);
+  background: var(--color-blue);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(46, 134, 222, 0.3);
 }
 
 .icon-btn {
-  border: 1px solid var(--app-border);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   outline: none;
   cursor: pointer;
-  background: var(--app-surface);
-  color: var(--app-text-primary);
+  background: #0f1d35;
+  color: rgba(255, 255, 255, 0.86);
   border-radius: 10px;
   padding: 10px;
   display: inline-flex;
@@ -100,14 +100,14 @@
 }
 
 .icon-btn.refresh {
-  background: var(--app-primary);
-  color: var(--app-primary-foreground);
-  border-color: var(--app-primary);
+  background: var(--color-blue);
+  color: #fff;
+  border-color: rgba(46, 134, 222, 0.55);
 }
 
 .icon-btn.refresh:hover:not(:disabled) {
-  background: var(--app-primary-hover);
-  border-color: var(--app-primary-hover);
+  background: var(--color-blue-hover);
+  border-color: rgba(42, 120, 201, 0.75);
 }
 
 .icon-btn:disabled {
@@ -117,9 +117,16 @@
 
 .state {
   text-align: center;
-  color: var(--app-text-muted);
+  color: rgba(255, 255, 255, 0.65);
   padding: 20px 0;
   font-weight: 500;
+}
+
+.state-empty {
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  padding: 24px;
+  background: #0f1d35;
 }
 
 .list {
@@ -136,19 +143,19 @@
   gap: 14px;
   padding: 14px 16px;
   border-radius: 14px;
-  border: 1px solid var(--app-border);
-  background: var(--app-surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0f1d35;
   transition: all 0.2s ease;
 }
 
 .item:hover {
-  background: var(--app-surface-muted);
-  border-color: var(--app-border);
+  background: #122544;
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .item.unread {
-  background: rgba(55, 65, 81, 0.06);
-  border-color: rgba(55, 65, 81, 0.2);
+  background: rgba(46, 134, 222, 0.08);
+  border-color: rgba(46, 134, 222, 0.28);
 }
 
 .item-main {
@@ -162,27 +169,27 @@
   width: 30px;
   height: 30px;
   border-radius: 12px;
-  background: rgba(55, 65, 81, 0.12);
-  color: var(--app-primary);
+  background: rgba(46, 134, 222, 0.15);
+  color: #6eb0f0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .icon-pill.unread {
-  background: rgba(234, 179, 8, 0.15);
-  color: #b45309;
+  background: rgba(29, 158, 117, 0.18);
+  color: #5fd3af;
 }
 
 .item-text .item-title {
   font-weight: 500;
-  font-size: 14px;
-  color: var(--app-text-primary);
+  font-size: 15px;
+  color: #f2f5fb;
 }
 
 .item-text .item-meta {
   font-size: 12px;
-  color: var(--app-text-muted);
+  color: rgba(255, 255, 255, 0.45);
   margin-top: 2px;
 }
 
@@ -210,23 +217,23 @@
 }
 
 .icon-btn.view {
-  background: rgba(55, 65, 81, 0.12);
-  color: var(--app-primary);
-  border-color: rgba(55, 65, 81, 0.25);
+  background: rgba(46, 134, 222, 0.14);
+  color: #6eb0f0;
+  border-color: rgba(46, 134, 222, 0.35);
 }
 
 .icon-btn.view:hover {
-  background: rgba(55, 65, 81, 0.18);
+  background: rgba(46, 134, 222, 0.22);
 }
 
 .icon-btn.mark {
-  background: rgba(34, 197, 94, 0.12);
-  color: #15803d;
-  border-color: rgba(34, 197, 94, 0.25);
+  background: rgba(29, 158, 117, 0.16);
+  color: #5fd3af;
+  border-color: rgba(29, 158, 117, 0.35);
 }
 
 .icon-btn.mark:hover {
-  background: rgba(34, 197, 94, 0.18);
+  background: rgba(29, 158, 117, 0.24);
 }
 
 :host ::ng-deep .fixed.inset-0 {
@@ -235,7 +242,7 @@
 
 @media (max-width: 768px) {
   .notifications-shell {
-    padding: 96px 12px 32px;
+    padding: 1rem 0.75rem 1.75rem;
   }
   .notifications-card {
     width: 100%;

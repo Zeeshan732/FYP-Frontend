@@ -49,6 +49,7 @@ import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analyti
 import { FingerTapComponent } from './pages/finger-tap/finger-tap.component';
 import { AboutComponent } from './pages/about/about.component';
 import { BlogComponent } from './pages/blog/blog.component';
+import { ChatHistoryComponent } from './pages/chat-history/chat-history.component';
 import { ArticleCardComponent } from './components/blog/article-card/article-card.component';
 import { SectionRowComponent } from './components/blog/section-row/section-row.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -86,6 +87,7 @@ import { SharedModule } from './shared/shared.module';
     FingerTapComponent,
     AboutComponent,
     BlogComponent,
+    ChatHistoryComponent,
     ArticleCardComponent,
     SectionRowComponent
   ],

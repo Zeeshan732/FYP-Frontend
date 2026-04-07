@@ -97,43 +97,44 @@
         <a routerLink="/home" 
            routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
            [routerLinkActiveOptions]="{exact: true}"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
            [title]="sidebarCollapsed ? 'Home' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
+          <i class="pi pi-home sidebar-icon" aria-hidden="true"></i>
           <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Home</span>
         </a>
 
         <a routerLink="/patient-test" 
            routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
            [title]="sidebarCollapsed ? 'Take Test' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-          </svg>
+          <i class="pi pi-microphone sidebar-icon" aria-hidden="true"></i>
           <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Take Test</span>
         </a>
 
         <a routerLink="/test-records" 
            routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
            [title]="sidebarCollapsed ? 'My Tests' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
+          <i class="pi pi-file sidebar-icon" aria-hidden="true"></i>
           <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">My Tests</span>
         </a>
 
-        <button type="button"
-                (click)="openAskResultsDialog()"
-                class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group text-left"
-                [title]="sidebarCollapsed ? 'Ask about your results' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Ask about your results</span>
-        </button>
+        <a routerLink="/consultation"
+           (click)="onConsultationClick($event)"
+           class="sidebar-link w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group text-left"
+           [title]="sidebarCollapsed ? 'Consultation' : ''">
+          <i class="pi pi-question-circle sidebar-icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Consultation</span>
+        </a>
+
+        <a routerLink="/chat-history"
+           (click)="onChatHistoryClick()"
+           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           [title]="sidebarCollapsed ? 'Chat History' : ''">
+          <i class="pi pi-comments sidebar-icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Chat History</span>
+        </a>
       </ng-container>
 
       <!-- Clinician -->
@@ -225,11 +226,9 @@
 
       <a routerLink="/contact" 
          routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group mt-2"
+         class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group mt-2"
          [title]="sidebarCollapsed ? 'Contact' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
+        <i class="pi pi-envelope sidebar-icon" aria-hidden="true"></i>
         <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Contact</span>
       </a>
     </nav>
@@ -237,11 +236,9 @@
     <!-- Sidebar Footer -->
     <div class="p-4 border-t border-white/10">
       <button (click)="logout()" 
-              class="sidebar-logout w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors group"
+              class="sidebar-link sidebar-logout w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors group"
               [title]="sidebarCollapsed ? 'Logout' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
+        <i class="pi pi-sign-out sidebar-icon" aria-hidden="true"></i>
         <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Logout</span>
       </button>
     </div>

@@ -1,11 +1,18 @@
 .ft-root {
-  padding: 2rem 1.5rem;
+  padding: clamp(1rem, 1.5vw, 1.75rem) 0 clamp(2rem, 3vw, 3rem);
   color: #e5e7eb;
 }
 
 .ft-container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto 2rem;
+  padding: 0 clamp(1rem, 2vw, 2rem);
+}
+
+.ft-container-embedded {
+  margin-bottom: 0;
+  padding: 0.25rem 0.5rem 0.5rem;
+  max-width: 100%;
 }
 
 .ft-centered {
@@ -14,15 +21,22 @@
 }
 
 .ft-title {
-  font-size: 1.9rem;
+  font-size: clamp(2rem, 2.6vw, 2.6rem);
   font-weight: 600;
   margin-bottom: 0.75rem;
 }
 
 .ft-subtitle {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.6);
   margin-bottom: 1.5rem;
+}
+
+.ft-hero {
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  background: #112240;
 }
 
 .ft-section-title {
@@ -59,13 +73,25 @@
 
 .ft-actions-row {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   margin-top: 1.25rem;
   flex-wrap: wrap;
 }
 
 .ft-mode-header {
   margin-bottom: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  background: #112240;
+}
+
+.ft-mode-header-embedded {
+  margin-bottom: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  padding: 0.6rem 0.2rem 0.2rem;
 }
 
 .ft-mode-title {
@@ -83,6 +109,65 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-bottom: 1.25rem;
+}
+
+.ft-mode-actions {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.ft-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 8, 23, 0.72);
+  backdrop-filter: blur(4px);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.ft-modal {
+  width: min(760px, 100%);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #112240;
+  padding: 1.25rem 1.25rem 1rem;
+}
+
+.ft-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.ft-modal-head h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.ft-modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: transparent;
+  color: rgba(255,255,255,0.8);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ft-modal-sub {
+  font-size: 0.92rem;
+  color: rgba(255,255,255,0.62);
+  margin: 0 0 1rem;
 }
 
 .ft-mode-card {

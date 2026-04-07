@@ -8,91 +8,37 @@
   background: var(--app-surface);
 }
 
-.consultation-header {
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--app-border);
-}
-
-.consultation-header--minimal {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 0;
-  border-bottom: 1px solid var(--app-border);
-  background: var(--app-surface);
-}
-
-.consultation-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.consultation-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--app-text-primary);
-  margin: 0;
-}
-
-.consultation-caret {
-  font-size: 0.75rem;
-  color: var(--app-text-muted);
-  line-height: 1;
-}
-
-.consultation-header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.consultation-header-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: var(--app-text-muted);
-  cursor: pointer;
-  border-radius: 0.5rem;
-}
-
-.consultation-header-icon:hover {
-  color: var(--app-text-primary);
-  background: var(--app-surface-muted);
-}
-
-.consultation-header-icon .pi {
-  font-size: 1.125rem;
-}
-
-.consultation-subtitle {
-  font-size: 0.875rem;
-  color: var(--app-text-muted);
-  margin: 0;
-}
-
 .consultation-main {
   flex: 1;
   display: flex;
-  flex-direction: column;
   min-height: 0;
-  padding: 0 1rem;
+  padding: 0.55rem 0.65rem 0.65rem;
+}
+
+.chat-stage {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.chat-stage--full {
+  width: 100%;
 }
 
 .consultation-notice {
-  margin-bottom: 0.75rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.75rem;
+  margin-bottom: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.8rem;
   color: var(--app-text-primary);
-  background: var(--app-surface-muted);
+  background: rgba(67, 131, 255, 0.12);
   border: 1px solid var(--app-border);
+  border-radius: 0.5rem;
 }
 
 .chat-container {
@@ -100,7 +46,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: var(--app-surface);
+  background: transparent;
   border: none;
   padding: 0;
 }
@@ -144,3 +90,4 @@
 .go-button:hover {
   background: var(--app-primary-hover);
 }
+

@@ -79,6 +79,7 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   // Test type + mode selector
   selectedTest: 'voice' | 'gait' | 'fingertap' = 'voice';
   selectedMode: 'record' | 'upload' | 'live' = 'record';
+  showFingerTapModal = false;
 
   constructor(
     private apiService: ApiService,
@@ -125,6 +126,9 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
 
   selectTest(test: 'voice' | 'gait' | 'fingertap'): void {
     this.selectedTest = test;
+    if (test !== 'fingertap') {
+      this.showFingerTapModal = false;
+    }
     if (test === 'fingertap') {
       this.selectedMode = 'live';
     } else {
@@ -141,11 +145,10 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
 
   startTest(): void {
     if (this.selectedTest === 'fingertap') {
-      this.router.navigate(['/finger-tap']);
+      this.showFingerTapModal = true;
       return;
     } else if (this.selectedTest === 'gait') {
-      // Navigate to existing gait test page (route already configured elsewhere)
-      this.router.navigate(['/gait-test']);
+      this.router.navigate(['/gait-analysis']);
       return;
     }
 
@@ -998,6 +1001,11 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     if (input) input.value = '';
     this.recordingTime = 0;
     this.error = '';
+    this.showFingerTapModal = false;
+  }
+
+  closeFingerTapModal(): void {
+    this.showFingerTapModal = false;
   }
 
   /** Open "Ask about your results" dialog once after test result is shown. */

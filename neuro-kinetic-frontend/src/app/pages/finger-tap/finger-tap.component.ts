@@ -1,9 +1,10 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, OnDestroy, Output, ViewChild } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserTestRecord, UserTestRecordRequest } from '../../models/api.models';
+import { Router } from '@angular/router';
 
 type ScreenState =
   | 'instructions'
@@ -29,10 +30,13 @@ interface FingerTapResult {
   templateUrl: './finger-tap.component.html',
   styleUrls: ['./finger-tap.component.scss']
 })
-export class FingerTapComponent implements OnDestroy {
+export class FingerTapComponent implements OnInit, OnDestroy {
   // State
   currentState: ScreenState = 'instructions';
   inputMode: 'upload' | 'live' = 'upload';
+  startModalOpen = false;
+  @Input() embedded = false;
+  @Output() requestClose = new EventEmitter<void>();
 
   apiError = '';
   isProcessing = false;
@@ -91,8 +95,25 @@ export class FingerTapComponent implements OnDestroy {
   constructor(
     private http: HttpClient,
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
+
+  ngOnInit(): void {
+    // If navigated here from embedded popup flow with a completed result, show it directly.
+    const navState = (history.state ?? {}) as { fingerTapResult?: FingerTapResult };
+    if (!this.embedded && navState.fingerTapResult) {
+      this.result = navState.fingerTapResult;
+      this.currentState = 'result';
+      return;
+    }
+
+    if (this.embedded) {
+      // In popup mode, avoid nested start screen/modal.
+      this.currentState = 'mode-select';
+      this.startModalOpen = false;
+    }
+  }
 
   // ── Derived values ─────────────────────────
 
@@ -193,8 +214,21 @@ export class FingerTapComponent implements OnDestroy {
   // ── Navigation / mode select ────────────────
 
   goToModeSelect(): void {
-    this.currentState = 'mode-select';
+    if (this.embedded) {
+      this.currentState = 'mode-select';
+      return;
+    }
+    this.startModalOpen = true;
     this.apiError = '';
+  }
+
+  closeStartModal(): void {
+    this.startModalOpen = false;
+  }
+
+  continueFromStartModal(): void {
+    this.startModalOpen = false;
+    this.currentState = 'mode-select';
   }
 
   selectMode(mode: 'upload' | 'live'): void {
@@ -217,7 +251,7 @@ export class FingerTapComponent implements OnDestroy {
     this.recordingElapsed = 0;
     this.recordedDuration = 0;
     this.apiError = '';
-    this.currentState = 'instructions';
+    this.currentState = this.embedded ? 'mode-select' : 'instructions';
   }
 
   // ── Upload mode ─────────────────────────────
@@ -259,6 +293,12 @@ export class FingerTapComponent implements OnDestroy {
         .toPromise();
 
       if (result) {
+        // Requirement: do not show final result inside popup.
+        if (this.embedded) {
+          this.requestClose.emit();
+          this.router.navigate(['/finger-tap'], { state: { fingerTapResult: result } });
+          return;
+        }
         this.result = result;
         this.currentState = 'result';
         this.persistFingerTapTestRecord(result);
@@ -498,6 +538,14 @@ export class FingerTapComponent implements OnDestroy {
     this.stopCamera();
     this.currentState = 'upload';
     this.inputMode = 'upload';
+  }
+
+  backFromModeSelect(): void {
+    if (this.embedded) {
+      this.requestClose.emit();
+      return;
+    }
+    this.currentState = 'instructions';
   }
 
   // ── Cleanup ────────────────────────────────

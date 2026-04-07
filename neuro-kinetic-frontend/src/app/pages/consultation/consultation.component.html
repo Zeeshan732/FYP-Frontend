@@ -1,31 +1,24 @@
 <div class="consultation-page">
-  <header class="consultation-header consultation-header--minimal">
-    <!-- <div class="consultation-header-left">
-      <h1 class="consultation-title">Consultation</h1>
-      <span class="consultation-caret" aria-hidden="true">▾</span>
-    </div> -->
-    <!-- <div class="consultation-header-right">
-      <button type="button" class="consultation-header-icon" aria-label="Profile">
-        <i class="pi pi-user"></i>
-      </button>
-      <button type="button" class="consultation-header-icon" aria-label="Search">
-        <i class="pi pi-search"></i>
-      </button>
-    </div> -->
-  </header>
-
   <main class="consultation-main">
-    <div *ngIf="riskPercent == null" class="consultation-notice">
-      For personalized guidance, complete a screening first. You can still ask general questions here.
-    </div>
+    <section class="chat-stage chat-stage--full">
+      <div *ngIf="riskPercent == null" class="consultation-notice">
+        For personalized guidance, complete a screening first. You can still ask general questions here.
+      </div>
 
-    <div class="chat-container">
-      <app-rag-chat
-        theme="light"
-        [riskPercent]="riskPercent"
-        [mode]="mode">
-      </app-rag-chat>
-    </div>
+      <div class="chat-container">
+        <app-rag-chat
+          theme="light"
+          [riskPercent]="riskPercent"
+          [mode]="mode"
+          [showNewChatButton]="true"
+          [conversationId]="conversationId"
+          [useLocalDraftFallback]="false"
+          (chatCleared)="startNewChat()"
+          (conversationCreated)="onConversationCreated($event)"
+          (conversationUnavailable)="onConversationUnavailable()">
+        </app-rag-chat>
+      </div>
+    </section>
   </main>
 
   <footer class="consultation-footer">
