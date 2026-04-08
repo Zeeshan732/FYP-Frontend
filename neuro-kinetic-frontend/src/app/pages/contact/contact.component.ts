@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./contact.component.scss']
 })
 export class ContactComponent {
-
+  // Form logic is handled by `app-contact-form`.
 }

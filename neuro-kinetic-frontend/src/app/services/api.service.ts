@@ -30,6 +30,9 @@ import {
   RagAskResponse,
   ChatConversation,
   ChatMessage,
+  ContactMessageRequest,
+  ContactMessageItem,
+  ContactMessageResponse,
   VoicePredictRequest,
   VoicePredictResponse,
   GaitModelInfo
@@ -294,6 +297,35 @@ export class ApiService {
 
   deleteChatConversation(conversationId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/chat-history/${conversationId}`);
+  }
+
+  // ========== CONTACT ==========
+
+  /** Public: send a contact message from Contact page. */
+  sendContactMessage(request: ContactMessageRequest): Observable<ContactMessageResponse> {
+    return this.http.post<ContactMessageResponse>(`${this.apiUrl}/contact/messages`, request);
+  }
+
+  getContactMessages(params: {
+    pageNumber?: number;
+    pageSize?: number;
+    searchTerm?: string;
+    subject?: string;
+    failedOnly?: boolean;
+    sortOrder?: 'asc' | 'desc';
+  } = {}): Observable<PagedResult<ContactMessageItem>> {
+    let httpParams = new HttpParams();
+    if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+    if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+    if (params.searchTerm) httpParams = httpParams.set('searchTerm', params.searchTerm);
+    if (params.subject) httpParams = httpParams.set('subject', params.subject);
+    if (params.failedOnly) httpParams = httpParams.set('failedOnly', 'true');
+    if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
+    return this.http.get<PagedResult<ContactMessageItem>>(`${this.apiUrl}/contact/messages`, { params: httpParams });
+  }
+
+  deleteContactMessage(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/contact/messages/${id}`);
   }
 
   /**

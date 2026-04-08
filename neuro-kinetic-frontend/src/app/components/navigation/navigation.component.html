@@ -230,6 +230,13 @@
         </svg>
         <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">All Users</span>
       </a>
+      <a *ngIf="isAdmin" routerLink="/contact-messages"
+         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+         [title]="sidebarCollapsed ? 'Contact Messages' : ''">
+        <i class="pi pi-inbox sidebar-icon" aria-hidden="true"></i>
+        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Contact Messages</span>
+      </a>
       </ng-container>
 
       <a routerLink="/contact" 

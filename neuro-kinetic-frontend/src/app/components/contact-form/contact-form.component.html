@@ -1,0 +1,162 @@
+<form class="contact-form" (ngSubmit)="submit()">
+  <div *ngIf="mode === 'landing' " class="space-y-8">
+    <div class="space-y-6">
+      <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Personal Information</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input
+            type="text"
+            required
+            class="form-input"
+            name="firstName"
+            placeholder="Enter your first name"
+            [(ngModel)]="firstName"
+            [disabled]="submitting" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input
+            type="text"
+            required
+            class="form-input"
+            name="lastName"
+            placeholder="Enter your last name"
+            [(ngModel)]="lastName"
+            [disabled]="submitting" />
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Contact Information</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input
+            type="email"
+            required
+            class="form-input"
+            name="email"
+            placeholder="your.email@example.com"
+            [(ngModel)]="email"
+            [disabled]="submitting" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Organization</label>
+          <input
+            type="text"
+            class="form-input"
+            name="organization"
+            placeholder="Your organization name"
+            [(ngModel)]="organization"
+            [disabled]="submitting" />
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Professional Information</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label class="form-label">Your Role</label>
+          <select class="form-input" name="role" [(ngModel)]="role" [disabled]="submitting" required>
+            <option *ngFor="let r of roleOptions" [ngValue]="r.value">{{ r.label }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Area of Interest</label>
+          <select
+            class="form-input"
+            name="interest"
+            [(ngModel)]="interest"
+            [disabled]="submitting"
+            required>
+            <option *ngFor="let i of interestOptions" [ngValue]="i.value">{{ i.label }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Your Message</h4>
+      <div class="form-group">
+        <label class="form-label" style="display:none;">Message</label>
+        <textarea
+          rows="5"
+          class="form-input resize-none"
+          name="message"
+          placeholder="Please describe your specific needs and how we can help you..."
+          [(ngModel)]="message"
+          [disabled]="submitting"></textarea>
+      </div>
+    </div>
+
+    <div class="pt-4">
+      <button type="submit" class="btn-send" [disabled]="!canSubmit">
+        <span class="flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+          {{ submitting ? 'Sending...' : 'Send Message' }}
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contact page (simple subject-based form) -->
+  <div *ngIf="mode === 'contact'">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input
+          type="text"
+          required
+          name="firstName"
+          [(ngModel)]="firstName"
+          [disabled]="submitting" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input
+          type="text"
+          required
+          name="lastName"
+          [(ngModel)]="lastName"
+          [disabled]="submitting" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input
+        type="email"
+        required
+        name="email"
+        [(ngModel)]="email"
+        [disabled]="submitting" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Organization</label>
+      <input type="text" name="organization" [(ngModel)]="organization" [disabled]="submitting" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Subject</label>
+      <select name="subject" [(ngModel)]="subject" required [disabled]="submitting">
+        <option *ngFor="let s of subjectOptions" [ngValue]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Message</label>
+      <textarea rows="5" name="message" [(ngModel)]="message" required [disabled]="submitting"></textarea>
+    </div>
+
+    <button type="submit" class="btn-send" [disabled]="!canSubmit">
+      {{ submitting ? 'Sending...' : 'Send Message' }}
+    </button>
+  </div>
+</form>
+
