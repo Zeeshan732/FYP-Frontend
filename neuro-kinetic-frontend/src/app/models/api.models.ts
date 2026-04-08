@@ -490,6 +490,38 @@ export interface ChatMessage {
   createdAt: string;
 }
 
+// ========== Contact Messages ==========
+
+export interface ContactMessageRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  organization?: string | null;
+  subject: string;
+  message: string;
+}
+
+export interface ContactMessageResponse {
+  message: string;
+  saved?: boolean;
+  emailSent?: boolean;
+  adminEmailSent?: boolean;
+  acknowledgementEmailSent?: boolean;
+}
+
+export interface ContactMessageItem {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  organization?: string | null;
+  subject: string;
+  message: string;
+  adminEmailSent?: boolean;
+  acknowledgementEmailSent?: boolean;
+  createdAt: string;
+}
+
 // ========== Voice Predict (FastAPI /api/voice/predict) ==========
 
 /** Request body for POST /api/voice/predict. Matches Python ML service: { features: [22 numbers in fixed order] }. */

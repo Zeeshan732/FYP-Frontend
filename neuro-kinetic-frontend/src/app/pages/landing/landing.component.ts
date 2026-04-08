@@ -10,13 +10,6 @@ import { ModalService } from '../../services/modal.service';
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent implements OnInit {
-  isRoleDropdownOpen = false;
-  isInterestDropdownOpen = false;
-  selectedRole = '';
-  selectedInterest = '';
-  selectedRoleText = 'Select your role';
-  selectedInterestText = 'Select your interest';
-
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -46,37 +39,6 @@ export class LandingComponent implements OnInit {
   @HostListener('window:scroll')
   onScroll() {
     this.observeElements();
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.custom-dropdown')) {
-      this.isRoleDropdownOpen = false;
-      this.isInterestDropdownOpen = false;
-    }
-  }
-
-  toggleDropdown(type: string) {
-    if (type === 'role') {
-      this.isRoleDropdownOpen = !this.isRoleDropdownOpen;
-      this.isInterestDropdownOpen = false;
-    } else if (type === 'interest') {
-      this.isInterestDropdownOpen = !this.isInterestDropdownOpen;
-      this.isRoleDropdownOpen = false;
-    }
-  }
-
-  selectOption(type: string, value: string, text: string) {
-    if (type === 'role') {
-      this.selectedRole = value;
-      this.selectedRoleText = text;
-      this.isRoleDropdownOpen = false;
-    } else if (type === 'interest') {
-      this.selectedInterest = value;
-      this.selectedInterestText = text;
-      this.isInterestDropdownOpen = false;
-    }
   }
 
   private observeElements() {

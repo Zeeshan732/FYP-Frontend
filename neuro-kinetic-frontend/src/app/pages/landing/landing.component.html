@@ -107,14 +107,14 @@
       <div class="lg:col-span-1 space-y-8">
         <div class="contact-info-card scroll-animate-left delay-100">
           <h3 class="card-title">Need Immediate Support?</h3>
-          <p class="card-desc">Our technical support team is available 24/7 for critical issues.</p>
+          <p class="card-desc">Our support team can help with urgent clinical and technical issues.</p>
           <div class="contact-info-item">
             <span>Emergency Support</span>
-            <span class="text-app-primary">+1 (555) 911-TECH</span>
+            <span class="text-app-primary">+92 307 4839373</span>
           </div>
           <div class="contact-info-item">
             <span>Email</span>
-            <span class="text-app-primary">support&#64;NeuroSync.com</span>
+            <span class="text-app-primary">zeeshanjbd732&#64;gmail.com</span>
           </div>
           <div class="contact-info-item">
             <span>Live Chat</span>
@@ -123,18 +123,18 @@
         </div>
         <div class="contact-info-card scroll-animate-left delay-200">
           <h3 class="card-title">Response Time</h3>
-          <p class="card-desc">We're committed to providing timely responses to all inquiries.</p>
+          <p class="card-desc">Typical turnaround for requests submitted through this form.</p>
           <div class="contact-info-item">
             <span>General Inquiries</span>
             <span class="urgency-normal">Within 24 hours</span>
           </div>
           <div class="contact-info-item">
             <span>Technical Support</span>
-            <span class="urgency-priority">Within 4 hours</span>
+            <span class="urgency-priority">Within 8 hours</span>
           </div>
           <div class="contact-info-item">
             <span>Emergency Issues</span>
-            <span class="urgency-critical">Immediate response</span>
+            <span class="urgency-critical">Same-day priority response</span>
           </div>
         </div>
       </div>
@@ -142,98 +142,7 @@
         <div class="contact-form-card scroll-animate-right delay-100">
           <h2>Contact Us</h2>
           <p class="form-desc">Ready to revolutionize your neurological assessment? Contact our team to learn more about our technology.</p>
-          <form class="space-y-8">
-            <div class="space-y-6">
-              <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Personal Information</h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                  <label class="form-label">First Name</label>
-                  <input type="text" required class="form-input" placeholder="Enter your first name">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Last Name</label>
-                  <input type="text" required class="form-input" placeholder="Enter your last name">
-                </div>
-              </div>
-            </div>
-            <div class="space-y-6">
-              <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Contact Information</h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                  <label class="form-label">Email Address</label>
-                  <input type="email" required class="form-input" placeholder="your.email@example.com">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Organization</label>
-                  <input type="text" class="form-input" placeholder="Your organization name">
-                </div>
-              </div>
-            </div>
-            <div class="space-y-6">
-              <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Professional Information</h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                  <label class="form-label">Your Role</label>
-                  <div class="relative">
-                    <div class="custom-dropdown w-full">
-                      <div class="dropdown-trigger form-input flex items-center justify-between cursor-pointer" (click)="toggleDropdown('role')">
-                        <span class="selected-text" [class.placeholder-text]="!selectedRole" [class.italic]="!selectedRole">{{ selectedRoleText }}</span>
-                        <svg class="w-5 h-5 transition-transform duration-200" [class.rotate-180]="isRoleDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                      </div>
-                      <div class="dropdown-menu absolute top-full left-0 right-0 z-50 mt-1 contact-dropdown-panel" [class.hidden]="!isRoleDropdownOpen">
-                        <div class="dropdown-option" (click)="selectOption('role', '', 'Select your role')">Select your role</div>
-                        <div class="dropdown-option" (click)="selectOption('role', 'healthcare', 'Healthcare Provider')">Healthcare Provider</div>
-                        <div class="dropdown-option" (click)="selectOption('role', 'researcher', 'Researcher')">Researcher</div>
-                        <div class="dropdown-option" (click)="selectOption('role', 'administrator', 'Clinical Administrator')">Clinical Administrator</div>
-                        <div class="dropdown-option" (click)="selectOption('role', 'it-professional', 'IT Professional')">IT Professional</div>
-                        <div class="dropdown-option" (click)="selectOption('role', 'other', 'Other')">Other</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Area of Interest</label>
-                  <div class="relative">
-                    <div class="custom-dropdown w-full">
-                      <div class="dropdown-trigger form-input flex items-center justify-between cursor-pointer" (click)="toggleDropdown('interest')">
-                        <span class="selected-text" [class.placeholder-text]="!selectedInterest" [class.italic]="!selectedInterest">{{ selectedInterestText }}</span>
-                        <svg class="w-5 h-5 transition-transform duration-200" [class.rotate-180]="isInterestDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                      </div>
-                      <div class="dropdown-menu absolute top-full left-0 right-0 z-50 mt-1 contact-dropdown-panel" [class.hidden]="!isInterestDropdownOpen">
-                        <div class="dropdown-option" (click)="selectOption('interest', '', 'Select your interest')">Select your interest</div>
-                        <div class="dropdown-option" (click)="selectOption('interest', 'voice-analysis', 'Voice Analysis Technology')">Voice Analysis Technology</div>
-                        <div class="dropdown-option" (click)="selectOption('interest', 'gait-analysis', 'Gait Analysis Technology')">Gait Analysis Technology</div>
-                        <div class="dropdown-option" (click)="selectOption('interest', 'clinical-integration', 'Clinical Integration')">Clinical Integration</div>
-                        <div class="dropdown-option" (click)="selectOption('interest', 'implementation-support', 'Implementation Support')">Implementation Support</div>
-                        <div class="dropdown-option" (click)="selectOption('interest', 'general-info', 'General Information')">General Information</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="space-y-6">
-              <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Your Message</h4>
-              <div class="form-group">
-                <label class="form-label">Tell us about your needs</label>
-                <textarea rows="5" class="form-input resize-none" placeholder="Please describe your specific needs and how we can help you..."></textarea>
-              </div>
-            </div>
-            <div class="pt-4">
-              <button type="submit" class="btn-send">
-                <span class="flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                  </svg>
-                  Send Message
-                </span>
-              </button>
-            </div>
-          </form>
+          <app-contact-form mode="landing"></app-contact-form>
         </div>
       </div>
     </div>
