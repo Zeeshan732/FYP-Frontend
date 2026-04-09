@@ -1,6 +1,6 @@
-<section class="contact-messages-shell min-h-screen bg-pagebg pb-20">
-  <div class="contact-messages-inner w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
-    <div class="max-w-[1600px] mx-auto mb-6">
+<section class="contact-messages-shell min-h-screen pt-24 text-app-text-primary">
+  <div class="container mx-auto px-4 py-8 contact-messages-inner">
+    <div class="mb-6">
       <div class="app-card bg-app-surface border border-app-border p-4">
         <div class="flex flex-col lg:flex-row gap-3 lg:items-end">
           <div class="flex-1">
@@ -43,13 +43,13 @@
       </div>
     </div>
 
-    <div *ngIf="error" class="max-w-[1600px] mx-auto mb-6">
+    <div *ngIf="error" class="mb-6">
       <div class="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg text-sm">{{ error }}</div>
     </div>
 
     <app-skeleton *ngIf="loading" variant="table" [rows]="6" [cols]="9"></app-skeleton>
 
-    <div *ngIf="!loading && items.length > 0" class="max-w-[1600px] mx-auto mb-8">
+    <div *ngIf="!loading && items.length > 0" class="mb-8">
       <div class="bg-app-surface border border-app-border rounded-lg overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
           <table class="w-full neuro-table">
@@ -57,9 +57,9 @@
               <tr>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Name</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Email</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Organization</th>
+                <!-- <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Organization</th> -->
                 <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Subject</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Message</th>
+                <!-- <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Message</th> -->
                 <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">Admin Email</th>
                 <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">User Ack</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Received</th>
@@ -70,9 +70,9 @@
               <tr *ngFor="let item of items">
                 <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.firstName }} {{ item.lastName }}</td>
                 <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.email }}</td>
-                <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.organization || '—' }}</td>
+                <!-- <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.organization || '—' }}</td> -->
                 <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.subject }}</td>
-                <td class="px-4 py-3 text-sm text-app-text-primary message-cell">{{ item.message }}</td>
+                <!-- <td class="px-4 py-3 text-sm text-app-text-primary message-cell">{{ item.message }}</td> -->
                 <td class="px-4 py-3 text-center">
                   <span [class]="getEmailBadgeClass(item.adminEmailSent)">
                     {{ getEmailStatusText(item.adminEmailSent) }}
@@ -100,12 +100,12 @@
       </div>
     </div>
 
-    <div *ngIf="!loading && items.length === 0" class="max-w-[1600px] mx-auto text-center py-12">
+    <div *ngIf="!loading && items.length === 0" class="text-center py-12">
       <p class="text-app-text-primary text-xl mb-3">No contact messages found</p>
       <p class="text-app-text-muted">Try adjusting search or filters.</p>
     </div>
 
-    <div *ngIf="!loading && totalPages > 0" class="max-w-[1600px] mx-auto">
+    <div *ngIf="!loading && totalPages > 0">
       <div class="bg-app-surface border border-app-border rounded-lg p-4 shadow-sm">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="text-sm text-app-text-primary">

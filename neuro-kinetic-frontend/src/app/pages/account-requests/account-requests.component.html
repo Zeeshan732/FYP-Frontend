@@ -1,6 +1,6 @@
 <app-navigation></app-navigation>
 
-<section class="min-h-screen bg-app-surface-muted pt-24 text-app-text-primary">
+<section class="min-h-screen  pt-24 text-app-text-primary">
   <div class="container mx-auto px-4 py-8">
     <div class="header-row">
       <div>
@@ -46,57 +46,55 @@
         [rows]="5"
         [cols]="5">
       </app-skeleton>
-      <div class="table-wrap" *ngIf="!loading">
+      <ng-container *ngIf="!loading">
         <div class="table-header">
-          <div>User</div>
-          <div>Email</div>
-          <div>Status</div>
-          <div>Reason</div>
-          <div class="actions-col">Actions</div>
+          <div class="col-user">User</div>
+          <div class="col-email">Email</div>
+          <div class="col-status">Status</div>
+          <div class="col-reason">Reason</div>
+          <div class="col-actions actions-col">Actions</div>
         </div>
 
-        <div class="table-body">
-          <div class="row state-row" *ngIf="!loading && requests.length === 0">No account requests found.</div>
+        <div class="row state-row text-center" *ngIf="requests.length === 0">No account requests found.</div>
 
-          <div class="row" *ngFor="let req of requests">
-            <div class="cell user">
-              <div class="name">{{ req.firstName }} {{ req.lastName }}</div>
-              <div class="meta">ID: {{ req.id }}</div>
-            </div>
-            <div class="cell email">{{ req.email }}</div>
-            <div class="cell">
-              <span
-                class="badge"
-                [ngClass]="{
-                  'pending': req.status === 'Pending',
-                  'approved': req.status === 'Approved',
-                  'rejected': req.status === 'Rejected'
-                }"
-              >
-                {{ req.status }}
-              </span>
-            </div>
-            <div class="cell reason">
-              <div class="pill">{{ req.comment ? req.comment : '-' }}</div>
-            </div>
-            <div class="cell actions">
-              <button
-                class="icon-btn view"
-                [disabled]="loading"
-                (click)="openModal(req)"
-                title="View details"
-              >
-                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </button>
-            </div>
+        <div class="row" *ngFor="let req of requests">
+          <div class="cell user col-user">
+            <div class="name">{{ req.firstName }} {{ req.lastName }}</div>
+            <div class="meta">ID: {{ req.id }}</div>
+          </div>
+          <div class="cell email col-email">{{ req.email }}</div>
+          <div class="cell col-status">
+            <span
+              class="badge"
+              [ngClass]="{
+                'pending': req.status === 'Pending',
+                'approved': req.status === 'Approved',
+                'rejected': req.status === 'Rejected'
+              }"
+            >
+              {{ req.status }}
+            </span>
+          </div>
+          <div class="cell reason col-reason">
+            <div class="pill">{{ req.comment ? req.comment : '-' }}</div>
+          </div>
+          <div class="cell actions col-actions">
+            <button
+              class="table-action-btn"
+              [disabled]="loading"
+              (click)="openModal(req)"
+              title="View details"
+              type="button"
+            >
+              <i class="pi pi-eye" aria-hidden="true"></i>
+            </button>
           </div>
         </div>
-      </div>
+      </ng-container>
+    </div>
 
-      <div class="table-footer" *ngIf="!loading">
+    <div class="table-footer-card" *ngIf="!loading">
+      <div class="table-footer">
         <div class="table-footer-text">
           Showing {{ ((pageNumber - 1) * pageSize) + 1 }}-
           {{ Math.min(pageNumber * pageSize, totalCount) }} of {{ totalCount }}

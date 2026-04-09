@@ -1,6 +1,6 @@
 <app-navigation></app-navigation>
 
-<section class="min-h-screen bg-app-surface-muted pt-24 text-app-text-primary">
+<section class="min-h-screen  pt-24 text-app-text-primary">
   <div class="container mx-auto px-4 py-8">
     <div class="header-row">
       <div>
@@ -60,7 +60,6 @@
           <div>Email</div>
           <div>Role</div>
           <div>Status</div>
-          <div>Institution</div>
           <div>Actions</div>
         </div>
 
@@ -89,24 +88,25 @@
                 {{ getStatusLabel(user.status, user.isActive) }}
               </span>
             </div>
-            <div class="cell">
-              <div class="pill">{{ user.institution || '-' }}</div>
-            </div>
             <div class="cell actions-cell">
               <div class="flex items-center gap-3">
                 <button
                   type="button"
-                  class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-app-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  [class.bg-app-primary]="isUserActive(user)"
-                  [class.bg-gray-600]="isUserInactive(user)"
+                  class="user-status-toggle"
+                  [ngClass]="{
+                    'is-on': isUserActive(user),
+                    'is-off': isUserInactive(user)
+                  }"
                   [disabled]="loading || isToggling(user.id)"
                   (click)="toggleUserStatus(user)"
                   [title]="isUserActive(user) ? 'Click to deactivate' : 'Click to activate'"
                 >
                   <span
-                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                    [class.translate-x-6]="isUserActive(user)"
-                    [class.translate-x-1]="isUserInactive(user)"
+                    class="user-status-toggle__knob"
+                    [ngClass]="{
+                      'is-on': isUserActive(user),
+                      'is-off': isUserInactive(user)
+                    }"
                   ></span>
                 </button>
                 <span class="text-sm text-app-text-muted whitespace-nowrap">
