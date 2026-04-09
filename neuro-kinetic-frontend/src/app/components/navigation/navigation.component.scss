@@ -232,7 +232,7 @@
 .neuro-sidebar {
   background: var(--color-sidebar-bg);
   border-right: 1px solid var(--color-border);
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
 }
 
 .neuro-sidebar .sidebar-logo {
@@ -382,7 +382,7 @@ aside button[title]:not([title=""]):hover::after {
     transform: translateX(0);
   }
 
-  .ml-64, .ml-20 {
+  .ml-56, .ml-64, .ml-20 {
     margin-left: 0 !important;
   }
 

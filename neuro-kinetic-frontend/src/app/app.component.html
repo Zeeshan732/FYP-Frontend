@@ -4,7 +4,7 @@
 <!-- Header Component (shown when authenticated) -->
 <app-header></app-header>
 
-<div [class.ml-64]="isAuthenticated && !sidebarCollapsed && !isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
+<div [class.ml-56]="isAuthenticated && !sidebarCollapsed && !isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
      [class.ml-20]="isAuthenticated && sidebarCollapsed && !isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
      [class.pt-16]="isAuthenticated && currentRoute !== '/landing' && currentRoute !== '/'"
      class="app-shell transition-all duration-300 ease-in-out">

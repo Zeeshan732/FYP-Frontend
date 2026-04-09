@@ -1,43 +1,116 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-  <div class="container mx-auto px-4 py-16">
-    <div class="text-center">
-      <h1 class="text-5xl font-bold text-gray-900 mb-6">
-        NeuroSync
-      </h1>
-      <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-        Advanced neurological analysis through voice and gait pattern recognition
-      </p>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-          <div class="text-blue-600 text-4xl mb-4">🎤</div>
-          <h3 class="text-xl font-semibold mb-2">Voice Analysis</h3>
-          <p class="text-gray-600">Advanced speech pattern analysis for neurological assessment</p>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-          <div class="text-green-600 text-4xl mb-4">🚶</div>
-          <h3 class="text-xl font-semibold mb-2">Gait Analysis</h3>
-          <p class="text-gray-600">Movement pattern recognition for neurological insights</p>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-          <div class="text-purple-600 text-4xl mb-4">🧠</div>
-          <h3 class="text-xl font-semibold mb-2">Research</h3>
-          <p class="text-gray-600">Cutting-edge neurological research and development</p>
-        </div>
+<app-navigation></app-navigation>
+
+<section class="public-dashboard-wrap min-h-screen pt-24 pb-16 text-app-text-primary">
+  <div class="container mx-auto px-4 py-8">
+    <div class="dashboard-header">
+      <div>
+        <h1>Public Dashboard</h1>
+        <p>Track your test activity, consultation sessions, and AI usage in one place.</p>
       </div>
-      
-      <div class="mt-12">
-        <a routerLink="/voice-analysis" 
-           class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors mr-4">
-          Voice Analysis
-        </a>
-        <a routerLink="/gait-analysis" 
-           class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors">
-          Gait Analysis
-        </a>
+      <div class="header-actions">
+        <button type="button" class="action-btn secondary" (click)="goToConsultation()">Consultation</button>
+        <button type="button" class="action-btn primary" (click)="goToTakeTest()">Take New Test</button>
       </div>
     </div>
+
+    <div *ngIf="error" class="error-card">{{ error }}</div>
+
+    <app-skeleton *ngIf="loading" variant="card" [cols]="4"></app-skeleton>
+
+    <ng-container *ngIf="!loading">
+      <div class="stats-grid">
+        <article class="stat-card">
+          <p class="label">Total Tests</p>
+          <p class="value">{{ stats.totalTests }}</p>
+          <p class="meta">Completed {{ stats.completedTests }} | Pending {{ stats.pendingTests }}</p>
+        </article>
+
+        <article class="stat-card">
+          <p class="label">Consultation Sessions</p>
+          <p class="value">{{ stats.consultationSessions }}</p>
+          <p class="meta">RAG interactions {{ stats.ragInteractions }}</p>
+        </article>
+
+        <article class="stat-card">
+          <p class="label">Average Accuracy</p>
+          <p class="value">{{ stats.averageAccuracy | number:'1.0-1' }}%</p>
+          <p class="meta">From your latest completed tests</p>
+        </article>
+
+        <article class="stat-card">
+          <p class="label">Result Split</p>
+          <p class="value split">P {{ stats.positiveTests }} | N {{ stats.negativeTests }} | U {{ stats.uncertainTests }}</p>
+          <p class="meta">Positive / Negative / Uncertain</p>
+        </article>
+      </div>
+
+      <div class="stats-grid compact">
+        <article class="stat-card small">
+          <p class="label">Voice Tests</p>
+          <p class="value">{{ stats.voiceTests }}</p>
+        </article>
+        <article class="stat-card small">
+          <p class="label">Gait Tests</p>
+          <p class="value">{{ stats.gaitTests }}</p>
+        </article>
+        <article class="stat-card small">
+          <p class="label">Finger Tapping</p>
+          <p class="value">{{ stats.fingerTappingTests }}</p>
+        </article>
+        <article class="stat-card small">
+          <p class="label">Failed Tests</p>
+          <p class="value">{{ stats.failedTests }}</p>
+        </article>
+      </div>
+
+      <div class="content-grid">
+        <section class="panel-card">
+          <div class="panel-head">
+            <h2>Recent Tests</h2>
+            <button type="button" class="link-btn" (click)="goToTests()">View all</button>
+          </div>
+
+          <div class="empty" *ngIf="recentTests.length === 0">No tests yet. Start your first assessment.</div>
+
+          <div class="list" *ngIf="recentTests.length > 0">
+            <div class="list-row" *ngFor="let t of recentTests">
+              <div>
+                <p class="title">{{ t.testType || 'test' | titlecase }} test</p>
+                <p class="sub">{{ t.testDate | date:'medium' }}</p>
+              </div>
+              <div class="right">
+                <span class="badge" [ngClass]="{
+                  'positive': t.testResult === 'Positive',
+                  'negative': t.testResult === 'Negative',
+                  'uncertain': t.testResult === 'Uncertain'
+                }">{{ t.testResult }}</span>
+                <span class="score">{{ t.accuracy | number:'1.0-1' }}%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-head">
+            <h2>Recent Consultation</h2>
+            <button type="button" class="link-btn" (click)="goToChatHistory()">View history</button>
+          </div>
+
+          <div class="empty" *ngIf="recentConversations.length === 0">No consultation chats yet.</div>
+
+          <div class="list" *ngIf="recentConversations.length > 0">
+            <div class="list-row" *ngFor="let c of recentConversations">
+              <div>
+                <p class="title">{{ c.title || 'Untitled conversation' }}</p>
+                <p class="sub">Updated {{ c.updatedAt | date:'medium' }}</p>
+              </div>
+              <div class="right">
+                <span class="score">{{ c.messageCount }} msgs</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </ng-container>
   </div>
-</div>
+</section>
