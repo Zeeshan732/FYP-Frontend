@@ -39,7 +39,7 @@
   box-sizing: border-box;
 }
 
-/* Global base styles â€” design tokens */
+/* Global base styles — design tokens */
 * {
   color: inherit;
 }
@@ -106,7 +106,7 @@ app-about {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* â•â•â• SCROLLBAR â€” NeuroSync Dark Theme â•â•â• */
+/* ═══ SCROLLBAR — NeuroSync Dark Theme ═══ */
 
 /* Firefox */
 * {
@@ -194,7 +194,7 @@ select option:hover {
   color: #ffffff !important;
 }
 
-/* ========== FIX 2 â€” Page & layout (dark theme) ========== */
+/* ========== FIX 2 — Page & layout (dark theme) ========== */
 body, #root, .app-container, .admin-dashboard-wrap, section.min-h-screen {
   background-color: var(--color-page-bg);
   color: var(--color-ink);
@@ -204,7 +204,7 @@ body, #root, .app-container, .admin-dashboard-wrap, section.min-h-screen {
   background-color: var(--color-page-bg);
 }
 
-/* ========== FIX 3 — Metric / stat cards ========== */
+/* ========== FIX 3 � Metric / stat cards ========== */
 .stat-card, .metric-card, .admin-dashboard-kpi,
 [class~="stat"], [class~="metric"],
 .app-card.bg-app-surface, .admin-dashboard-kpi.bg-app-surface {
@@ -287,7 +287,7 @@ body, #root, .app-container, .admin-dashboard-wrap, section.min-h-screen {
 .card-uncertain { --global-stat-accent: #c084fc; }
 .card-accuracy { --global-stat-accent: #22d3ee; }
 .card-per-user { --global-stat-accent: #a78bfa; }
-/* ========== FIX 4 â€” Chart cards ========== */
+/* ========== FIX 4 — Chart cards ========== */
 .chart-card, .chart-container, .admin-dashboard-chart-card,
 [class*="chart-wrap"], [class*="ChartCard"] {
   background-color: var(--color-surface) !important;
@@ -317,7 +317,7 @@ body, #root, .app-container, .admin-dashboard-wrap, section.min-h-screen {
   padding: 2px 10px;
 }
 
-/* ========== FIX 6 â€” Filter row ========== */
+/* ========== FIX 6 — Filter row ========== */
 .filter-row, .filter-card, .admin-dashboard-filters {
   background-color: var(--color-surface) !important;
   border: 1px solid var(--color-border) !important;
@@ -550,7 +550,7 @@ a.text-app-primary,
   border-color: var(--color-blue);
 }
 
-/* Risk badges â€” design tokens (override Tailwind when combined in template) */
+/* Risk badges — design tokens (override Tailwind when combined in template) */
 .risk-badge-healthy {
   background: var(--color-healthy-bg) !important;
   color: var(--color-healthy) !important;
@@ -605,7 +605,7 @@ a.text-app-primary,
   font-weight: 500;
 }
 
-/* Tables â€” design tokens */
+/* Tables — design tokens */
 .neuro-table thead {
   background: var(--color-page-bg);
 }
@@ -672,7 +672,7 @@ a.text-app-primary,
   background: var(--color-border);
 }
 
-/* Alerts / Toasts â€” design tokens */
+/* Alerts / Toasts — design tokens */
 .p-toast-message-success {
   background: #E1F5EE !important;
   border: 1px solid #1D9E75 !important;
@@ -765,13 +765,13 @@ html {
   }
 }
 
-/* About page â€” section margin reset */
+/* About page — section margin reset */
 app-about > section {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
-/* â•â•â• Marketing pages â€” slightly larger size and height â•â•â• */
+/* ═══ Marketing pages — slightly larger size and height ═══ */
 app-landing,
 app-about,
 app-blog,
@@ -1016,7 +1016,7 @@ label,
   h2 { font-size: 20px !important; }
 }
 
-/* Top loading bar â€” appears on route change */
+/* Top loading bar — appears on route change */
 .ns-progress-bar {
   position: fixed;
   top: 0;
@@ -1214,4 +1214,5 @@ table {
   font-size: clamp(1rem, 1.25vw, 1.15rem) !important;
   line-height: 1.6 !important;
 }
+
 

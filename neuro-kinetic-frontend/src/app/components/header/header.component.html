@@ -1,9 +1,9 @@
 <div *ngIf="currentUser && !isLandingPage" 
      class="neuro-header fixed top-0 z-40 backdrop-blur-md shadow-sm transition-all duration-300 ease-in-out h-16"
-     [class.left-64]="!sidebarCollapsed && !isCompactViewport"
+     [class.left-56]="!sidebarCollapsed && !isCompactViewport"
      [class.left-20]="sidebarCollapsed && !isCompactViewport"
      [class.right-0]="true"
-     [style.width]="isCompactViewport ? '100%' : (!sidebarCollapsed ? 'calc(100% - 256px)' : 'calc(100% - 80px)')">
+     [style.width]="isCompactViewport ? '100%' : (!sidebarCollapsed ? 'calc(100% - 224px)' : 'calc(100% - 80px)')">
   <div class="header-inner flex items-center justify-between px-4 sm:px-6 py-4 h-16">
     <!-- Breadcrumb Path -->
     <div class="flex items-center space-x-2 flex-1 min-w-0">

@@ -325,7 +325,7 @@ export class AuthService {
       this.router.navigate(['/clinician']);
       return;
     }
-    this.router.navigate(['/patient-test']);
+    this.router.navigate(['/home']);
   }
 
   // ========== PRIVATE METHODS ==========

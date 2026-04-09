@@ -12,8 +12,8 @@
 
 /* Keep content centered inside the visible area when desktop sidebar shifts layout */
 @media (min-width: 1025px) {
-  .app-shell.ml-64 {
-    width: calc(100% - 16rem);
+  .app-shell.ml-56 {
+    width: calc(100% - 14rem);
   }
 
   .app-shell.ml-20 {
