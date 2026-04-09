@@ -81,10 +81,6 @@ export class ClinicianService {
     return this.http.post<void>(`${this.base}/patients/${payload.patientId}/request-test`, payload);
   }
 
-  addNote(patientId: string, content: string): Observable<ClinicianNote> {
-    return this.http.post<ClinicianNote>(`${this.base}/patients/${patientId}/notes`, { content });
-  }
-
   removePatient(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/patients/${id}`);
   }

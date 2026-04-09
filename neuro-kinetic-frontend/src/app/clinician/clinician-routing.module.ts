@@ -10,11 +10,10 @@ const routes: Routes = [
     canActivate: [ClinicianGuard],
     canActivateChild: [ClinicianGuard],
     children: [
-      { path: '', redirectTo: 'patients', pathMatch: 'full' },
-      { path: 'patients', component: PatientsComponent },
+      { path: '', component: PatientsComponent },
       { path: 'patients/:id', component: PatientProfileComponent },
-      { path: 'results', redirectTo: '/test-records', pathMatch: 'full' },
-      { path: 'analytics', redirectTo: '/analytics-dashboard', pathMatch: 'full' }
+      { path: 'patients', redirectTo: '', pathMatch: 'full' },
+      { path: 'results', redirectTo: '/test-records', pathMatch: 'full' }
     ]
   }
 ];

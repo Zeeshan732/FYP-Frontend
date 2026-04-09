@@ -106,6 +106,26 @@
   width: 100%;
 }
 
+// Inline patient search: vertically center placeholder and value (match filter button h-10)
+:host ::ng-deep input.test-records-inline-search.p-inputtext,
+:host ::ng-deep input.test-records-inline-search {
+  box-sizing: border-box;
+  width: 100%;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0 0.75rem 0 2.35rem !important;
+  line-height: 2.5rem !important;
+  font-size: 0.875rem;
+  margin: 0;
+  vertical-align: middle;
+}
+
+:host ::ng-deep input.test-records-inline-search::-webkit-search-decoration,
+:host ::ng-deep input.test-records-inline-search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 @media (max-width: 1024px) {
   .test-records-inner {
     padding-top: 1.25rem !important;

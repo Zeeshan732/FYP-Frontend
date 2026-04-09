@@ -14,9 +14,6 @@ export class PatientProfileComponent implements OnInit {
   notes: ClinicianNote[] = [];
   isLoading = true;
   showRequestModal = false;
-  showNoteForm = false;
-  newNote = '';
-  isSavingNote = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -82,22 +79,6 @@ export class PatientProfileComponent implements OnInit {
     if (label === 'Healthy') return 'b-healthy';
     if (label === 'At risk') return 'b-risk';
     return 'b-high';
-  }
-
-  saveNote(): void {
-    if (!this.patient?.id || !this.newNote.trim()) return;
-    this.isSavingNote = true;
-    this.clinicianService.addNote(this.patient.id, this.newNote.trim()).subscribe({
-      next: (note) => {
-        this.notes = [note, ...this.notes];
-        this.newNote = '';
-        this.showNoteForm = false;
-        this.isSavingNote = false;
-      },
-      error: () => {
-        this.isSavingNote = false;
-      }
-    });
   }
 
   onTestRequested(): void {

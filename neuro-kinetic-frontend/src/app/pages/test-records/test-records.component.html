@@ -16,17 +16,32 @@
 
     <!-- Filters and Controls -->
     <div class="test-records-controls max-w-[1600px] mx-auto mb-6 relative">
-      <div class="test-records-controls-row flex items-center justify-between">
-        <div class="flex flex-col gap-1">
+      <div class="test-records-controls-row flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-1 min-w-0">
           <span class="text-xs font-semibold uppercase tracking-wide text-app-text-muted">
             Test Records
           </span>
           <span class="text-xs text-app-text-muted">
-            Use the filter icon to refine results
+            Search by name or use filters to refine results
           </span>
         </div>
 
-        <div class="test-records-controls-actions flex items-center gap-2">
+        <div class="test-records-controls-actions flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <div *ngIf="isAdmin || isMedicalProfessional" class="flex-1 min-w-0 w-full sm:max-w-[280px] md:max-w-[320px]">
+            <div class="relative w-full">
+              <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted text-sm pointer-events-none z-10"></i>
+              <input
+                pInputText
+                type="search"
+                [(ngModel)]="filterUserName"
+                (ngModelChange)="onNameSearchInput()"
+                class="w-full test-records-inline-search"
+                placeholder="Search patient name or email…"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="flex items-center gap-2 justify-end shrink-0">
           <!-- Filter icon button -->
           <button
             type="button"
@@ -44,6 +59,7 @@
           >
             Take New Test
           </button>
+          </div>
         </div>
       </div>
 
@@ -173,7 +189,7 @@
                 <th class="px-6 py-4 text-left text-sm font-semibold text-app-primary cursor-pointer hover:opacity-90" 
                     (click)="onSortChange('userName')">
                   <div class="flex items-center gap-2">
-                    <span>User Name</span>
+                    <span>Patient</span>
                     <span *ngIf="isColumnSorted('userName')" class="text-app-primary font-bold opacity-90">
                       {{ getSortIcon('userName') }}
                     </span>
@@ -232,7 +248,15 @@
             </thead>
             <tbody>
               <tr *ngFor="let record of records" class="transition-colors">
-                <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.userName }}</td>
+                <td class="px-6 py-4 text-sm text-app-text-primary">
+                  <div class="font-medium">{{ recordDisplayName(record) }}</div>
+                  <div
+                    *ngIf="record.displayName && record.userName && record.displayName.trim() !== record.userName.trim()"
+                    class="text-xs text-app-text-muted mt-0.5 break-all"
+                  >
+                    {{ record.userName }}
+                  </div>
+                </td>
                 <td class="px-6 py-4 text-sm text-app-text-primary">{{ record.testDate | date:'short' }}</td>
                 <td class="px-6 py-4 text-sm text-app-text-primary">{{ getTestCategoryLabel(record.testType) }}</td>
                 <td class="px-6 py-4 text-center">
@@ -295,7 +319,14 @@
     <!-- Empty State -->
     <div *ngIf="!loading && records.length === 0" class="max-w-[1600px] mx-auto text-center py-12">
       <p class="text-app-text-primary text-xl mb-4">No test records found</p>
-      <p class="text-app-text-muted mb-6">Try adjusting your filters or take a new test</p>
+      <p class="text-app-text-muted mb-6">
+        <ng-container *ngIf="isMedicalProfessional">
+          No tests yet for patients assigned to you. Add patients from your Dashboard, or ask them to complete a test.
+        </ng-container>
+        <ng-container *ngIf="!isMedicalProfessional">
+          Try adjusting your filters or take a new test
+        </ng-container>
+      </p>
       <button 
         (click)="takeNewTest()"
         class="bg-app-primary hover:bg-app-primary-hover text-white px-6 py-3 rounded-app-lg transition-colors font-semibold"

@@ -189,15 +189,7 @@ export class AuthService {
         // Set auth data with token and user
         this.setAuthData(token, user);
         
-        // Redirect based on user role (dashboard routes)
-        setTimeout(() => {
-          if (user.role === 'Admin') {
-            this.router.navigate(['/admin-dashboard']);
-          } else {
-            // Main dashboard for regular users
-            this.router.navigate(['/patient-test']);
-          }
-        }, 100);
+        setTimeout(() => this.navigateForAuthenticatedUser(user), 100);
       } else {
         console.error('Failed to decode user from token');
         this.router.navigate(['/login'], { queryParams: { error: 'oauth_failed' } });
@@ -315,6 +307,25 @@ export class AuthService {
   isAdmin(): boolean {
     const user = this.currentUserSubject.value;
     return user?.role === 'Admin';
+  }
+
+  /**
+   * Default route after login or when an authenticated user hits a generic entry (e.g. /home, /landing).
+   */
+  navigateForAuthenticatedUser(user: User | null | undefined): void {
+    if (!user) {
+      this.router.navigate(['/landing']);
+      return;
+    }
+    if (user.role === 'Admin') {
+      this.router.navigate(['/admin-dashboard']);
+      return;
+    }
+    if (user.role === 'MedicalProfessional') {
+      this.router.navigate(['/clinician']);
+      return;
+    }
+    this.router.navigate(['/patient-test']);
   }
 
   // ========== PRIVATE METHODS ==========
