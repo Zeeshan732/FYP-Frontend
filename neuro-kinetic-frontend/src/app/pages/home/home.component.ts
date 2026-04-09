@@ -18,13 +18,7 @@ export class HomeComponent implements OnInit {
     if (this.authService.isAuthenticated()) {
       const user = this.authService.getCurrentUser();
       
-      // Redirect admins to admin dashboard
-      if (user?.role === 'Admin') {
-        this.router.navigate(['/admin-dashboard']);
-      } else {
-        // For other users, redirect to patient-test
-        this.router.navigate(['/patient-test']);
-      }
+      this.authService.navigateForAuthenticatedUser(user);
     } else {
       // Not authenticated, redirect to landing page
       this.router.navigate(['/landing']);

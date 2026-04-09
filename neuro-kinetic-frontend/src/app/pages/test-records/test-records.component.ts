@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { 
@@ -15,7 +15,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
   templateUrl: './test-records.component.html',
   styleUrls: ['./test-records.component.scss']
 })
-export class TestRecordsComponent implements OnInit {
+export class TestRecordsComponent implements OnInit, OnDestroy {
+  private nameSearchDebounce: ReturnType<typeof setTimeout> | null = null;
   records: UserTestRecord[] = [];
   loading = false;
   error = '';
@@ -32,6 +33,8 @@ export class TestRecordsComponent implements OnInit {
   filterStatus: string = '';
   filterResult: string = '';
   filterTestType: string = '';
+  /** Medical professional: filter table by patient name/email (UserName). */
+  filterUserName: string = '';
   sortBy: string = 'testDate';
   sortOrder: 'asc' | 'desc' = 'desc';
 
@@ -80,6 +83,7 @@ export class TestRecordsComponent implements OnInit {
   // User info
   currentUser: any = null;
   isAdmin = false;
+  isMedicalProfessional = false;
 
   // Dialog state
   showDialog: boolean = false;
@@ -115,8 +119,35 @@ export class TestRecordsComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       this.isAdmin = user?.role === 'Admin';
+      this.isMedicalProfessional = user?.role === 'MedicalProfessional';
       this.loadRecords();
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.nameSearchDebounce) {
+      clearTimeout(this.nameSearchDebounce);
+    }
+  }
+
+  /** Debounced server search for admin / medical professional. */
+  onNameSearchInput(): void {
+    if (!this.isAdmin && !this.isMedicalProfessional) {
+      return;
+    }
+    if (this.nameSearchDebounce) {
+      clearTimeout(this.nameSearchDebounce);
+    }
+    this.nameSearchDebounce = setTimeout(() => {
+      this.nameSearchDebounce = null;
+      this.currentPage = 1;
+      this.loadRecords();
+    }, 350);
+  }
+
+  /** Primary label for table: resolved name from API. */
+  recordDisplayName(record: UserTestRecord): string {
+    return (record.displayName?.trim() || record.userName || '').trim() || '—';
   }
 
   loadRecords() {
@@ -130,8 +161,8 @@ export class TestRecordsComponent implements OnInit {
       sortOrder: this.sortOrder
     };
 
-    // Filter by user if not admin
-    if (!this.isAdmin && this.currentUser?.id) {
+    // Patients: scope to self. Admins: all. Clinicians: backend uses JWT + MedicalProfessional role (omit userId).
+    if (!this.isAdmin && !this.isMedicalProfessional && this.currentUser?.id) {
       params.userId = this.currentUser.id;
     }
 
@@ -144,6 +175,9 @@ export class TestRecordsComponent implements OnInit {
     }
     if (this.filterTestType) {
       params.testType = this.filterTestType;
+    }
+    if ((this.isMedicalProfessional || this.isAdmin) && this.filterUserName?.trim()) {
+      params.userNameSearch = this.filterUserName.trim();
     }
 
     this.apiService.getUserTestRecords(params).subscribe({
@@ -194,6 +228,7 @@ export class TestRecordsComponent implements OnInit {
     this.filterStatus = '';
     this.filterResult = '';
     this.filterTestType = '';
+    this.filterUserName = '';
     this.currentPage = 1;
     this.loadRecords();
   }
@@ -361,7 +396,12 @@ export class TestRecordsComponent implements OnInit {
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.filterStatus || this.filterResult || this.filterTestType);
+    return !!(
+      this.filterStatus ||
+      this.filterResult ||
+      this.filterTestType ||
+      ((this.isMedicalProfessional || this.isAdmin) && this.filterUserName?.trim())
+    );
   }
 
   // Helper for template

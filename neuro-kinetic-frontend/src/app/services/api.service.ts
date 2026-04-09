@@ -425,6 +425,7 @@ export class ApiService {
     status?: string;
     testResult?: string;
     testType?: string;
+    userNameSearch?: string;
   } = {}): Observable<PagedResult<UserTestRecord>> {
     let httpParams = new HttpParams();
 
@@ -451,6 +452,9 @@ export class ApiService {
     }
     if (params.testType) {
       httpParams = httpParams.set('testType', params.testType);
+    }
+    if (params.userNameSearch?.trim()) {
+      httpParams = httpParams.set('userNameSearch', params.userNameSearch.trim());
     }
 
     return this.http.get<PagedResult<UserTestRecord>>(`${this.apiUrl}/testrecords`, { params: httpParams });

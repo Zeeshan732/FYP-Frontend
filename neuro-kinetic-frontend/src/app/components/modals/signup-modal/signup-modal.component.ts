@@ -159,7 +159,8 @@ export class SignupModalComponent implements OnInit, OnDestroy {
       lastName: this.lastName,
       institution: this.institution || undefined,
       researchFocus: undefined,
-      role: this.selectedRole === 'clinician' ? 'MedicalProfessional' : 'Public'
+      // Must match backend RegisterRequest.Role (Public | MedicalProfessional); kept in sync by selectRole().
+      role: this.role
     };
 
     this.authService.register(registrationData).subscribe({
@@ -186,7 +187,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
             // Redirect based on role
             const createdRole = response.user?.role;
             if (createdRole === 'MedicalProfessional') {
-              this.router.navigate(['/clinician/patients']);
+              this.router.navigate(['/clinician']);
             } else {
               this.router.navigate(['/patient-test']);
             }

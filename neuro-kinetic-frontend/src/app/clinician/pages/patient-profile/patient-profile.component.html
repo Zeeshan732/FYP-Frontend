@@ -1,5 +1,5 @@
 <div class="pp-page" *ngIf="!isLoading && patient">
-  <button class="pp-back" routerLink="/clinician/patients">← My patients</button>
+  <button class="pp-back" routerLink="/clinician">← Dashboard</button>
 
   <div class="pp-header-card">
     <div class="pp-header-left">
@@ -20,7 +20,6 @@
       </div>
     </div>
     <div class="pp-header-actions">
-      <button class="pp-btn-ghost" (click)="showNoteForm = true">Add note</button>
       <button class="pp-btn-primary" (click)="showRequestModal = true">Request test</button>
     </div>
   </div>
@@ -52,45 +51,43 @@
     </div>
   </div>
 
-  <div class="pp-bottom-grid">
-    <div class="pp-combined-card" [style.border-left-color]="riskColor(combinedScore)">
-      <div class="pp-combined-label">Combined risk score</div>
-      <div class="pp-combined-score" [style.color]="riskColor(combinedScore)">{{ combinedScore.toFixed(1) }}%</div>
-      <div class="pp-combined-sub">Averaged across {{ signalCount }} signals</div>
+  <div class="pp-detail-layout">
+    <div class="pp-detail-sidebar">
+      <div class="pp-combined-card" [style.border-left-color]="riskColor(combinedScore)">
+        <div class="pp-combined-label">Combined risk score</div>
+        <div class="pp-combined-score" [style.color]="riskColor(combinedScore)">{{ combinedScore.toFixed(1) }}%</div>
+        <div class="pp-combined-sub">Averaged across {{ signalCount }} signals</div>
+      </div>
+
+      <div class="pp-notes-card">
+        <div class="pp-section-title">Clinician notes</div>
+        <div class="pp-notes-body">
+          <div class="pp-note-item" *ngFor="let note of notes">
+            <div class="pp-note-meta">{{ note.clinicianName }} · {{ note.createdAt | date:'MMM d, y' }}</div>
+            <div class="pp-note-text">{{ note.content }}</div>
+          </div>
+          <div class="pp-empty-timeline" *ngIf="notes.length === 0">No notes yet</div>
+        </div>
+      </div>
     </div>
 
     <div class="pp-history-card">
-      <div class="pp-section-title">Test history</div>
-      <div class="pp-timeline">
+      <div class="pp-history-header">
+        <div class="pp-section-title">Test history</div>
+        <span class="pp-history-count" *ngIf="results.length">{{ results.length }} {{ results.length === 1 ? 'entry' : 'entries' }}</span>
+      </div>
+      <div class="pp-timeline pp-timeline--scroll">
         <div class="pp-timeline-item" *ngFor="let r of results">
           <div class="pp-timeline-dot" [style.background]="signalColor(r.testType)"></div>
           <div class="pp-timeline-content">
             <div class="pp-timeline-type">{{ r.testType | titlecase }} test</div>
-            <div class="pp-timeline-score" [style.color]="riskColor(r.riskPercent)">{{ r.riskPercent.toFixed(1) }}%</div>
-            <div class="pp-timeline-date">{{ r.createdAt | date:'MMM d, y · HH:mm' }}</div>
+            <div class="pp-timeline-row">
+              <span class="pp-timeline-score" [style.color]="riskColor(r.riskPercent)">{{ r.riskPercent.toFixed(1) }}%</span>
+              <span class="pp-timeline-date">{{ r.createdAt | date:'MMM d, y · HH:mm' }}</span>
+            </div>
           </div>
         </div>
         <div class="pp-empty-timeline" *ngIf="results.length === 0">No tests completed yet</div>
-      </div>
-    </div>
-
-    <div class="pp-notes-card">
-      <div class="pp-section-title">Clinician notes</div>
-
-      <div class="pp-note-item" *ngFor="let note of notes">
-        <div class="pp-note-meta">{{ note.clinicianName }} · {{ note.createdAt | date:'MMM d, y' }}</div>
-        <div class="pp-note-text">{{ note.content }}</div>
-      </div>
-
-      <div class="pp-add-note" *ngIf="showNoteForm">
-        <textarea class="pp-note-input" [(ngModel)]="newNote" placeholder="Enter clinical observations..." rows="3"></textarea>
-        <div class="pp-note-actions">
-          <button class="pp-btn-ghost-sm" (click)="showNoteForm=false;newNote=''">Cancel</button>
-          <button class="pp-btn-teal-sm" [disabled]="!newNote || isSavingNote" (click)="saveNote()">
-            <app-loader *ngIf="isSavingNote" variant="button" title="Saving..."></app-loader>
-            <ng-container *ngIf="!isSavingNote">Save note</ng-container>
-          </button>
-        </div>
       </div>
     </div>
   </div>

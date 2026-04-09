@@ -1,0 +1,172 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ns-stat-card {
+  --ns-card-accent: #6ca8df;
+
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 55%),
+    #11284a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  min-height: 110px;
+  box-shadow: 0 10px 24px rgba(2, 12, 26, 0.28);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, var(--ns-card-accent), transparent);
+    opacity: 0.65;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba(2, 12, 26, 0.35);
+  }
+}
+
+.ns-stat-card__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+
+  svg {
+    width: 21px;
+    height: 21px;
+    display: block;
+  }
+}
+
+.ns-stat-card__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ns-stat-card__value {
+  margin: 0;
+  font-size: clamp(28px, 2.2vw, 34px);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.ns-stat-card__label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.ns-stat-card--patients {
+  --ns-card-accent: #62a6f0;
+
+  .ns-stat-card__icon {
+    background: rgba(53, 132, 220, 0.14);
+    border-color: rgba(98, 166, 240, 0.34);
+    color: #84beff;
+  }
+
+  .ns-stat-card__value {
+    color: #eaf4ff;
+  }
+
+  .ns-stat-card__label {
+    color: rgba(132, 190, 255, 0.88);
+  }
+}
+
+.ns-stat-card--high-risk {
+  --ns-card-accent: #ef7272;
+
+  .ns-stat-card__icon {
+    background: rgba(220, 80, 80, 0.14);
+    border-color: rgba(239, 114, 114, 0.36);
+    color: #f39a9a;
+  }
+
+  .ns-stat-card__value {
+    color: #ffd1d1;
+  }
+
+  .ns-stat-card__label {
+    color: rgba(243, 154, 154, 0.9);
+  }
+}
+
+.ns-stat-card--at-risk {
+  --ns-card-accent: #f0b14b;
+
+  .ns-stat-card__icon {
+    background: rgba(232, 165, 61, 0.16);
+    border-color: rgba(240, 177, 75, 0.38);
+    color: #ffd08a;
+  }
+
+  .ns-stat-card__value {
+    color: #ffe4b5;
+  }
+
+  .ns-stat-card__label {
+    color: rgba(255, 208, 138, 0.9);
+  }
+}
+
+.ns-stat-card--healthy {
+  --ns-card-accent: #4dcc9b;
+
+  .ns-stat-card__icon {
+    background: rgba(51, 187, 134, 0.16);
+    border-color: rgba(77, 204, 155, 0.36);
+    color: #9de9ca;
+  }
+
+  .ns-stat-card__value {
+    color: #cbffe9;
+  }
+
+  .ns-stat-card__label {
+    color: rgba(157, 233, 202, 0.9);
+  }
+}
+
+@media (max-width: 768px) {
+  .ns-stat-card {
+    min-height: 98px;
+    padding: 16px;
+  }
+
+  .ns-stat-card__icon {
+    width: 40px;
+    height: 40px;
+  }
+}

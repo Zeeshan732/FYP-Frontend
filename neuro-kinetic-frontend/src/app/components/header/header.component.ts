@@ -38,7 +38,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     'voice-analysis': 'Voice Analysis',
     'gait-analysis': 'Gait Analysis',
     'login': 'Login',
-    'signup': 'Sign Up'
+    'signup': 'Sign Up',
+    'profile-settings': 'Profile Settings',
+    'clinician': 'Dashboard',
+    'patients': 'Patient'
   };
 
   constructor(
@@ -209,9 +212,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.currentUser?.role === 'Admin';
   }
 
-  navigateToProfile() {
-    // Can navigate to profile page if exists
-    // this.router.navigate(['/profile']);
+  navigateToProfile(): void {
+    this.router.navigate(['/profile-settings']);
   }
 
   goToNotifications() {

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ClinicianService, Patient } from '../../services/clinician.service';
 
 type FilterStatus = 'all' | 'healthy' | 'at-risk' | 'high-risk';
@@ -16,11 +17,15 @@ export class PatientsComponent implements OnInit {
   searchQuery = '';
   filterStatus: FilterStatus = 'all';
   showAddModal = false;
+  showRemovePatientDialog = false;
+  patientPendingRemoval: Patient | null = null;
+  deletingId: string | null = null;
   stats = { total: 0, healthy: 0, atRisk: 0, highRisk: 0 };
 
   constructor(
     private clinicianService: ClinicianService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -62,10 +67,16 @@ export class PatientsComponent implements OnInit {
     return '#E05252';
   }
 
-  labelBadgeClass(label: string): string {
+  statusLabel(p: Patient): string {
+    return p.latestResult?.label ?? 'No tests';
+  }
+
+  statusBadgeClass(label: string | undefined): string {
+    if (!label) return 'b-neutral';
     if (label === 'Healthy') return 'b-healthy';
     if (label === 'At risk') return 'b-risk';
-    return 'b-high';
+    if (label === 'High risk') return 'b-high';
+    return 'b-neutral';
   }
 
   onPatientAdded(patient: Patient): void {
@@ -77,6 +88,43 @@ export class PatientsComponent implements OnInit {
 
   navigateToProfile(id: string): void {
     this.router.navigate(['/clinician/patients', id]);
+  }
+
+  openRemovePatientDialog(p: Patient, event: Event): void {
+    event.stopPropagation();
+    this.patientPendingRemoval = p;
+    this.showRemovePatientDialog = true;
+  }
+
+  cancelRemovePatient(): void {
+    this.showRemovePatientDialog = false;
+    this.patientPendingRemoval = null;
+  }
+
+  confirmRemovePatient(): void {
+    const p = this.patientPendingRemoval;
+    if (!p) {
+      return;
+    }
+    this.deletingId = p.id;
+    this.clinicianService.removePatient(p.id).subscribe({
+      next: () => {
+        this.patients = this.patients.filter((x) => x.id !== p.id);
+        this.deletingId = null;
+        this.showRemovePatientDialog = false;
+        this.patientPendingRemoval = null;
+        this.calculateStats();
+        this.filterPatients();
+      },
+      error: () => {
+        this.deletingId = null;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Remove failed',
+          detail: 'Could not remove this patient. Please try again.'
+        });
+      }
+    });
   }
 
   private calculateStats(): void {

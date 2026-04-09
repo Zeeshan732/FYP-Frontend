@@ -74,11 +74,22 @@ export class TestRecordDialogComponent implements OnInit, OnChanges, AfterViewIn
     }
   }
 
+  /** Shown under patient name when it differs from stored login/email. */
+  get patientEmailLine(): string | null {
+    if (!this.record) return null;
+    const name = (this.record.displayName || '').trim();
+    const login = (this.record.userName || '').trim();
+    if (!login || !name || login.toLowerCase() === name.toLowerCase()) return null;
+    return `Account / email: ${login}`;
+  }
+
   initializeForm() {
     const recordData: Partial<UserTestRecord> = this.record || {};
-    
+    const display =
+      (recordData.displayName?.trim() || recordData.userName || '').trim();
+
     this.recordForm = this.fb.group({
-      userName: [{ value: recordData.userName || '', disabled: true }],
+      userName: [{ value: display, disabled: true }],
       testDate: [{ value: recordData.testDate ? new Date(recordData.testDate) : new Date(), disabled: true }],
       // In view mode, make these fields read-only as well
       testResult: [{ value: recordData.testResult || 'Uncertain', disabled: !this.isEditMode }, Validators.required],
@@ -95,6 +106,8 @@ export class TestRecordDialogComponent implements OnInit, OnChanges, AfterViewIn
       const updatedRecord: UserTestRecord = {
         ...this.record!,
         ...formValue,
+        userName: this.record!.userName,
+        displayName: this.record!.displayName,
         testDate: formValue.testDate instanceof Date 
           ? formValue.testDate.toISOString() 
           : this.record!.testDate

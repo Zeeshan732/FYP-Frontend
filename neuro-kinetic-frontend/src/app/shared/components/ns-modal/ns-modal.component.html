@@ -1,0 +1,69 @@
+<div
+  class="ns-modal-backdrop"
+  *ngIf="visible"
+  @nsBackdrop
+  (click)="onBackdropClick()"
+  role="presentation"
+>
+  <div
+    class="ns-modal"
+    @nsPanel
+    (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="title ? 'ns-modal-title' : null"
+  >
+    <header class="ns-modal__header" [ngClass]="headerModifierClass()">
+      <div class="ns-modal__header-left">
+        <i [class]="headerIconClass()" aria-hidden="true"></i>
+        <h2 id="ns-modal-title" class="ns-modal__title">{{ title }}</h2>
+      </div>
+      <button
+        type="button"
+        class="ns-modal__close"
+        (click)="onCloseClick()"
+        [disabled]="confirmLoading || !dismissible"
+        [attr.aria-label]="cancelLabel"
+      >
+        ×
+      </button>
+    </header>
+
+    <div class="ns-modal__body">
+      <div class="ns-modal__body-main">
+        <ng-content></ng-content>
+      </div>
+      <p class="ns-modal__subtext" *ngIf="subtext">{{ subtext }}</p>
+    </div>
+
+    <footer class="ns-modal__footer">
+      <button
+        *ngIf="!singleAction"
+        type="button"
+        class="ns-modal__icon-btn ns-modal__footer-cancel"
+        (click)="onCancelClick()"
+        [disabled]="confirmLoading"
+        [attr.aria-label]="cancelLabel"
+        [attr.title]="cancelLabel"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+      <button
+        type="button"
+        class="ns-modal__icon-btn ns-modal__footer-confirm"
+        [ngClass]="confirmModifierClass()"
+        (click)="onConfirmClick()"
+        [disabled]="confirmLoading"
+        [attr.aria-label]="confirmLabel"
+        [attr.title]="confirmLabel"
+      >
+        <i
+          *ngIf="!confirmLoading"
+          class="pi pi-check"
+          aria-hidden="true"
+        ></i>
+        <span *ngIf="confirmLoading" class="ns-modal__spinner" aria-hidden="true"></span>
+      </button>
+    </footer>
+  </div>
+</div>

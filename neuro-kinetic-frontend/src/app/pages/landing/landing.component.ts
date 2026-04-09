@@ -21,11 +21,7 @@ export class LandingComponent implements OnInit {
     // If user is authenticated (with valid token), redirect to appropriate page
     if (this.authService.isAuthenticated()) {
       const user = this.authService.getCurrentUser();
-      if (user?.role === 'Admin') {
-        this.router.navigate(['/admin-dashboard']);
-      } else {
-        this.router.navigate(['/patient-test']);
-      }
+      this.authService.navigateForAuthenticatedUser(user);
       return;
     }
 

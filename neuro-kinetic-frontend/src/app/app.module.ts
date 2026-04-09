@@ -45,7 +45,6 @@ import { VoiceInputComponent } from './pages/voice-input/voice-input.component';
 import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.component';
 import { LiveVoiceMonitorComponent } from './pages/live-voice-monitor/live-voice-monitor.component';
 import { ConsultationComponent } from './pages/consultation/consultation.component';
-import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
 import { FingerTapComponent } from './pages/finger-tap/finger-tap.component';
 import { AboutComponent } from './pages/about/about.component';
 import { BlogComponent } from './pages/blog/blog.component';
@@ -86,7 +85,6 @@ import { SharedModule } from './shared/shared.module';
     VoiceInputComponent,
     LiveVoiceMonitorComponent,
     ConsultationComponent,
-    AnalyticsDashboardComponent,
     FingerTapComponent,
     AboutComponent,
     BlogComponent,

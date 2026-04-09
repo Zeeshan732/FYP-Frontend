@@ -138,14 +138,23 @@
   color: rgba(255,255,255,0.35);
 }
 
-.pp-bottom-grid {
+.pp-detail-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.pp-detail-sidebar {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+  min-width: 0;
 }
 
 .pp-combined-card {
   border-left: 3px solid #2E86DE;
+  flex-shrink: 0;
 }
 
 .pp-combined-label {
@@ -167,13 +176,69 @@
   font-size: 14px;
   font-weight: 600;
   color: #fff;
+  margin: 0;
+}
+
+.pp-history-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+  max-height: min(72vh, 640px);
+  min-width: 0;
+}
+
+.pp-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pp-history-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+}
+
+.pp-notes-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.pp-notes-card .pp-section-title {
   margin-bottom: 10px;
+}
+
+.pp-notes-body {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-right: -4px;
+  padding-right: 4px;
+}
+
+.pp-timeline--scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-right: -6px;
+  padding-right: 6px;
 }
 
 .pp-timeline-item {
   display: flex;
   gap: 10px;
-  padding: 8px 0;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pp-timeline-item:last-of-type {
+  border-bottom: none;
 }
 
 .pp-timeline-dot {
@@ -184,9 +249,30 @@
   flex-shrink: 0;
 }
 
-.pp-timeline-type { font-size: 13px; color: #fff; }
-.pp-timeline-score { font-size: 13px; font-weight: 600; }
-.pp-timeline-date { font-size: 11px; color: rgba(255,255,255,0.38); }
+.pp-timeline-type {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.pp-timeline-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.pp-timeline-score {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pp-timeline-date {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.38);
+  text-align: right;
+}
 .pp-empty-timeline { font-size: 12px; color: rgba(255,255,255,0.35); }
 
 .pp-note-item {
@@ -227,11 +313,36 @@
   margin-top: 8px;
 }
 
+.pp-timeline--scroll::-webkit-scrollbar,
+.pp-notes-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pp-timeline--scroll::-webkit-scrollbar-thumb,
+.pp-notes-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.pp-timeline--scroll::-webkit-scrollbar-track,
+.pp-notes-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 @media (max-width: 1024px) {
   .pp-signals-grid {
     grid-template-columns: 1fr;
   }
-  .pp-bottom-grid {
+
+  .pp-detail-layout {
     grid-template-columns: 1fr;
+  }
+
+  .pp-history-card {
+    max-height: min(55vh, 480px);
+  }
+
+  .pp-notes-body {
+    max-height: 180px;
   }
 }

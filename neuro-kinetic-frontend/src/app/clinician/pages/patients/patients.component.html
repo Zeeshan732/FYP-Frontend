@@ -1,22 +1,10 @@
 <div class="cp-page">
-  <div class="cp-stats">
-    <div class="cp-stat-card cp-stat-blue">
-      <div class="cp-stat-label">Total patients</div>
-      <div class="cp-stat-value">{{ stats.total }}</div>
-    </div>
-    <div class="cp-stat-card cp-stat-red">
-      <div class="cp-stat-label">High risk</div>
-      <div class="cp-stat-value cp-val-red">{{ stats.highRisk }}</div>
-    </div>
-    <div class="cp-stat-card cp-stat-amber">
-      <div class="cp-stat-label">At risk</div>
-      <div class="cp-stat-value cp-val-amber">{{ stats.atRisk }}</div>
-    </div>
-    <div class="cp-stat-card cp-stat-teal">
-      <div class="cp-stat-label">Healthy</div>
-      <div class="cp-stat-value cp-val-teal">{{ stats.healthy }}</div>
-    </div>
-  </div>
+  <ns-stat-card-grid>
+    <ns-stat-card variant="patients" [value]="stats.total" label="Total Patients"></ns-stat-card>
+    <ns-stat-card variant="high-risk" [value]="stats.highRisk" label="High Risk"></ns-stat-card>
+    <ns-stat-card variant="at-risk" [value]="stats.atRisk" label="At Risk"></ns-stat-card>
+    <ns-stat-card variant="healthy" [value]="stats.healthy" label="Healthy"></ns-stat-card>
+  </ns-stat-card-grid>
 
   <div class="cp-table-header">
     <h2 class="cp-table-title">My Patients</h2>
@@ -50,11 +38,11 @@
 
   <div class="cp-table" *ngIf="!isLoading">
     <div class="cp-table-head">
-      <span>Patient</span>
-      <span>Last test</span>
-      <span>Risk score</span>
-      <span>Status</span>
-      <span></span>
+      <span class="cp-col-patient">Patient</span>
+      <span class="cp-col-last-test">Last test</span>
+      <span class="cp-col-risk">Risk score</span>
+      <span class="cp-col-status">Status</span>
+      <span class="cp-col-actions cp-th-actions">Actions</span>
     </div>
 
     <div class="cp-table-row" *ngFor="let p of filteredPatients" (click)="navigateToProfile(p.id)">
@@ -70,18 +58,37 @@
         </div>
       </div>
 
-      <span class="cp-cell-muted">{{ p.latestResult?.lastTestDate | date:'MMM d' }}</span>
+      <span class="cp-cell-muted cp-col-last-test">{{ p.latestResult?.lastTestDate | date:'MMM d' }}</span>
 
-      <span class="cp-risk-score" [style.color]="riskColor(p.latestResult?.overallScore ?? 0)">
+      <span class="cp-risk-score cp-col-risk" [style.color]="riskColor(p.latestResult?.overallScore ?? 0)">
         {{ p.latestResult?.overallScore?.toFixed(1) ?? '—' }}%
       </span>
 
-      <span class="cp-badge" [ngClass]="labelBadgeClass(p.latestResult?.label ?? '')">
-        <span class="cp-badge-dot"></span>
-        {{ p.latestResult?.label ?? 'No tests' }}
+      <span class="cp-badge cp-col-status" [ngClass]="statusBadgeClass(p.latestResult?.label)">
+        {{ statusLabel(p) }}
       </span>
 
-      <span class="cp-view-link">View →</span>
+      <div class="cp-actions-cell cp-col-actions" (click)="$event.stopPropagation()">
+        <button
+          type="button"
+          class="cp-view-btn"
+          (click)="navigateToProfile(p.id)"
+          title="View patient"
+        >
+          <i class="pi pi-eye" aria-hidden="true"></i>
+          <span class="cp-sr-only">View patient</span>
+        </button>
+        <button
+          type="button"
+          class="cp-delete-btn"
+          [disabled]="deletingId === p.id"
+          (click)="openRemovePatientDialog(p, $event)"
+          title="Remove from my patients"
+        >
+          <i class="pi pi-trash" aria-hidden="true"></i>
+          <span class="cp-sr-only">Remove from my patients</span>
+        </button>
+      </div>
     </div>
 
     <div class="cp-empty" *ngIf="filteredPatients.length === 0">
@@ -96,6 +103,22 @@
     </div>
   </div>
 </div>
+
+<ns-modal
+  [(visible)]="showRemovePatientDialog"
+  intent="danger"
+  title="Remove patient"
+  subtext="Their NeuroSync account is not deleted—they will only disappear from your patients until assigned again."
+  [confirmLoading]="!!deletingId"
+  [dismissible]="!deletingId"
+  cancelLabel="Cancel"
+  confirmLabel="Remove from list"
+  (cancel)="cancelRemovePatient()"
+  (confirm)="confirmRemovePatient()">
+  <p *ngIf="patientPendingRemoval as pending">
+    Remove <strong>{{ pending.firstName }} {{ pending.lastName }}</strong> from your list?
+  </p>
+</ns-modal>
 
 <app-add-patient-modal
   *ngIf="showAddModal"

@@ -17,7 +17,6 @@ import { LiveVoiceMonitorComponent } from './pages/live-voice-monitor/live-voice
 import { OAuthCallbackComponent } from './pages/oauth-callback/oauth-callback.component';
 import { ConsultationComponent } from './pages/consultation/consultation.component';
 import { FingerTapComponent } from './pages/finger-tap/finger-tap.component';
-import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
 import { ChatHistoryComponent } from './pages/chat-history/chat-history.component';
 import { ProfileSettingsComponent } from './pages/profile-settings/profile-settings.component';
 import { ContactMessagesComponent } from './pages/contact-messages/contact-messages.component';
@@ -33,7 +32,7 @@ const routes: Routes = [
   { path: 'services', component: ServicesComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'login', component: LandingComponent, data: { openLoginModal: true } },
-  { path: 'dashboard', redirectTo: '/patient-test', pathMatch: 'full' },
+  { path: 'dashboard', redirectTo: '/home', pathMatch: 'full' },
   { path: 'auth/callback', component: OAuthCallbackComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'patient-test', component: PatientTestComponent, canActivate: [AuthGuard] },
@@ -43,7 +42,6 @@ const routes: Routes = [
   { path: 'chat-history', component: ChatHistoryComponent, canActivate: [AuthGuard] },
   { path: 'profile-settings', component: ProfileSettingsComponent, canActivate: [AuthGuard] },
   { path: 'finger-tap', component: FingerTapComponent, canActivate: [AuthGuard] },
-  { path: 'analytics-dashboard', component: AnalyticsDashboardComponent, canActivate: [AuthGuard] },
   { path: 'test-records', component: TestRecordsComponent, canActivate: [AuthGuard] },
   { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
   { path: 'account-requests', component: AccountRequestsComponent, canActivate: [AdminGuard] },

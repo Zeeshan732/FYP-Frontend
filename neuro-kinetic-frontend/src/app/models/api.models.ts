@@ -231,7 +231,10 @@ export interface StatisticalSummary {
 export interface UserTestRecord {
   id: number;
   userId: number;
+  /** Stored account label (often email). */
   userName: string;
+  /** Patient full name when linked to a user profile; fallback matches userName. */
+  displayName?: string;
   testDate: string;
   testResult: 'Positive' | 'Negative' | 'Uncertain';
   accuracy: number;
@@ -551,43 +554,3 @@ export interface VoicePredictErrorBody {
   [key: string]: unknown;
 }
 
-// ========== Analytics Layer (independent of ML/RAG) ==========
-
-export interface RiskAdjustRequest {
-  mlRiskPercent: number;
-  gaitScore?: number;
-  age?: number;
-}
-
-export interface RiskAdjustResponse {
-  finalAdjustedRisk: number;
-}
-
-export interface TestRecordPoint {
-  testDate: string; // ISO
-  riskValue: number;
-}
-
-export interface ProgressionRequest {
-  userId?: number;
-  dataPoints?: TestRecordPoint[];
-}
-
-export interface ProgressionAnalysisDto {
-  linearRegressionSlope: number;
-  movingAverages: number[];
-  trendClassification: 'Stable' | 'Increasing' | 'Rapid increase';
-  smoothedPoints: TestRecordPoint[];
-}
-
-export interface StatisticsRequest {
-  values: number[];
-}
-
-export interface StatisticsResponse {
-  mean: number;
-  variance: number;
-  standardDeviation: number;
-  zScores: number[];
-  minMaxNormalized: number[];
-}

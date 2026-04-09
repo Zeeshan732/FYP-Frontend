@@ -209,12 +209,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           // Double-check authentication before redirect
           if (this.authService.isAuthenticated()) {
-            // Redirect based on user role
-            if (response.user?.role === 'Admin') {
-              this.router.navigate(['/admin-dashboard']);
-            } else {
-              this.router.navigate(['/patient-test']);
-            }
+            this.authService.navigateForAuthenticatedUser(response.user);
           } else {
             console.error('Authentication check failed after login');
             this.error = 'Login successful but authentication check failed. Please try again.';
