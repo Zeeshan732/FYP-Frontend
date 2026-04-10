@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../services/api.service';
-import { ChatConversation, PagedResult } from '../../models/api.models';
+import { ChatConversation, ChatMessage, PagedResult } from '../../models/api.models';
 
 @Component({
   selector: 'app-chat-history',
@@ -16,6 +16,17 @@ export class ChatHistoryComponent implements OnInit {
   bulkDeleting = false;
   error = '';
   selectedIds = new Set<number>();
+
+  showDeleteChatDialog = false;
+  chatPendingDelete: ChatConversation | null = null;
+
+  showBulkDeleteDialog = false;
+
+  showChatDetailModal = false;
+  chatDetail: ChatConversation | null = null;
+  chatDetailMessages: ChatMessage[] = [];
+  chatDetailLoading = false;
+  chatDetailError = '';
 
   searchTerm = '';
   sortOrder: 'asc' | 'desc' = 'desc';
@@ -96,11 +107,50 @@ export class ChatHistoryComponent implements OnInit {
   }
 
   openConversation(item: ChatConversation): void {
-    this.router.navigate(['/consultation'], { queryParams: { cid: item.id } });
+    const conversationId = item.id;
+    this.chatDetail = item;
+    this.chatDetailMessages = [];
+    this.chatDetailError = '';
+    this.chatDetailLoading = true;
+    this.showChatDetailModal = true;
+    this.apiService.getChatMessages(conversationId).subscribe({
+      next: (messages) => {
+        if (this.chatDetail?.id !== conversationId) {
+          return;
+        }
+        this.chatDetailMessages = messages;
+        this.chatDetailLoading = false;
+      },
+      error: () => {
+        if (this.chatDetail?.id !== conversationId) {
+          return;
+        }
+        this.chatDetailLoading = false;
+        this.chatDetailError = 'Could not load messages for this conversation.';
+      }
+    });
+  }
+
+  closeChatDetailModal(): void {
+    this.showChatDetailModal = false;
+    this.chatDetail = null;
+    this.chatDetailMessages = [];
+    this.chatDetailError = '';
+    this.chatDetailLoading = false;
   }
 
   openConsultation(): void {
     this.router.navigate(['/consultation']);
+  }
+
+  get chatDetailSubtext(): string | null {
+    const c = this.chatDetail;
+    if (!c) {
+      return null;
+    }
+    const n = c.messageCount;
+    const when = new Date(c.updatedAt).toLocaleString();
+    return `${n} message${n === 1 ? '' : 's'} · Last activity ${when}`;
   }
 
   get hasAnySelection(): boolean {
@@ -127,11 +177,27 @@ export class ChatHistoryComponent implements OnInit {
     this.selectedIds.add(itemId);
   }
 
-  deleteConversation(item: ChatConversation): void {
+  openDeleteChatDialog(item: ChatConversation): void {
+    this.chatPendingDelete = item;
+    this.showDeleteChatDialog = true;
+  }
+
+  cancelDeleteChat(): void {
+    this.showDeleteChatDialog = false;
+    this.chatPendingDelete = null;
+  }
+
+  confirmDeleteChat(): void {
+    const item = this.chatPendingDelete;
+    if (!item) {
+      return;
+    }
     this.deletingId = item.id;
     this.apiService.deleteChatConversation(item.id).subscribe({
       next: () => {
         this.deletingId = null;
+        this.showDeleteChatDialog = false;
+        this.chatPendingDelete = null;
         this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Chat removed successfully.' });
         if (this.items.length === 1 && this.currentPage > 1) {
           this.currentPage -= 1;
@@ -145,7 +211,23 @@ export class ChatHistoryComponent implements OnInit {
     });
   }
 
-  deleteSelected(): void {
+  openBulkDeleteDialog(): void {
+    if (!this.hasAnySelection || this.bulkDeleting) {
+      return;
+    }
+    this.showBulkDeleteDialog = true;
+  }
+
+  cancelBulkDelete(): void {
+    this.showBulkDeleteDialog = false;
+  }
+
+  confirmBulkDelete(): void {
+    this.showBulkDeleteDialog = false;
+    this.executeBulkDelete();
+  }
+
+  private executeBulkDelete(): void {
     if (!this.hasAnySelection || this.bulkDeleting) return;
     this.bulkDeleting = true;
 

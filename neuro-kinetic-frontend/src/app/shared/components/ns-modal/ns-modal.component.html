@@ -7,6 +7,7 @@
 >
   <div
     class="ns-modal"
+    [class.ns-modal--wide]="panelSize === 'wide'"
     @nsPanel
     (click)="$event.stopPropagation()"
     role="dialog"
@@ -15,18 +16,21 @@
   >
     <header class="ns-modal__header" [ngClass]="headerModifierClass()">
       <div class="ns-modal__header-left">
-        <i [class]="headerIconClass()" aria-hidden="true"></i>
+        <i *ngIf="intent === 'danger'" class="pi pi-exclamation-triangle ns-modal__header-icon" aria-hidden="true"></i>
+        <span
+          *ngIf="intent === 'warning'"
+          class="ns-modal__header-dot ns-modal__header-dot--warning"
+          aria-hidden="true"></span>
+        <span
+          *ngIf="intent === 'success'"
+          class="ns-modal__header-dot ns-modal__header-dot--success"
+          aria-hidden="true"></span>
+        <span
+          *ngIf="intent === 'info'"
+          class="ns-modal__header-dot ns-modal__header-dot--info"
+          aria-hidden="true"></span>
         <h2 id="ns-modal-title" class="ns-modal__title">{{ title }}</h2>
       </div>
-      <button
-        type="button"
-        class="ns-modal__close"
-        (click)="onCloseClick()"
-        [disabled]="confirmLoading || !dismissible"
-        [attr.aria-label]="cancelLabel"
-      >
-        ×
-      </button>
     </header>
 
     <div class="ns-modal__body">

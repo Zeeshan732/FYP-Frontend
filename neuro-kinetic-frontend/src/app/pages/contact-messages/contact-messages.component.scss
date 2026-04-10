@@ -1,3 +1,8 @@
+/* Global .app-card.bg-app-surface uses overflow:hidden (stat-card styling) — clips p-dropdown panel */
+.contact-messages-filters {
+  overflow: visible;
+}
+
 .message-cell {
   max-width: 340px;
   white-space: nowrap;

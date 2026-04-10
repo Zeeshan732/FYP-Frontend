@@ -22,7 +22,7 @@
         <article class="stat-card">
           <p class="label">Total Tests</p>
           <p class="value">{{ stats.totalTests }}</p>
-          <p class="meta">Completed {{ stats.completedTests }} | Pending {{ stats.pendingTests }}</p>
+          <p class="meta">Completed {{ stats.completedTests }} · Pending {{ stats.pendingTests }}</p>
         </article>
 
         <article class="stat-card">
@@ -39,27 +39,75 @@
 
         <article class="stat-card">
           <p class="label">Result Split</p>
-          <p class="value split">P {{ stats.positiveTests }} | N {{ stats.negativeTests }} | U {{ stats.uncertainTests }}</p>
-          <p class="meta">Positive / Negative / Uncertain</p>
+          <div class="split-row">
+            <div class="split-item s-pos">
+              <span class="split-ltr">P</span>
+              <span class="split-num">{{ stats.positiveTests }}</span>
+            </div>
+            <span class="split-div">·</span>
+            <div class="split-item s-neg">
+              <span class="split-ltr">N</span>
+              <span class="split-num">{{ stats.negativeTests }}</span>
+            </div>
+            <span class="split-div">·</span>
+            <div class="split-item s-unc">
+              <span class="split-ltr">U</span>
+              <span class="split-num">{{ stats.uncertainTests }}</span>
+            </div>
+          </div>
+          <p class="meta">Positive · Negative · Uncertain</p>
         </article>
       </div>
 
       <div class="stats-grid compact">
         <article class="stat-card small">
-          <p class="label">Voice Tests</p>
-          <p class="value">{{ stats.voiceTests }}</p>
+          <div class="stat-icon stat-icon--voice" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="23" />
+              <line x1="8" y1="23" x2="16" y2="23" />
+            </svg>
+          </div>
+          <div class="stat-card-sm-copy">
+            <p class="sm-value">{{ stats.voiceTests }}</p>
+            <p class="sm-label">Voice Tests</p>
+          </div>
         </article>
         <article class="stat-card small">
-          <p class="label">Gait Tests</p>
-          <p class="value">{{ stats.gaitTests }}</p>
+          <div class="stat-icon stat-icon--gait" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+          </div>
+          <div class="stat-card-sm-copy">
+            <p class="sm-value">{{ stats.gaitTests }}</p>
+            <p class="sm-label">Gait Tests</p>
+          </div>
         </article>
         <article class="stat-card small">
-          <p class="label">Finger Tapping</p>
-          <p class="value">{{ stats.fingerTappingTests }}</p>
+          <div class="stat-icon stat-icon--finger" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+          </div>
+          <div class="stat-card-sm-copy">
+            <p class="sm-value">{{ stats.fingerTappingTests }}</p>
+            <p class="sm-label">Finger Tapping</p>
+          </div>
         </article>
         <article class="stat-card small">
-          <p class="label">Failed Tests</p>
-          <p class="value">{{ stats.failedTests }}</p>
+          <div class="stat-icon stat-icon--failed" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M15 9l-6 6M9 9l6 6" />
+            </svg>
+          </div>
+          <div class="stat-card-sm-copy">
+            <p class="sm-value">{{ stats.failedTests }}</p>
+            <p class="sm-label">Failed Tests</p>
+          </div>
         </article>
       </div>
 

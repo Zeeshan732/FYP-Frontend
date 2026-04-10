@@ -42,16 +42,30 @@
           <div class="nl-line"></div>
         </div>
 
-        <form (ngSubmit)="onSubmit()" class="nl-form">
+        <form (ngSubmit)="onSubmit()" class="nl-form" autocomplete="on">
           <div class="nl-field">
             <label>Email address</label>
-            <input type="email" [(ngModel)]="email" name="email" [disabled]="loading" placeholder="you@hospital.com" required>
+            <input
+              type="email"
+              [(ngModel)]="email"
+              name="email"
+              autocomplete="username"
+              [disabled]="loading"
+              placeholder="you@hospital.com"
+              required>
           </div>
 
           <div class="nl-field">
             <label>Password</label>
             <div class="nl-pass-wrap">
-              <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" [disabled]="loading" placeholder="Enter your password" required>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                [(ngModel)]="password"
+                name="password"
+                autocomplete="current-password"
+                [disabled]="loading"
+                placeholder="Enter your password"
+                required>
               <button class="nl-eye" type="button" (click)="showPassword = !showPassword">
                 <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
@@ -116,7 +130,13 @@
 
         <div class="nl-field">
           <label>Email address</label>
-          <input type="email" [(ngModel)]="resetEmail" name="resetEmail" placeholder="you@hospital.com" required>
+          <input
+            type="email"
+            [(ngModel)]="resetEmail"
+            name="resetEmail"
+            autocomplete="email"
+            placeholder="you@hospital.com"
+            required>
         </div>
 
         <button type="button" class="nl-submit" (click)="sendResetLink()" [disabled]="loading">

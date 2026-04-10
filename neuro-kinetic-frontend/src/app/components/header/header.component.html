@@ -1,27 +1,33 @@
 <div *ngIf="currentUser && !isLandingPage" 
-     class="neuro-header fixed top-0 z-40 backdrop-blur-md shadow-sm transition-all duration-300 ease-in-out h-16"
+     class="neuro-header fixed top-0 z-50 backdrop-blur-md shadow-sm transition-all duration-300 ease-in-out"
+     [class.h-16]="!isCompactViewport"
+     [class.neuro-header--compact]="isCompactViewport"
      [class.left-56]="!sidebarCollapsed && !isCompactViewport"
      [class.left-20]="sidebarCollapsed && !isCompactViewport"
      [class.right-0]="true"
      [style.width]="isCompactViewport ? '100%' : (!sidebarCollapsed ? 'calc(100% - 224px)' : 'calc(100% - 80px)')">
-  <div class="header-inner flex items-center justify-between px-4 sm:px-6 py-4 h-16">
+  <div class="header-inner flex items-center justify-between min-w-0"
+       [class.header-inner--desktop]="!isCompactViewport"
+       [class.header-inner--compact]="isCompactViewport">
     <!-- Breadcrumb Path -->
     <div class="flex items-center space-x-2 flex-1 min-w-0">
-      <svg class="w-5 h-5 text-blue flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="text-blue flex-shrink-0 header-home-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
       </svg>
       <span class="header-breadcrumb text-ink text-sm truncate">{{ breadcrumbPath }}</span>
     </div>
 
     <!-- Actions + User Badge -->
-    <div class="flex items-center space-x-2 sm:space-x-3 ml-3 sm:ml-4">
+    <div class="flex items-center gap-2 sm:gap-3 ml-2 sm:ml-4 shrink-0">
       <!-- Notifications -->
       <button
-        class="neuro-header-icon relative p-2 rounded-lg transition-colors"
+        type="button"
+        class="neuro-header-icon relative rounded-lg transition-colors"
+        [class.neuro-header-icon--compact]="isCompactViewport"
         (click)="goToNotifications()"
         title="Notifications"
       >
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="header-action-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
         <span *ngIf="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] flex items-center justify-center">
@@ -41,14 +47,17 @@
         
         <div class="relative">
           <button 
+            type="button"
             (click)="navigateToProfile()"
-            class="w-10 h-10 rounded-full bg-blue hover:bg-navy flex items-center justify-center text-white font-medium text-sm transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 focus:ring-offset-surface"
+            class="rounded-full bg-blue hover:bg-navy flex items-center justify-center text-white font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 focus:ring-offset-surface header-avatar-btn"
+            [class.header-avatar-btn--compact]="isCompactViewport"
             [title]="getUserDisplayName()">
             {{ getUserInitials() }}
           </button>
           
           <!-- Online Status Indicator -->
-          <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+          <span class="absolute bg-green-500 border-2 border-[var(--color-sidebar-bg)] rounded-full header-avatar-status"
+                [class.header-avatar-status--compact]="isCompactViewport"></span>
         </div>
       </div>
     </div>
