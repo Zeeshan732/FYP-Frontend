@@ -112,6 +112,39 @@
             </div>
           </div>
 
+          <div class="ns-two" *ngIf="selectedRole === 'clinician'">
+            <div class="ns-field">
+              <label>Clinic / Hospital name</label>
+              <input
+                type="text"
+                [(ngModel)]="clinicName"
+                name="clinicName"
+                placeholder="City Hospital"
+                [disabled]="loading"
+                required>
+            </div>
+            <div class="ns-field">
+              <label>License number</label>
+              <input
+                type="text"
+                [(ngModel)]="licenseNumber"
+                name="licenseNumber"
+                placeholder="PMDC-123456"
+                [disabled]="loading"
+                required>
+            </div>
+          </div>
+
+          <div class="ns-field" *ngIf="selectedRole === 'clinician'">
+            <label>License document URL (optional)</label>
+            <input
+              type="url"
+              [(ngModel)]="licenseDocumentUrl"
+              name="licenseDocumentUrl"
+              placeholder="https://.../license.pdf"
+              [disabled]="loading">
+          </div>
+
           <label class="ns-terms">
             <input type="checkbox" [(ngModel)]="agreeTerms" name="agreeTerms" [disabled]="loading">
             <span>

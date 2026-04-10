@@ -155,6 +155,26 @@
           <label>Email</label>
           <div class="value">{{ selectedUser.email }}</div>
         </div>
+        <div *ngIf="selectedUser.role">
+          <label>Role</label>
+          <div class="value">{{ selectedUser.role }}</div>
+        </div>
+        <div *ngIf="selectedUser.clinicName">
+          <label>Clinic / Hospital</label>
+          <div class="value">{{ selectedUser.clinicName }}</div>
+        </div>
+        <div *ngIf="selectedUser.licenseNumber">
+          <label>License Number</label>
+          <div class="value">{{ selectedUser.licenseNumber }}</div>
+        </div>
+        <div *ngIf="selectedUser.licenseDocumentUrl">
+          <label>License Document</label>
+          <div class="value">
+            <a [href]="selectedUser.licenseDocumentUrl" target="_blank" rel="noopener noreferrer">
+              Open document
+            </a>
+          </div>
+        </div>
         <div>
           <label>User ID</label>
           <div class="value">{{ selectedUser.id }}</div>
@@ -178,7 +198,7 @@
         </div>
       </div>
 
-      <div class="field" *ngIf="selectedUser?.status !== 'Approved'">
+      <div class="field" *ngIf="selectedUser.status !== 'Approved'">
         <label>Comment (Optional)</label>
         <textarea
           [(ngModel)]="modalComment"
