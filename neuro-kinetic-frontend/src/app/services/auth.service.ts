@@ -61,6 +61,9 @@ export class AuthService {
     firstName: string;
     lastName: string;
     institution?: string;
+    clinicName?: string;
+    licenseNumber?: string;
+    licenseDocumentUrl?: string;
     researchFocus?: string;
     role?: 'Public' | 'MedicalProfessional';
   }): Observable<AuthResponse> {

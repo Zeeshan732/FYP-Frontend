@@ -15,6 +15,9 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   lastName = '';
   email = '';
   institution = '';
+  clinicName = '';
+  licenseNumber = '';
+  licenseDocumentUrl = '';
   role: 'Public' | 'MedicalProfessional' = 'Public';
   password = '';
   confirmPassword = '';
@@ -58,6 +61,9 @@ export class SignupModalComponent implements OnInit, OnDestroy {
           this.lastName = '';
           this.email = '';
           this.institution = '';
+          this.clinicName = '';
+          this.licenseNumber = '';
+          this.licenseDocumentUrl = '';
           this.role = 'Public';
           this.password = '';
           this.confirmPassword = '';
@@ -148,6 +154,17 @@ export class SignupModalComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.role === 'MedicalProfessional') {
+      if (!this.clinicName.trim()) {
+        this.error = 'Clinic name is required for medical professional registration';
+        return;
+      }
+      if (!this.licenseNumber.trim()) {
+        this.error = 'License number is required for medical professional registration';
+        return;
+      }
+    }
+
     this.error = '';
     this.info = '';
     this.loading = true;
@@ -158,6 +175,11 @@ export class SignupModalComponent implements OnInit, OnDestroy {
       firstName: this.firstName,
       lastName: this.lastName,
       institution: this.institution || undefined,
+      clinicName: this.role === 'MedicalProfessional' ? this.clinicName.trim() : undefined,
+      licenseNumber: this.role === 'MedicalProfessional' ? this.licenseNumber.trim() : undefined,
+      licenseDocumentUrl: this.role === 'MedicalProfessional' && this.licenseDocumentUrl.trim()
+        ? this.licenseDocumentUrl.trim()
+        : undefined,
       researchFocus: undefined,
       // Must match backend RegisterRequest.Role (Public | MedicalProfessional); kept in sync by selectRole().
       role: this.role

@@ -8,6 +8,9 @@ export interface User {
   status?: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
   isActive?: boolean; // NEW: indicates if account is active
   institution?: string;
+  clinicName?: string;
+  licenseNumber?: string;
+  licenseDocumentUrl?: string;
   researchFocus?: string;
   provider?: string; // OAuth provider (e.g., Google, Facebook)
   providerId?: string; // Provider user id
@@ -29,6 +32,11 @@ export interface AccountRequest {
   firstName: string;
   lastName: string;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
+  role?: 'Public' | 'Researcher' | 'MedicalProfessional' | 'Admin';
+  institution?: string;
+  clinicName?: string;
+  licenseNumber?: string;
+  licenseDocumentUrl?: string;
   comment?: string;
   createdAt?: string;
 }
