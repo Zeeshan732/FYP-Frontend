@@ -24,7 +24,7 @@
             type="button"
             class="chat-action-btn chat-action-btn--danger"
             [disabled]="!hasAnySelection || bulkDeleting"
-            (click)="deleteSelected()">
+            (click)="openBulkDeleteDialog()">
             <i class="pi pi-trash"></i>
            
           </button>
@@ -37,9 +37,6 @@
             class="chat-search-input" />
           <button type="button" class="chat-action-btn" (click)="applyFilter()">
             <i class="pi pi-search"></i>
-          </button>
-          <button type="button" class="chat-action-btn" (click)="clearFilter()">
-            <i class="pi pi-times"></i>
           </button>
           <button type="button" class="chat-sort-btn" (click)="toggleSortOrder()">
             <i class="pi pi-sort-alt"></i>
@@ -68,10 +65,10 @@
                   aria-label="Select all chats" />
               </th>
               <th>Title</th>
-              <th>Last Message</th>
-              <th class="text-center">Messages</th>
-              <th class="text-center">Updated</th>
-              <th class="text-center">Actions</th>
+              <!-- <th>Last Message</th> -->
+              <th class="text-center col-messages">Messages</th>
+              <th class="text-center col-updated">Updated</th>
+              <th class="text-center col-actions">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -84,13 +81,13 @@
                   aria-label="Select chat row" />
               </td>
               <td class="title-cell">{{ item.title }}</td>
-              <td class="preview-cell">{{ item.lastMessagePreview || '—' }}</td>
-              <td class="text-center">{{ item.messageCount }}</td>
-              <td class="text-center">{{ item.updatedAt | date:'short' }}</td>
-              <td class="text-center">
+              <!-- <td class="preview-cell">{{ item.lastMessagePreview || '—' }}</td> -->
+              <td class="text-center col-messages">{{ item.messageCount }}</td>
+              <td class="text-center col-updated">{{ item.updatedAt | date:'short' }}</td>
+              <td class="text-center col-actions">
                 <div class="actions-cell">
-                  <p-button icon="pi pi-eye" (onClick)="openConversation(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View chat" tooltipPosition="top"></p-button>
-                  <p-button icon="pi pi-trash" [loading]="deletingId === item.id" (onClick)="deleteConversation(item)" severity="danger" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="Delete chat" tooltipPosition="top"></p-button>
+                  <p-button icon="pi pi-eye" (onClick)="openConversation(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View messages" tooltipPosition="top"></p-button>
+                  <p-button icon="pi pi-trash" [loading]="deletingId === item.id" (onClick)="openDeleteChatDialog(item)" severity="danger" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="Delete chat" tooltipPosition="top"></p-button>
                 </div>
               </td>
             </tr>
@@ -130,3 +127,68 @@
   </div>
 </section>
 
+<ns-modal
+  [(visible)]="showDeleteChatDialog"
+  intent="danger"
+  title="Delete chat"
+  subtext="This conversation will be removed from your history. You cannot undo this action."
+  [confirmLoading]="!!deletingId"
+  [dismissible]="!deletingId"
+  cancelLabel="Cancel"
+  confirmLabel="Delete chat"
+  (cancel)="cancelDeleteChat()"
+  (confirm)="confirmDeleteChat()">
+  <p *ngIf="chatPendingDelete as c">
+    Delete <strong>{{ c.title || 'this conversation' }}</strong>?
+  </p>
+</ns-modal>
+
+<ns-modal
+  [(visible)]="showBulkDeleteDialog"
+  intent="danger"
+  title="Delete selected chats"
+  subtext="Selected conversations will be removed from your history. You cannot undo this action."
+  [confirmLoading]="bulkDeleting"
+  [dismissible]="!bulkDeleting"
+  cancelLabel="Cancel"
+  confirmLabel="Delete all"
+  (cancel)="cancelBulkDelete()"
+  (confirm)="confirmBulkDelete()">
+  <p>
+    Delete <strong>{{ selectedIds.size }}</strong> selected chat{{ selectedIds.size === 1 ? '' : 's' }}?
+  </p>
+</ns-modal>
+
+<ns-modal
+  [(visible)]="showChatDetailModal"
+  intent="info"
+  panelSize="wide"
+  [title]="chatDetail?.title || 'Conversation'"
+  [subtext]="chatDetailSubtext"
+  [singleAction]="true"
+  confirmLabel="Close"
+  [dismissible]="!chatDetailLoading"
+  (cancel)="closeChatDetailModal()"
+  (confirm)="closeChatDetailModal()">
+  <div class="chat-detail-modal">
+    <div *ngIf="chatDetailLoading" class="chat-detail-state chat-detail-state--loading" aria-live="polite">
+      <span class="chat-detail-spinner" aria-hidden="true"></span>
+      <span>Loading messages…</span>
+    </div>
+    <p *ngIf="!chatDetailLoading && chatDetailError" class="chat-detail-state chat-detail-state--error">{{ chatDetailError }}</p>
+    <div *ngIf="!chatDetailLoading && !chatDetailError" class="chat-detail-thread" role="log" aria-label="Conversation messages">
+      <p *ngIf="chatDetailMessages.length === 0" class="chat-detail-empty">No messages in this conversation.</p>
+      <div
+        *ngFor="let m of chatDetailMessages"
+        class="chat-detail-row"
+        [class.chat-detail-row--user]="m.role === 'user'"
+        [class.chat-detail-row--assistant]="m.role === 'assistant'">
+        <div class="chat-detail-bubble">
+          <span class="chat-detail-role">{{ m.role === 'user' ? 'You' : 'Assistant' }}</span>
+          <p class="chat-detail-text">{{ m.content }}</p>
+          <time class="chat-detail-time" [attr.datetime]="m.createdAt">{{ m.createdAt | date:'short' }}</time>
+        </div>
+      </div>
+    </div>
+  </div>
+</ns-modal>

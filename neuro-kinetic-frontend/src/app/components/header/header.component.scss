@@ -2,15 +2,120 @@
 .neuro-header {
   background: var(--color-sidebar-bg);
   border-bottom: 1px solid var(--color-border);
+  box-sizing: border-box;
+}
+
+/* Desktop: 64px bar */
+.header-inner--desktop {
+  height: 4rem;
+  min-height: 4rem;
+  padding: 0 1rem 0 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .header-inner--desktop {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Tablet / phone: height matches mobile menu toggle math in navigation.component.scss */
+.neuro-header--compact {
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(env(safe-area-inset-top, 0px) + 3.75rem); /* 60px */
+  border-bottom: 1px solid var(--color-border);
+}
+
+@media (max-width: 640px) {
+  .neuro-header--compact {
+    height: calc(env(safe-area-inset-top, 0px) + 3.5rem); /* 56px */
+  }
+}
+
+.header-inner--compact {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 3.75rem;
+  min-height: 3.75rem;
+  padding: 0 max(1rem, env(safe-area-inset-right, 0px)) 0
+    calc(max(12px, env(safe-area-inset-left, 0px)) + 34px + 16px);
+  /* matches .mobile-sidebar-toggle: left max(12px,safe) + 34px width + 16px gap */
+}
+
+@media (max-width: 640px) {
+  .header-inner--compact {
+    height: 3.5rem;
+    min-height: 3.5rem;
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  }
+}
+
+.header-home-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .header-home-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+.header-action-svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .header-action-svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
 }
 
 .neuro-header-icon {
   color: var(--color-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.neuro-header-icon--compact {
+  padding: 0.375rem;
 }
 
 .neuro-header-icon:hover {
   background: var(--color-sky);
   color: var(--color-blue);
+}
+
+.header-avatar-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.header-avatar-btn--compact {
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 0.8125rem;
+}
+
+.header-avatar-status {
+  bottom: 0;
+  right: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+.header-avatar-status--compact {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-width: 1.5px;
 }
 
 @media (max-width: 1024px) {
@@ -19,13 +124,8 @@
     width: 100% !important;
   }
 
-  .header-inner {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
   .header-breadcrumb {
-    max-width: 46vw;
+    max-width: min(46vw, 100%);
   }
 }
 

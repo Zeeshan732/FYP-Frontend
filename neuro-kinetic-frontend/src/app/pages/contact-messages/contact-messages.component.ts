@@ -26,6 +26,10 @@ export class ContactMessagesComponent implements OnInit {
   hasNext = false;
   failedCount = 0;
 
+  /** NeuroSync confirmation modal (ns-modal) */
+  showDeleteMessageDialog = false;
+  messagePendingDelete: ContactMessageItem | null = null;
+
   readonly subjectOptions = [
     { label: 'All Subjects', value: '' },
     { label: 'General Inquiry', value: 'General Inquiry' },
@@ -127,11 +131,27 @@ export class ContactMessagesComponent implements OnInit {
     this.load();
   }
 
-  deleteMessage(item: ContactMessageItem): void {
+  openDeleteMessageDialog(item: ContactMessageItem): void {
+    this.messagePendingDelete = item;
+    this.showDeleteMessageDialog = true;
+  }
+
+  cancelDeleteMessage(): void {
+    this.showDeleteMessageDialog = false;
+    this.messagePendingDelete = null;
+  }
+
+  confirmDeleteMessage(): void {
+    const item = this.messagePendingDelete;
+    if (!item) {
+      return;
+    }
     this.deletingId = item.id;
     this.apiService.deleteContactMessage(item.id).subscribe({
       next: () => {
         this.deletingId = null;
+        this.showDeleteMessageDialog = false;
+        this.messagePendingDelete = null;
         this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Contact message deleted.' });
         if (this.items.length === 1 && this.currentPage > 1) this.currentPage -= 1;
         this.load();

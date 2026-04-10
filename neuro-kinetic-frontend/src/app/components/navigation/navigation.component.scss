@@ -346,22 +346,39 @@ aside button[title]:not([title=""]):hover::after {
   }
 }
 
+/* Fixed menu control — size/position must match .neuro-header--compact + .header-inner--compact */
 .mobile-sidebar-toggle {
   position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 60;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-input);
+  z-index: 55;
+  left: max(12px, env(safe-area-inset-left, 0px));
+  top: calc(env(safe-area-inset-top, 0px) + (3.75rem - 34px) / 2);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   border: 0.5px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-ink);
+  background: var(--color-sidebar-bg);
+  color: var(--color-muted);
   display: none;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(6px);
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.mobile-sidebar-toggle:hover {
+  background: var(--color-sky);
+  color: var(--color-blue);
+}
+
+.mobile-sidebar-toggle__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .mobile-sidebar-backdrop {
@@ -373,13 +390,39 @@ aside button[title]:not([title=""]):hover::after {
 
 // Responsive adjustments
 @media (max-width: 1024px) {
-  aside {
+  aside.neuro-sidebar {
+    box-sizing: border-box;
+    min-height: 100vh;
+    height: 100vh;
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
+    border-right: 0.5px solid var(--color-border);
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
-  aside.mobile-open {
+  /* Expanded drawer — target width (Tailwind w-56 is 224px; we go slightly wider on mobile) */
+  aside.neuro-sidebar.w-56 {
+    width: min(280px, 88vw) !important;
+    max-width: 280px;
+  }
+
+  aside.neuro-sidebar.mobile-open {
     transform: translateX(0);
+  }
+
+  aside.neuro-sidebar > .flex.flex-col > .border-b {
+    padding: 10px 12px;
+    min-height: 3.75rem;
+    box-sizing: border-box;
+    align-items: center;
+  }
+
+  aside.neuro-sidebar nav.flex-1 {
+    padding: 12px;
+  }
+
+  aside.neuro-sidebar .sidebar-logo-img {
+    height: 34px;
   }
 
   .ml-56, .ml-64, .ml-20 {
@@ -388,5 +431,38 @@ aside button[title]:not([title=""]):hover::after {
 
   .mobile-sidebar-toggle {
     display: inline-flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .mobile-sidebar-toggle {
+    top: calc(env(safe-area-inset-top, 0px) + (3.5rem - 34px) / 2);
+  }
+
+  .mobile-sidebar-toggle__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  aside.neuro-sidebar > .flex.flex-col > .border-b {
+    min-height: 3.5rem;
+    padding: 8px 10px;
+  }
+
+  aside.neuro-sidebar .sidebar-link {
+    min-height: 42px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  aside.neuro-sidebar .sidebar-icon {
+    font-size: 15px;
+  }
+}
+
+/* Tablet-only: slightly narrower drawer */
+@media (min-width: 641px) and (max-width: 1024px) {
+  aside.neuro-sidebar.w-56 {
+    width: min(272px, 82vw) !important;
   }
 }

@@ -95,6 +95,11 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
   deleteRecordId: number | null = null;
   deleting: boolean = false;
 
+  /** Admin + medical professional: row selection and bulk delete */
+  selectedIds = new Set<number>();
+  showBulkDeleteDialog = false;
+  bulkDeleting = false;
+
   // Trend analysis
   trendData: TrendAnalysisDto | null = null;
   loadingTrends = false;
@@ -183,6 +188,7 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
     this.apiService.getUserTestRecords(params).subscribe({
       next: (response: PagedResult<UserTestRecord>) => {
         this.records = response.items;
+        this.selectedIds.clear();
         this.currentPage = response.pageNumber;
         this.totalPages = response.totalPages;
         this.totalCount = response.totalCount;
@@ -287,6 +293,110 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteDialog = false;
     this.deleteRecordId = null;
+  }
+
+  get canManageRecords(): boolean {
+    return this.isAdmin || this.isMedicalProfessional;
+  }
+
+  get hasAnySelection(): boolean {
+    return this.selectedIds.size > 0;
+  }
+
+  get isAllSelected(): boolean {
+    return this.records.length > 0 && this.records.every((r) => this.selectedIds.has(r.id));
+  }
+
+  toggleSelectAll(): void {
+    if (this.isAllSelected) {
+      this.selectedIds.clear();
+      return;
+    }
+    this.selectedIds = new Set(this.records.map((r) => r.id));
+  }
+
+  toggleSelection(recordId: number): void {
+    if (this.selectedIds.has(recordId)) {
+      this.selectedIds.delete(recordId);
+      return;
+    }
+    this.selectedIds.add(recordId);
+  }
+
+  openBulkDeleteDialog(): void {
+    if (!this.hasAnySelection || this.bulkDeleting) {
+      return;
+    }
+    this.showBulkDeleteDialog = true;
+  }
+
+  cancelBulkDelete(): void {
+    this.showBulkDeleteDialog = false;
+  }
+
+  confirmBulkDelete(): void {
+    this.showBulkDeleteDialog = false;
+    this.executeBulkDelete();
+  }
+
+  private executeBulkDelete(): void {
+    if (!this.hasAnySelection || this.bulkDeleting) {
+      return;
+    }
+    this.bulkDeleting = true;
+    const ids = Array.from(this.selectedIds);
+    let done = 0;
+    let failed = 0;
+
+    ids.forEach((id) => {
+      this.apiService.deleteUserTestRecord(id).subscribe({
+        next: () => {
+          done += 1;
+          if (done + failed === ids.length) {
+            this.finishBulkDelete(done, failed);
+          }
+        },
+        error: () => {
+          failed += 1;
+          if (done + failed === ids.length) {
+            this.finishBulkDelete(done, failed);
+          }
+        }
+      });
+    });
+  }
+
+  private finishBulkDelete(done: number, failed: number): void {
+    this.bulkDeleting = false;
+    this.selectedIds.clear();
+
+    if (done > 0) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Deleted',
+        detail: `${done} record${done > 1 ? 's' : ''} removed.`
+      });
+    }
+
+    if (failed > 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Partial',
+        detail: `${failed} record${failed > 1 ? 's' : ''} could not be deleted.`
+      });
+    }
+
+    this.loadRecords();
+  }
+
+  /** Table display: limit decimal noise from API floats */
+  formatAccuracyPercent(value: number | null | undefined): string {
+    if (value == null || Number.isNaN(Number(value))) {
+      return '—';
+    }
+    const n = Number(value);
+    const rounded = Math.round(n * 100) / 100;
+    return `${rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(2)}%`;
   }
 
   viewRecord(id: number) {

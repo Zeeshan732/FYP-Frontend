@@ -52,13 +52,15 @@ export class NsModalComponent {
   /** Muted secondary line under the projected body */
   @Input() subtext: string | null = null;
   @Input() confirmLoading = false;
-  /** Backdrop, Escape, and header close respect this */
+  /** Backdrop and Escape respect this (footer cancel always dismisses when not loading). */
   @Input() dismissible = true;
   /** Single primary action (e.g. success / OK); hides cancel */
   @Input() singleAction = false;
   /** Accessible labels for icon-only footer controls */
   @Input() cancelLabel = 'Cancel';
   @Input() confirmLabel = 'Confirm';
+  /** Wider panel for read-only content (e.g. conversation transcript). */
+  @Input() panelSize: 'default' | 'wide' = 'default';
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() cancel = new EventEmitter<void>();
@@ -80,13 +82,6 @@ export class NsModalComponent {
     this.emitDismiss();
   }
 
-  onCloseClick(): void {
-    if (!this.dismissible || this.confirmLoading) {
-      return;
-    }
-    this.emitDismiss();
-  }
-
   onCancelClick(): void {
     if (this.confirmLoading) {
       return;
@@ -99,20 +94,6 @@ export class NsModalComponent {
       return;
     }
     this.confirm.emit();
-  }
-
-  headerIconClass(): string {
-    switch (this.intent) {
-      case 'danger':
-        return 'pi pi-exclamation-triangle ns-modal__header-icon';
-      case 'warning':
-        return 'pi pi-exclamation-triangle ns-modal__header-icon';
-      case 'success':
-        return 'pi pi-check ns-modal__header-icon';
-      case 'info':
-      default:
-        return 'pi pi-info-circle ns-modal__header-icon';
-    }
   }
 
   headerModifierClass(): string {

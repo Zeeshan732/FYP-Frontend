@@ -5,9 +5,27 @@
 
 .app-shell {
   width: 100%;
+  min-width: 0;
   min-height: 100vh;
   max-width: 100%;
   overflow-x: clip;
+}
+
+/* Match fixed header height on compact viewports (see header.component.scss .neuro-header--compact) */
+.app-shell.pt-16 {
+  @media (max-width: 1024px) {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 3.75rem) !important;
+  }
+
+  @media (max-width: 640px) {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 3.5rem) !important;
+  }
+}
+
+/* Align main content with header row (same inset as .header-inner--compact) */
+.app-shell--compact-auth {
+  padding-left: calc(max(12px, env(safe-area-inset-left, 0px)) + 34px + 16px);
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
 }
 
 /* Keep content centered inside the visible area when desktop sidebar shifts layout */
@@ -18,5 +36,10 @@
 
   .app-shell.ml-20 {
     width: calc(100% - 5rem);
+  }
+
+  .app-shell--compact-auth {
+    padding-left: 0;
+    padding-right: 0;
   }
 }

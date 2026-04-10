@@ -55,40 +55,58 @@
           </button>
         </div>
 
-        <form (ngSubmit)="onSubmit()" class="ns-form">
+        <form (ngSubmit)="onSubmit()" class="ns-form" autocomplete="on">
           <div class="ns-two">
             <div class="ns-field">
               <label>First name</label>
-              <input type="text" [(ngModel)]="firstName" name="firstName" placeholder="Ali" [disabled]="loading" required>
+              <input
+                type="text"
+                [(ngModel)]="firstName"
+                name="firstName"
+                autocomplete="given-name"
+                placeholder="Ali"
+                [disabled]="loading"
+                required>
             </div>
             <div class="ns-field">
               <label>Last name</label>
-              <input type="text" [(ngModel)]="lastName" name="lastName" placeholder="Ahmed" [disabled]="loading" required>
+              <input
+                type="text"
+                [(ngModel)]="lastName"
+                name="lastName"
+                autocomplete="family-name"
+                placeholder="Ahmed"
+                [disabled]="loading"
+                required>
             </div>
           </div>
 
           <div class="ns-two">
             <div class="ns-field">
               <label>Email address</label>
-              <input type="email"
-                     [(ngModel)]="email"
-                     (ngModelChange)="onEmailChange()"
-                     name="email"
-                     placeholder="you@hospital.com"
-                     [disabled]="loading"
-                     required>
+              <input
+                type="email"
+                [(ngModel)]="email"
+                (ngModelChange)="onEmailChange()"
+                name="email"
+                autocomplete="email"
+                placeholder="you@hospital.com"
+                [disabled]="loading"
+                required>
             </div>
 
             <div class="ns-field">
               <label>Password</label>
               <div class="ns-pass-wrap">
-                <input [type]="showPassword ? 'text' : 'password'"
-                       [(ngModel)]="password"
-                       (input)="checkPasswordStrength(password)"
-                       name="password"
-                       placeholder="Min. 8 characters"
-                       [disabled]="loading"
-                       required>
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  [(ngModel)]="password"
+                  (input)="checkPasswordStrength(password)"
+                  name="new-password"
+                  autocomplete="new-password"
+                  placeholder="Min. 8 characters"
+                  [disabled]="loading"
+                  required>
                 <button class="ns-eye" type="button" (click)="showPassword = !showPassword">
                   <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>

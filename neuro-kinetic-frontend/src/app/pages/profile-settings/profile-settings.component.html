@@ -50,15 +50,27 @@
         <div class="form-grid single">
           <label>
             <span>Current Password</span>
-            <input type="password" [(ngModel)]="password.currentPassword" />
+            <input
+              type="password"
+              name="currentPassword"
+              [(ngModel)]="password.currentPassword"
+              autocomplete="current-password" />
           </label>
           <label>
             <span>New Password</span>
-            <input type="password" [(ngModel)]="password.newPassword" />
+            <input
+              type="password"
+              name="newPassword"
+              [(ngModel)]="password.newPassword"
+              autocomplete="new-password" />
           </label>
           <label>
             <span>Confirm New Password</span>
-            <input type="password" [(ngModel)]="password.confirmPassword" />
+            <input
+              type="password"
+              name="confirmNewPassword"
+              [(ngModel)]="password.confirmPassword"
+              autocomplete="new-password" />
           </label>
         </div>
         <div class="actions">

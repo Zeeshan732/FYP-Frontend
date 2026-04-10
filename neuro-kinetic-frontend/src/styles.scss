@@ -44,6 +44,11 @@
   color: inherit;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   background-color: var(--color-page-bg);
   color: var(--color-ink);
@@ -52,6 +57,17 @@ body {
   line-height: var(--leading-base);
   margin: 0;
   padding: 0;
+  overflow-x: clip;
+  max-width: 100vw;
+}
+
+/* Prevent common media / charts from forcing horizontal scroll */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Shared container tokens (About, Home, Blog, Contact) */
