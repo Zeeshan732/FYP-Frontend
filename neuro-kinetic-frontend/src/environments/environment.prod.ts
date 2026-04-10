@@ -1,6 +1,6 @@
 // Production: deployed App Service origin (scheme + host, no trailing slash, no /api path).
 const apiBaseUrl =
-  'https://neurosync-api-exgrebagh6ghczcg.canadacentral.azurewebsites.net';
+  'https://neurosync-api-exgrebaqh6ghczcg.canadacentral-01.azurewebsites.net';
 
 export const environment = {
   production: true,
