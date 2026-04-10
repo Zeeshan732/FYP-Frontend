@@ -1,4 +1,15 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, OnDestroy, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ApiService } from '../../services/api.service';
@@ -30,7 +41,7 @@ interface FingerTapResult {
   templateUrl: './finger-tap.component.html',
   styleUrls: ['./finger-tap.component.scss']
 })
-export class FingerTapComponent implements OnInit, OnDestroy {
+export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   // State
   currentState: ScreenState = 'instructions';
   inputMode: 'upload' | 'live' = 'upload';
@@ -98,6 +109,15 @@ export class FingerTapComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Embedded popup hides the instructions screen (*ngIf="!embedded"); jump straight to mode-select
+    // as soon as @Input() embedded is true so the modal body never paints empty.
+    if (changes['embedded']?.currentValue === true) {
+      this.currentState = 'mode-select';
+      this.startModalOpen = false;
+    }
+  }
 
   ngOnInit(): void {
     // If navigated here from embedded popup flow with a completed result, show it directly.
