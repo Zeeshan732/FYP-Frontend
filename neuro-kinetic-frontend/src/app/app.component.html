@@ -8,6 +8,7 @@
      [class.ml-20]="isAuthenticated && sidebarCollapsed && !isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
      [class.pt-16]="isAuthenticated && currentRoute !== '/landing' && currentRoute !== '/'"
      [class.app-shell--compact-auth]="isAuthenticated && isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
+     [class.app-shell--fab-safe]="isAuthenticated && isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
      class="app-shell transition-all duration-300 ease-in-out">
   <router-outlet></router-outlet>
 </div>
@@ -34,9 +35,6 @@
   </ng-template>
 </p-dialog>
 
-<!-- PrimeNG Toast -->
-<p-toast></p-toast>
-
 <!-- PrimeNG Confirm Popup (automatically injected by ConfirmationService) -->
 <p-confirmPopup></p-confirmPopup>
 
@@ -49,3 +47,6 @@
   [mode]="askResultsDialogState.mode"
   (visibleChange)="onAskResultsDialogClose()">
 </app-ask-results-dialog>
+
+<!-- Toast last in DOM + high z-index so it stays above modals and centers correctly on mobile -->
+<p-toast position="top-center" [baseZIndex]="12000"></p-toast>

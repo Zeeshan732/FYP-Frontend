@@ -9,24 +9,28 @@
     </button>
   </div>
 
-  <div class="rag-messages" [class.rag-messages--empty]="theme === 'light' && messages.length === 0">
-    <p *ngIf="theme === 'light' && messages.length === 0" class="rag-welcome">What can I help with?</p>
-    <p *ngIf="theme !== 'light' && messages.length === 0" class="rag-placeholder">Ask a question about your screening result, risk level, or general guidance.</p>
-    <div *ngFor="let msg of messages" class="rag-msg" [class.rag-msg--sent]="msg.reply">
-      <div class="rag-msg-bubble">
-        <span *ngIf="!msg.reply" class="rag-msg-sender">{{ msg.sender }}</span>
-        <div class="rag-msg-text">{{ msg.text }}</div>
+  <div
+    class="rag-chat-body"
+    [class.rag-light-main]="theme === 'light'"
+    [class.rag-light-main--empty]="theme === 'light' && messages.length === 0">
+    <div class="rag-messages" [class.rag-messages--empty]="theme === 'light' && messages.length === 0">
+      <p *ngIf="theme === 'light' && messages.length === 0 && !loading" class="rag-welcome">What can I help with?</p>
+      <p *ngIf="theme !== 'light' && messages.length === 0" class="rag-placeholder">Ask a question about your screening result, risk level, or general guidance.</p>
+      <div *ngFor="let msg of messages" class="rag-msg" [class.rag-msg--sent]="msg.reply">
+        <div class="rag-msg-bubble">
+          <span *ngIf="!msg.reply" class="rag-msg-sender">{{ msg.sender }}</span>
+          <div class="rag-msg-text">{{ msg.text }}</div>
+        </div>
+      </div>
+      <div *ngIf="loading" class="rag-msg rag-msg--loader">
+        <div class="rag-msg-bubble rag-msg-bubble--typing">
+          <span class="rag-msg-sender">NeuroSync</span>
+          <app-loader variant="dots" signal="default"></app-loader>
+        </div>
       </div>
     </div>
-    <div *ngIf="loading" class="rag-msg rag-msg--loader">
-      <div class="rag-msg-bubble rag-msg-bubble--typing">
-        <span class="rag-msg-sender">NeuroSync</span>
-        <app-loader variant="dots" signal="default"></app-loader>
-      </div>
-    </div>
-  </div>
 
-  <div class="rag-form" [class.rag-form--light]="theme === 'light'">
+    <div class="rag-form" [class.rag-form--light]="theme === 'light'">
     <ng-container *ngIf="theme === 'light'">
       <button
         *ngIf="showNewChatButton"
@@ -65,6 +69,7 @@
         <ng-container *ngIf="!loading">Send</ng-container>
       </button>
     </ng-container>
+    </div>
   </div>
 
   <div *ngIf="error" class="rag-error">{{ error }}</div>

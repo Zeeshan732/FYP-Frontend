@@ -57,8 +57,18 @@ body {
   line-height: var(--leading-base);
   margin: 0;
   padding: 0;
-  overflow-x: clip;
+  /* hidden avoids clipping position:fixed overlays (toasts) on some mobile browsers */
+  overflow-x: hidden;
   max-width: 100vw;
+}
+
+/*
+ * Chatbase embed (index.html): launcher lives in a cross-origin iframe, so only
+ * the outer frame can be styled here. Rounded shape reads less like a harsh black tile.
+ */
+body.user-logged-in iframe[src*="chatbase.co"] {
+  border-radius: 999px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 /* Prevent common media / charts from forcing horizontal scroll */
@@ -498,6 +508,31 @@ button,
   border-radius: 0 0 var(--radius-card) var(--radius-card);
 }
 
+/* Dialogs / overlays — fit small screens + safe areas (PrimeNG) */
+.p-dialog-mask {
+  padding: max(0.5rem, env(safe-area-inset-top, 0px)) max(0.5rem, env(safe-area-inset-right, 0px))
+    max(0.5rem, env(safe-area-inset-bottom, 0px)) max(0.5rem, env(safe-area-inset-left, 0px));
+  box-sizing: border-box;
+}
+
+.p-dialog {
+  max-width: min(100vw - 1.25rem, 96vw) !important;
+  max-height: min(92dvh, 92vh) !important;
+}
+
+@media (max-width: 768px) {
+  .p-dialog .p-dialog-content {
+    max-height: min(72dvh, 72vh);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.p-confirm-popup {
+  max-width: min(22rem, calc(100vw - 1.5rem)) !important;
+  z-index: 11950 !important;
+}
+
 .p-dropdown.p-dropdown-open .p-dropdown-label,
 .p-inputtext:focus,
 .p-focus {
@@ -644,6 +679,131 @@ a.text-app-primary,
   color: var(--color-ink);
 }
 
+/* ---------- Shared pagination (tables & lists, mobile-first) ---------- */
+.ns-pagination {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.45rem 0.75rem;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.ns-pagination__summary {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--color-muted);
+  min-width: 0;
+}
+
+.ns-pagination__toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 0.45rem 0.5rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.ns-pagination__rows {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.ns-pagination__rows-label {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.ns-pagination__select {
+  min-height: 2rem;
+  max-height: 2.25rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.8125rem;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  min-width: 3.25rem;
+  max-width: 5.5rem;
+}
+
+.ns-pagination__pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ns-pagination__pager .pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.ns-pagination__page-indicator {
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  white-space: nowrap;
+  padding: 0 0.2rem;
+  min-width: 0;
+}
+
+.ns-pagination__pager .p-button {
+  flex-shrink: 0;
+}
+
+.ns-pagination__pager .p-button .p-button-icon {
+  font-size: 0.85rem;
+}
+
+/* Standalone card (chat history, test records, contact messages) */
+.ns-pagination--card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 0.6rem 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .ns-pagination {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem 1rem;
+  }
+
+  .ns-pagination__toolbar {
+    justify-content: flex-end;
+    width: auto;
+    flex: 0 1 auto;
+  }
+
+  .ns-pagination__pager {
+    flex: 0 0 auto;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 639px) {
+  .ns-pagination__toolbar {
+    flex-wrap: nowrap;
+  }
+
+  .ns-pagination__pager {
+    justify-content: flex-end;
+  }
+}
+
 /* AI result / confidence cards */
 .ai-result-card {
   background: var(--color-lavender);
@@ -688,10 +848,36 @@ a.text-app-primary,
   background: var(--color-border);
 }
 
-/* Alerts / Toasts â€” design tokens */
-/* Toast container above modals (login modal backdrop z-index 9999) */
-.p-toast {
-  z-index: 10050 !important;
+/*
+ * PrimeNG toast (top-center): theme uses left:50% + translateX(-50%). Overriding only left:0
+ * without clearing transform shifts the bubble off-screen (clipped top-left on mobile).
+ */
+.p-toast.p-component {
+  z-index: 12050 !important;
+  position: fixed !important;
+  transform: none !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: max(0.5rem, env(safe-area-inset-top, 0px)) !important;
+  bottom: auto !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 max(0.75rem, env(safe-area-inset-right, 0px)) 0 max(0.75rem, env(safe-area-inset-left, 0px)) !important;
+  box-sizing: border-box !important;
+  pointer-events: none;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.p-toast .p-toast-message {
+  pointer-events: auto;
+  width: 100% !important;
+  max-width: min(28rem, calc(100vw - 1.25rem)) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
 }
 
 .p-toast-message-success {
@@ -1184,6 +1370,17 @@ table {
   padding-right: var(--app-page-inline) !important;
 }
 
+/* Landing: full-bleed width — global shell max-width + inline padding were adding
+   ~80px+ side “margin” in DevTools. Inner sections use .hero__shell / own containers. */
+.app-shell > app-landing {
+  max-width: none !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 /* Normalize inner wrappers so pages align to one grid */
 .app-shell .container,
 .app-shell .contact-container,
@@ -1234,5 +1431,12 @@ table {
 .app-shell [class*="page-subtitle"] {
   font-size: clamp(1rem, 1.25vw, 1.15rem) !important;
   line-height: 1.6 !important;
+}
+
+/* Mobile nav drawer open — never stack the hamburger above the sheet (see navigation z-index) */
+body.ns-mobile-drawer-open .mobile-sidebar-toggle {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 

@@ -5,14 +5,14 @@
         <h1>Notifications</h1>
         <p>Stay up to date with account and test activity.</p>
       </div>
-      <div class="toolbar">
-        <div class="tabs">
-          <button class="tab-btn" [class.active]="filter === 'All'" (click)="filter='All'; refresh()">All</button>
-          <button class="tab-btn" [class.active]="filter === 'Unread'" (click)="filter='Unread'; refresh()">Unread</button>
-          <button class="tab-btn" [class.active]="filter === 'Read'" (click)="filter='Read'; refresh()">Read</button>
+      <div class="toolbar" role="toolbar" aria-label="Notification filters">
+        <div class="tabs" role="tablist" aria-label="Filter by read status">
+          <button type="button" role="tab" class="tab-btn" [class.active]="filter === 'All'" [attr.aria-selected]="filter === 'All'" (click)="filter='All'; refresh()">All</button>
+          <button type="button" role="tab" class="tab-btn" [class.active]="filter === 'Unread'" [attr.aria-selected]="filter === 'Unread'" (click)="filter='Unread'; refresh()">Unread</button>
+          <button type="button" role="tab" class="tab-btn" [class.active]="filter === 'Read'" [attr.aria-selected]="filter === 'Read'" (click)="filter='Read'; refresh()">Read</button>
         </div>
-        <button class="icon-btn refresh" (click)="refresh()" [disabled]="loading" title="Refresh">
-          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+        <button type="button" class="icon-btn refresh" (click)="refresh()" [disabled]="loading" title="Refresh" aria-label="Refresh notifications">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-2.197M19 5a9 9 0 00-14 2.197"/>
           </svg>
         </button>
@@ -53,22 +53,26 @@
         <div class="item-actions">
           <button
             *ngIf="isAccountRequest(note)"
+            type="button"
             class="icon-btn view"
             (click)="viewUserDetails(note)"
             title="Open in Account Requests"
+            aria-label="Open account request"
           >
-            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h8" />
             </svg>
           </button>
           <button
             *ngIf="notificationsService.isUnread(note)"
+            type="button"
             class="icon-btn mark"
             (click)="markRead(note)"
             title="Mark as read"
+            aria-label="Mark as read"
           >
-            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </button>

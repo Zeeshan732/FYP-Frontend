@@ -13,6 +13,41 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 768px) {
+  .notifications-shell {
+    padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .notifications-card {
+    width: 100%;
+    padding: 16px 14px 18px;
+    border-radius: 14px;
+  }
+
+  .toolbar {
+    gap: 8px;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+  }
+
+  .item {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .item-actions {
+    flex-direction: column;
+    align-items: flex-end;
+    width: auto;
+  }
+}
+
 .notifications-card {
   width: min(1120px, 100%);
   background: #112240;
@@ -24,10 +59,29 @@
 
 .header-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
   margin-bottom: 16px;
+}
+
+@media (min-width: 900px) {
+  .header-row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .toolbar {
+    width: auto;
+    max-width: min(520px, 100%);
+    flex-shrink: 0;
+  }
+
+  .tabs {
+    flex: 1 1 auto;
+  }
 }
 
 .title-block h1 {
@@ -45,17 +99,27 @@
 
 .toolbar {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
 }
 
 .tabs {
   display: inline-flex;
+  flex: 1 1 auto;
+  min-width: 0;
   background: #0f1d35;
   border-radius: 11px;
   padding: 4px;
   gap: 4px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
 }
 
 .tab-btn {
@@ -100,6 +164,7 @@
 }
 
 .icon-btn.refresh {
+  flex: 0 0 auto;
   background: var(--color-blue);
   color: #fff;
   border-color: rgba(46, 134, 222, 0.55);
@@ -138,14 +203,16 @@
 
 .item {
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   padding: 14px 16px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: #0f1d35;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  min-width: 0;
 }
 
 .item:hover {
@@ -160,14 +227,16 @@
 
 .item-main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .icon-pill {
   width: 30px;
   height: 30px;
+  flex-shrink: 0;
   border-radius: 12px;
   background: rgba(46, 134, 222, 0.15);
   color: #6eb0f0;
@@ -176,15 +245,28 @@
   justify-content: center;
 }
 
+.icon-pill svg {
+  width: 16px;
+  height: 16px;
+}
+
 .icon-pill.unread {
   background: rgba(29, 158, 117, 0.18);
   color: #5fd3af;
+}
+
+.item-text {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .item-text .item-title {
   font-weight: 500;
   font-size: 15px;
   color: #f2f5fb;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .item-text .item-meta {
@@ -195,24 +277,18 @@
 
 .item-actions {
   display: inline-flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
   gap: 8px;
+  flex: 0 0 auto;
+  padding-top: 2px;
 }
 
 @media (max-width: 1024px) {
-  .notifications-shell {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
   .notifications-card {
     width: 100%;
     max-width: 980px;
-  }
-
-  .toolbar {
-    flex-wrap: wrap;
-    justify-content: flex-end;
   }
 }
 
@@ -238,52 +314,6 @@
 
 :host ::ng-deep .fixed.inset-0 {
   z-index: 60;
-}
-
-@media (max-width: 768px) {
-  .notifications-shell {
-    padding: 1rem 0.75rem 1.75rem;
-  }
-  .notifications-card {
-    width: 100%;
-    padding: 18px 16px 20px;
-    border-radius: 14px;
-  }
-  .header-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .toolbar {
-    width: 100%;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .tabs {
-    width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: thin;
-  }
-  .tab-btn {
-    flex: 0 0 auto;
-  }
-  .item {
-    align-items: flex-start;
-    width: 100%;
-    flex-direction: column;
-    gap: 10px;
-    padding: 12px;
-  }
-  .item-actions {
-    align-self: flex-start;
-    justify-content: flex-start;
-    width: 100%;
-    flex-wrap: wrap;
-  }
-  .item-main {
-    width: 100%;
-  }
 }
 
 @media (max-width: 480px) {

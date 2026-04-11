@@ -120,47 +120,54 @@
       </div>
 
 
-      <div class="table-footer" *ngIf="!loading">
-        <div class="table-footer-text">
+      <div class="table-footer ns-pagination" *ngIf="!loading">
+        <div class="table-footer-text ns-pagination__summary">
           Showing {{ ((currentPage - 1) * pageSize) + 1 }}-
           {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} users
         </div>
-        <div class="flex items-center gap-2">
-          <select
-            [(ngModel)]="pageSize"
-            (change)="onPageSizeChange()"
-            class="select text-sm"
-            [disabled]="loading"
-          >
-            <option [value]="10">10 per page</option>
-            <option [value]="25">25 per page</option>
-            <option [value]="50">50 per page</option>
-            <option [value]="100">100 per page</option>
-          </select>
-          <div class="pager">
-            <button
-              class="pager-btn"
-              [disabled]="!hasPrevious || loading"
-              (click)="previousPage()"
-              title="Previous"
+        <div class="ns-pagination__toolbar">
+          <div class="ns-pagination__rows">
+            <select
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange()"
+              class="select text-sm ns-pagination__select"
+              [disabled]="loading"
+              aria-label="Rows per page"
             >
-              <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <span class="px-3 text-sm text-app-text-muted">
-              Page {{ currentPage }} of {{ totalPages }}
-            </span>
-            <button
-              class="pager-btn"
-              [disabled]="!hasNext || loading"
-              (click)="nextPage()"
-              title="Next"
-            >
-              <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+              <option [value]="10">10 per page</option>
+              <option [value]="25">25 per page</option>
+              <option [value]="50">50 per page</option>
+              <option [value]="100">100 per page</option>
+            </select>
+          </div>
+          <div class="ns-pagination__pager">
+            <div class="pager">
+              <button
+                class="pager-btn"
+                [disabled]="!hasPrevious || loading"
+                (click)="previousPage()"
+                title="Previous"
+                type="button"
+              >
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <span class="ns-pagination__page-indicator px-2 text-sm text-app-text-muted">
+                Page {{ currentPage }} of {{ totalPages }}
+              </span>
+              <button
+                class="pager-btn"
+                [disabled]="!hasNext || loading"
+                (click)="nextPage()"
+                title="Next"
+                type="button"
+              >
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>

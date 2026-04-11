@@ -1,4 +1,4 @@
-<section class="ft-root">
+<section class="ft-root" [class.ft-root--embedded]="embedded">
   <!-- Instructions -->
   <div *ngIf="!embedded && currentState === 'instructions'" class="ft-container">
     <div class="ft-hero app-card">
@@ -148,8 +148,8 @@
   </div>
 
   <!-- Camera ready -->
-  <div class="ft-container" *ngIf="currentState === 'cam-ready'">
-    <h2 class="ft-section-title">Position your hand and start recording</h2>
+  <div class="ft-container ft-cam-flow" *ngIf="currentState === 'cam-ready'">
+    <h2 class="ft-section-title ft-section-title--cam">Position your hand and start recording</h2>
 
     <div class="ft-flash-callout" *ngIf="isMobileLike || torchSupported">
       <ng-container *ngIf="torchSupported">
@@ -166,7 +166,7 @@
       </p>
     </div>
 
-    <div class="ft-cam-viewport">
+    <div class="ft-cam-viewport ft-cam-viewport--live">
       <video #videoPreview autoplay muted playsinline class="ft-video"></video>
       <div class="ft-guide-box">Position hand here</div>
     </div>
@@ -177,19 +177,24 @@
       </button>
     </div>
 
-    <div class="ft-actions-row">
-      <button class="ft-btn-primary" (click)="startRecording()">
-        Start Recording
+    <div class="ft-actions-row ft-actions-row--primary">
+      <button type="button" class="ft-btn-primary ft-btn-primary--wide" (click)="startRecording()">
+        Start recording
       </button>
-      <button class="ft-btn-secondary" (click)="switchToUpload()">
-        Stop camera and use upload
+    </div>
+    <div class="ft-actions-row ft-actions-row--secondary">
+      <button type="button" class="ft-btn-secondary ft-btn-secondary--full" (click)="switchToUpload()">
+        Stop camera &amp; use upload instead
       </button>
     </div>
   </div>
 
   <!-- Recording -->
-  <div class="ft-container" *ngIf="currentState === 'cam-recording'">
-    <h2 class="ft-section-title">Recording...</h2>
+  <div class="ft-container ft-cam-flow" *ngIf="currentState === 'cam-recording'">
+    <div class="ft-rec-header">
+      <h2 class="ft-section-title ft-section-title--cam">Recording</h2>
+      <span class="ft-rec-badge-inline" aria-live="polite">{{ formattedElapsed }}</span>
+    </div>
 
     <div class="ft-flash-callout ft-flash-callout--compact" *ngIf="torchSupported || isMobileLike">
       <p class="ft-flash-callout-text" *ngIf="torchSupported && torchOn">Flash on — better visibility for analysis.</p>
@@ -201,25 +206,30 @@
       </p>
     </div>
 
-    <div class="ft-cam-viewport">
+    <div class="ft-cam-viewport ft-cam-viewport--live">
       <video #videoPreview autoplay muted playsinline class="ft-video"></video>
-      <div class="ft-rec-pill">REC - {{ formattedElapsed }}</div>
+      <div class="ft-rec-pill">REC</div>
+    </div>
+
+    <!-- Primary control: always directly under preview so it is not missed on small screens -->
+    <div class="ft-stop-record-block">
+      <button type="button" class="ft-btn-stop-recording" (click)="stopRecording()">
+        Stop recording
+      </button>
+      <p class="ft-stop-record-hint">Ends the clip. Next you can review and analyze the test.</p>
     </div>
 
     <div class="ft-actions-row ft-torch-row" *ngIf="torchSupported">
-      <button type="button" class="ft-btn-secondary ft-btn-torch" (click)="toggleTorch()">
+      <button type="button" class="ft-btn-secondary ft-btn-torch ft-btn-torch--grow" (click)="toggleTorch()">
         Flash: {{ torchOn ? 'On' : 'Off' }}
       </button>
     </div>
     <div class="ft-waveform">
       <div class="ft-wave-bar" *ngFor="let h of waveformBars" [style.height.%]="h || 5"></div>
     </div>
-    <p class="ft-text">
-      {{ tapCount }} taps detected - remaining {{ formattedRemaining }}
+    <p class="ft-text ft-rec-stats">
+      {{ tapCount }} taps detected — {{ formattedRemaining }} left
     </p>
-    <div class="ft-actions-row">
-      <button class="ft-btn-primary" (click)="stopRecording()">Stop Recording</button>
-    </div>
   </div>
 
   <!-- Review -->

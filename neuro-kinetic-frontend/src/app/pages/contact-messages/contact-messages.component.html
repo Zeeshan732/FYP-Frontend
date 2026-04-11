@@ -1,45 +1,66 @@
 <section class="contact-messages-shell min-h-screen pt-24 text-app-text-primary">
-  <div class="container mx-auto px-4 py-8 contact-messages-inner">
+  <div class="container mx-auto px-3 sm:px-4 py-6 sm:py-8 contact-messages-inner">
     <div class="mb-6">
-      <div class="app-card bg-app-surface border border-app-border p-4 contact-messages-filters">
-        <div class="flex flex-col lg:flex-row gap-3 lg:items-end">
-          <div class="flex-1">
-            <label class="block text-sm text-app-text-muted mb-2">Search</label>
-            <input
-              [(ngModel)]="searchTerm"
-              type="text"
-              placeholder="Search by name, email, subject, message..."
-              class="w-full px-3 py-2 bg-app-surface border border-app-border rounded-app text-app-text-primary focus:outline-none focus:ring-2 focus:ring-app-primary">
+      <div class="app-card bg-app-surface border border-app-border p-3 sm:p-4 contact-messages-filters">
+        <div class="contact-messages-filters-grid">
+          <div class="contact-messages-field contact-messages-field--search">
+            <label class="block text-sm text-app-text-muted mb-1.5" for="contact-msg-search">Search</label>
+            <div class="contact-messages-search-field">
+              <i class="pi pi-search contact-messages-search-field__icon" aria-hidden="true"></i>
+              <input
+                id="contact-msg-search"
+                [(ngModel)]="searchTerm"
+                (ngModelChange)="onSearchTermChange()"
+                (keydown.enter)="$event.preventDefault(); applyFilters()"
+                type="search"
+                placeholder="Name, email, subject…"
+                title="Search by name, email, subject, or message"
+                autocomplete="off"
+                enterkeyhint="search"
+                class="contact-messages-search-input w-full bg-app-surface border border-app-border rounded-app text-app-text-primary focus:outline-none focus:ring-2 focus:ring-app-primary" />
+            </div>
           </div>
-          <div class="w-full lg:w-64">
-            <label class="block text-sm text-app-text-muted mb-2">Subject</label>
+          <div class="contact-messages-field contact-messages-field--subject">
+            <label class="block text-sm text-app-text-muted mb-1.5" for="contact-msg-subject">Subject</label>
             <p-dropdown
+              inputId="contact-msg-subject"
               [(ngModel)]="filterSubject"
+              (ngModelChange)="onFilterSubjectChange()"
               [options]="subjectOptions"
               optionLabel="label"
               optionValue="value"
               appendTo="body"
               [autoZIndex]="true"
               [baseZIndex]="11000"
-              styleClass="w-full">
+              styleClass="w-full contact-messages-subject-dd">
             </p-dropdown>
           </div>
-          <div class="flex gap-2">
-            <button class="px-4 py-2 bg-app-primary text-white rounded-app-lg" (click)="applyFilters()">Apply</button>
-            <button class="px-4 py-2 border border-app-border text-app-text-primary rounded-app-lg" (click)="clearFilters()">Clear</button>
+          <div class="contact-messages-actions" role="toolbar" aria-label="Message filters">
             <button
-              class="px-4 py-2 border rounded-app-lg"
+              type="button"
+              class="contact-messages-btn contact-messages-btn--secondary px-3 py-2 border border-app-border text-app-text-primary rounded-app-lg text-sm"
+              (click)="clearFilters()">
+              Clear
+            </button>
+            <button
+              type="button"
+              class="contact-messages-btn contact-messages-btn--sort px-3 py-2 border border-app-border text-app-text-primary rounded-app-lg text-sm whitespace-nowrap"
+              (click)="toggleSortOrder()">
+              {{ sortOrder === 'desc' ? 'Newest' : 'Oldest' }}
+            </button>
+            <button
+              type="button"
+              class="contact-messages-btn contact-messages-btn--failed px-3 py-2 border rounded-app-lg text-sm text-left sm:text-center"
               [ngClass]="failedOnly
                 ? 'bg-red-500/15 border-red-400 text-red-300'
                 : 'border-app-border text-app-text-primary'"
               (click)="toggleFailedOnly()">
-              {{ failedOnly ? 'Showing Failed Only' : 'Show Failed Only' }}
-              <span class="ml-2 inline-flex items-center justify-center min-w-[1.3rem] h-5 px-1.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-400/40">
+              <span class="contact-messages-failed-label">{{ failedOnly ? 'Showing failed' : 'Show failed' }}</span>
+              <span
+                class="ml-2 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-400/40"
+                aria-hidden="true">
                 {{ failedCount }}
               </span>
-            </button>
-            <button class="px-4 py-2 border border-app-border text-app-text-primary rounded-app-lg" (click)="toggleSortOrder()">
-              {{ sortOrder === 'desc' ? 'Newest' : 'Oldest' }}
             </button>
           </div>
         </div>
@@ -54,8 +75,8 @@
 
     <div *ngIf="!loading && items.length > 0" class="mb-8">
       <div class="bg-app-surface border border-app-border rounded-lg overflow-hidden shadow-sm">
-        <div class="overflow-x-auto">
-          <table class="w-full neuro-table">
+        <div class="contact-messages-table-wrap overflow-x-auto">
+          <table class="contact-messages-table w-full neuro-table">
             <thead class="border-b border-border">
               <tr>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Name</th>
@@ -71,8 +92,8 @@
             </thead>
             <tbody>
               <tr *ngFor="let item of items">
-                <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.firstName }} {{ item.lastName }}</td>
-                <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.email }}</td>
+                <td class="px-3 sm:px-4 py-3 text-sm text-app-text-primary contact-messages-col-name">{{ item.firstName }} {{ item.lastName }}</td>
+                <td class="px-3 sm:px-4 py-3 text-sm text-app-text-primary contact-messages-col-email">{{ item.email }}</td>
                 <!-- <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.organization || '—' }}</td> -->
                 <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.subject }}</td>
                 <!-- <td class="px-4 py-3 text-sm text-app-text-primary message-cell">{{ item.message }}</td> -->
@@ -109,25 +130,41 @@
     </div>
 
     <div *ngIf="!loading && totalPages > 0">
-      <div class="bg-app-surface border border-app-border rounded-lg p-4 shadow-sm">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="text-sm text-app-text-primary">
-            Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} messages
+      <div class="ns-pagination ns-pagination--card shadow-sm">
+        <div class="ns-pagination__summary text-app-text-primary">
+          Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} messages
+        </div>
+        <div class="ns-pagination__toolbar">
+          <div class="ns-pagination__rows">
+            <span class="ns-pagination__rows-label">Rows</span>
+            <select
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange()"
+              class="ns-pagination__select"
+              aria-label="Rows per page">
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="20">20</option>
+              <option [ngValue]="50">50</option>
+            </select>
           </div>
-          <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2 text-app-text-primary text-sm">
-              <span>Rows:</span>
-              <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="px-3 py-2 bg-app-surface border border-app-border rounded-app text-app-text-primary">
-                <option [ngValue]="10">10</option>
-                <option [ngValue]="20">20</option>
-                <option [ngValue]="50">50</option>
-              </select>
-            </div>
-            <div class="flex items-center gap-2">
-              <p-button icon="pi pi-chevron-left" [outlined]="true" [rounded]="true" (onClick)="previousPage()" [disabled]="!hasPrevious"></p-button>
-              <span class="px-2 text-app-text-primary text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
-              <p-button icon="pi pi-chevron-right" [outlined]="true" [rounded]="true" (onClick)="nextPage()" [disabled]="!hasNext"></p-button>
-            </div>
+          <div class="ns-pagination__pager">
+            <p-button
+              icon="pi pi-chevron-left"
+              [outlined]="true"
+              [rounded]="true"
+              (onClick)="previousPage()"
+              [disabled]="!hasPrevious"
+              pTooltip="Previous page"
+              tooltipPosition="top"></p-button>
+            <span class="ns-pagination__page-indicator text-app-text-primary">Page {{ currentPage }} of {{ totalPages }}</span>
+            <p-button
+              icon="pi pi-chevron-right"
+              [outlined]="true"
+              [rounded]="true"
+              (onClick)="nextPage()"
+              [disabled]="!hasNext"
+              pTooltip="Next page"
+              tooltipPosition="top"></p-button>
           </div>
         </div>
       </div>

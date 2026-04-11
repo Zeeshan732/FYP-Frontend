@@ -120,6 +120,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('ns-mobile-drawer-open');
+    }
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
     }
@@ -168,12 +171,26 @@ export class NavigationComponent implements OnInit, OnDestroy {
     if (this.isMobile) {
       this.mobileSidebarOpen = !this.mobileSidebarOpen;
     }
+    this.syncMobileDrawerBodyClass();
   }
 
   closeMobileSidebar() {
     if (this.mobileSidebarOpen) {
       this.mobileSidebarOpen = false;
     }
+    /* Keep drawer width state consistent next time hamburger opens */
+    if (this.isMobile) {
+      this.sidebarService.setSidebarCollapsed(true);
+    }
+    this.syncMobileDrawerBodyClass();
+  }
+
+  /** Ensures the menu trigger never stacks above the open drawer (see z-index + CSS fallback). */
+  private syncMobileDrawerBodyClass(): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    document.body.classList.toggle('ns-mobile-drawer-open', this.isMobile && this.mobileSidebarOpen);
   }
 
   private syncSidebarForViewport() {
@@ -185,6 +202,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.mobileSidebarOpen = false;
       // keep existing collapsed state from service for desktop
     }
+    this.syncMobileDrawerBodyClass();
   }
 
   openLoginModal() {

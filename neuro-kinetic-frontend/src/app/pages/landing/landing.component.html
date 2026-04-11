@@ -1,154 +1,161 @@
-<!-- Hero Section -->
-<section class="hero">
-  <div class="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-center">
-      <div class="text-center lg:text-left hero-content">
-        <h1 class="hero-title">
-          <span class="accent">NeuroSync</span>
-        </h1>
-        <p class="hero-subtitle">
-          Revolutionizing neurological assessment through advanced voice and gait analysis technology
-        </p>
-        <div class="hero-cta-group">
-          <a routerLink="/services" class="hero-btn-primary">Explore Services</a>
-          <a routerLink="/contact" class="hero-btn-outline">Get In Touch</a>
+<div class="landing-page">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__ambient" aria-hidden="true"></div>
+    <div class="hero__grid" aria-hidden="true"></div>
+    <div class="w-full mx-auto hero__shell">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-20 2xl:gap-24 items-center hero__grid-main">
+        <div class="text-center lg:text-left hero-content">
+          <h1 class="hero-title">
+            <span class="accent">NeuroSync</span>
+          </h1>
+          <p class="hero-subtitle">
+            Revolutionizing neurological assessment through advanced voice and gait analysis technology
+          </p>
+          <div class="hero-cta-group">
+            <a routerLink="/services" class="hero-btn-primary">Explore Services</a>
+            <a routerLink="/contact" class="hero-btn-outline">Get In Touch</a>
+          </div>
+          <div class="flex flex-wrap gap-3 mt-6 justify-center lg:justify-start hero-badges">
+            <span class="hero-badge">AI-Powered Analysis</span>
+            <span class="hero-badge">Voice &amp; Gait</span>
+          </div>
         </div>
-        <div class="flex flex-wrap gap-3 mt-6 justify-center lg:justify-start">
-          <span class="hero-badge">AI-Powered Analysis</span>
-          <span class="hero-badge">Voice &amp; Gait</span>
-        </div>
-      </div>
-      <div class="flex justify-center lg:justify-end hero-image">
-        <div class="relative">
-          <div class="w-80 h-80 xl:w-[22rem] xl:h-[22rem] rounded-full overflow-hidden shadow-2xl border-4 border-white/20 researcher-image">
-            <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-                 alt="NeuroSync Researcher" 
-                 class="w-full h-full object-cover">
+        <div class="flex justify-center lg:justify-end hero-image">
+          <div class="relative hero-visual">
+            <div class="hero-visual__ring" aria-hidden="true"></div>
+            <div class="w-80 h-80 xl:w-96 xl:h-96 2xl:w-[26rem] 2xl:h-[26rem] rounded-full overflow-hidden shadow-2xl researcher-image">
+              <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                   alt="NeuroSync Researcher"
+                   class="w-full h-full object-cover">
+            </div>
+            <div class="absolute -top-4 -right-4 hero-badge floating-badge">
+              <span class="text-sm font-semibold">Dr. Sarah Chen</span>
+              <p class="text-xs opacity-90">NeuroSync Researcher</p>
+            </div>
+            <div class="absolute -bottom-4 -left-4 hero-badge floating-badge" style="animation-delay: 1.5s;">
+              <span class="text-sm font-semibold">15+ Years</span>
+              <p class="text-xs opacity-90">Research Experience</p>
+            </div>
+            <div class="absolute top-1/2 -left-8 w-16 h-16 xl:w-20 xl:h-20 bg-app-primary/30 rounded-full animate-pulse hero-orb hero-orb--a"></div>
+            <div class="absolute top-1/4 -right-8 w-12 h-12 xl:w-16 xl:h-16 bg-app-primary-hover/30 rounded-full animate-pulse hero-orb hero-orb--b" style="animation-delay: 1s;"></div>
           </div>
-          <div class="absolute -top-4 -right-4 hero-badge floating-badge">
-            <span class="text-sm font-semibold">Dr. Sarah Chen</span>
-            <p class="text-xs opacity-90">NeuroSync Researcher</p>
-          </div>
-          <div class="absolute -bottom-4 -left-4 hero-badge floating-badge" style="animation-delay: 1.5s;">
-            <span class="text-sm font-semibold">15+ Years</span>
-            <p class="text-xs opacity-90">Research Experience</p>
-          </div>
-          <div class="absolute top-1/2 -left-8 w-16 h-16 xl:w-20 xl:h-20 bg-app-primary/30 rounded-full animate-pulse"></div>
-          <div class="absolute top-1/4 -right-8 w-12 h-12 xl:w-16 xl:h-16 bg-app-primary-hover/30 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
         </div>
       </div>
     </div>
-  </div>
-</section>    <!-- Our Technology Section -->
-    <section class="technology-section">
-      <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+  </section>
+
+  <!-- Our Technology -->
+  <section class="technology-section">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <header class="tech-section__header">
         <h2 class="section-title scroll-animate">Our Technology</h2>
         <p class="section-subtitle scroll-animate">Cutting-edge AI-powered analysis for precise neurological insights</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="tech-card card-voice scroll-animate delay-100">
-            <div class="tech-icon tech-icon-voice" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z"></path>
-                <path d="M19 11v1a7 7 0 01-14 0v-1"></path>
-                <path d="M12 19v3"></path>
-                <path d="M9 22h6"></path>
-              </svg>
-            </div>
-            <h3 class="tech-card-title">Voice Analysis</h3>
-            <p class="tech-card-desc">
-              Advanced speech pattern recognition to detect neurological conditions through voice biomarkers
-            </p>
-            <a routerLink="/voice-analysis" class="tech-card-link">Learn More -></a>
+      </header>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="tech-card card-voice scroll-animate delay-100">
+          <div class="tech-icon tech-icon-voice" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z"></path>
+              <path d="M19 11v1a7 7 0 01-14 0v-1"></path>
+              <path d="M12 19v3"></path>
+              <path d="M9 22h6"></path>
+            </svg>
           </div>
-
-          <div class="tech-card card-gait scroll-animate delay-200">
-            <div class="tech-icon tech-icon-gait" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="4.5" r="2"></circle>
-                <path d="M12 7v5l-3 4"></path>
-                <path d="M12 12l3 4"></path>
-                <path d="M8.5 20h3"></path>
-                <path d="M12.5 20h3"></path>
-              </svg>
-            </div>
-            <h3 class="tech-card-title">Gait Analysis</h3>
-            <p class="tech-card-desc">
-              Movement pattern analysis using computer vision to assess neurological motor functions
-            </p>
-            <a routerLink="/gait-analysis" class="tech-card-link">Learn More -></a>
-          </div>
-
-          <div class="tech-card card-tap scroll-animate delay-300">
-            <div class="tech-icon tech-icon-ai" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="4" width="16" height="16" rx="3"></rect>
-                <path d="M8 12h8"></path>
-                <path d="M12 8v8"></path>
-                <circle cx="7" cy="7" r="1"></circle>
-                <circle cx="17" cy="7" r="1"></circle>
-                <circle cx="7" cy="17" r="1"></circle>
-                <circle cx="17" cy="17" r="1"></circle>
-              </svg>
-            </div>
-            <h3 class="tech-card-title">AI Integration</h3>
-            <p class="tech-card-desc">
-              Machine learning algorithms that provide accurate, real-time neurological assessments
-            </p>
-            <a routerLink="/services" class="tech-card-link">Learn More -></a>
-          </div>
+          <h3 class="tech-card-title">Voice Analysis</h3>
+          <p class="tech-card-desc">
+            Advanced speech pattern recognition to detect neurological conditions through voice biomarkers
+          </p>
+          <a routerLink="/voice-analysis" class="tech-card-link">Learn More -></a>
         </div>
-      </div>
-    </section>
 
-<!-- Contact / Get Started Section -->
-<section class="contact-section">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-      <div class="lg:col-span-1 space-y-8">
-        <div class="contact-info-card scroll-animate-left delay-100">
-          <h3 class="card-title">Need Immediate Support?</h3>
-          <p class="card-desc">Our support team can help with urgent clinical and technical issues.</p>
-          <div class="contact-info-item">
-            <span>Emergency Support</span>
-            <span class="text-app-primary">+92 307 4839373</span>
+        <div class="tech-card card-gait scroll-animate delay-200">
+          <div class="tech-icon tech-icon-gait" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="4.5" r="2"></circle>
+              <path d="M12 7v5l-3 4"></path>
+              <path d="M12 12l3 4"></path>
+              <path d="M8.5 20h3"></path>
+              <path d="M12.5 20h3"></path>
+            </svg>
           </div>
-          <div class="contact-info-item">
-            <span>Email</span>
-            <span class="text-app-primary">zeeshanjbd732&#64;gmail.com</span>
-          </div>
-          <div class="contact-info-item">
-            <span>Live Chat</span>
-            <span class="text-app-primary">Available on our platform</span>
-          </div>
+          <h3 class="tech-card-title">Gait Analysis</h3>
+          <p class="tech-card-desc">
+            Movement pattern analysis using computer vision to assess neurological motor functions
+          </p>
+          <a routerLink="/gait-analysis" class="tech-card-link">Learn More -></a>
         </div>
-        <div class="contact-info-card scroll-animate-left delay-200">
-          <h3 class="card-title">Response Time</h3>
-          <p class="card-desc">Typical turnaround for requests submitted through this form.</p>
-          <div class="contact-info-item">
-            <span>General Inquiries</span>
-            <span class="urgency-normal">Within 24 hours</span>
+
+        <div class="tech-card card-tap scroll-animate delay-300">
+          <div class="tech-icon tech-icon-ai" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+              <path d="M8 12h8"></path>
+              <path d="M12 8v8"></path>
+              <circle cx="7" cy="7" r="1"></circle>
+              <circle cx="17" cy="7" r="1"></circle>
+              <circle cx="7" cy="17" r="1"></circle>
+              <circle cx="17" cy="17" r="1"></circle>
+            </svg>
           </div>
-          <div class="contact-info-item">
-            <span>Technical Support</span>
-            <span class="urgency-priority">Within 8 hours</span>
-          </div>
-          <div class="contact-info-item">
-            <span>Emergency Issues</span>
-            <span class="urgency-critical">Same-day priority response</span>
-          </div>
-        </div>
-      </div>
-      <div class="lg:col-span-2">
-        <div class="contact-form-card scroll-animate-right delay-100">
-          <h2>Contact Us</h2>
-          <p class="form-desc">Ready to revolutionize your neurological assessment? Contact our team to learn more about our technology.</p>
-          <app-contact-form mode="landing"></app-contact-form>
+          <h3 class="tech-card-title">AI Integration</h3>
+          <p class="tech-card-desc">
+            Machine learning algorithms that provide accurate, real-time neurological assessments
+          </p>
+          <a routerLink="/services" class="tech-card-link">Learn More -></a>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Footer -->
-<app-footer></app-footer>
+  <!-- Contact / Get Started -->
+  <section class="contact-section">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div class="lg:col-span-1 space-y-8 contact-sidebar">
+          <div class="contact-info-card scroll-animate-left delay-100">
+            <h3 class="card-title">Need Immediate Support?</h3>
+            <p class="card-desc">Our support team can help with urgent clinical and technical issues.</p>
+            <div class="contact-info-item">
+              <span>Emergency Support</span>
+              <span class="text-app-primary">+92 307 4839373</span>
+            </div>
+            <div class="contact-info-item">
+              <span>Email</span>
+              <span class="text-app-primary">zeeshanjbd732&#64;gmail.com</span>
+            </div>
+            <div class="contact-info-item">
+              <span>Live Chat</span>
+              <span class="text-app-primary">Available on our platform</span>
+            </div>
+          </div>
+          <div class="contact-info-card scroll-animate-left delay-200">
+            <h3 class="card-title">Response Time</h3>
+            <p class="card-desc">Typical turnaround for requests submitted through this form.</p>
+            <div class="contact-info-item">
+              <span>General Inquiries</span>
+              <span class="urgency-normal">Within 24 hours</span>
+            </div>
+            <div class="contact-info-item">
+              <span>Technical Support</span>
+              <span class="urgency-priority">Within 8 hours</span>
+            </div>
+            <div class="contact-info-item">
+              <span>Emergency Issues</span>
+              <span class="urgency-critical">Same-day priority response</span>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2">
+          <div class="contact-form-card scroll-animate-right delay-100">
+            <h2>Contact Us</h2>
+            <p class="form-desc">Ready to revolutionize your neurological assessment? Contact our team to learn more about our technology.</p>
+            <app-contact-form mode="landing"></app-contact-form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <app-footer></app-footer>
+</div>
