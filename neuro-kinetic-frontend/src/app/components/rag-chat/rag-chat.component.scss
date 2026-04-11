@@ -1,3 +1,19 @@
+/* Fill consultation layout (flex chain) */
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.rag-chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
 // Consultation / RAG chat – compact layout, no oversized icon
 :host ::ng-deep nb-chat {
   border: none;
@@ -256,6 +272,42 @@
   }
 }
 
+/* Messages + composer — empty consultation: center heading + input together (see rag-light-main--empty) */
+.rag-chat-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.rag-chat--light .rag-light-main--empty {
+  justify-content: center;
+  align-items: stretch;
+  gap: clamp(1rem, 3.5vh, 2rem);
+  padding: 0.35rem 0;
+}
+
+.rag-chat--light .rag-light-main--empty .rag-messages {
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.rag-chat--light .rag-light-main--empty .rag-messages--empty {
+  justify-content: center;
+  align-items: center;
+}
+
+.rag-chat--light .rag-light-main--empty .rag-welcome {
+  margin: 0;
+}
+
+.rag-chat--light .rag-light-main:not(.rag-light-main--empty) .rag-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 // Light theme: clean centered layout like reference
 .rag-chat--light {
   display: flex;
@@ -288,6 +340,10 @@
     background: transparent;
   }
 
+  .rag-light-main--empty .rag-messages {
+    min-height: 0;
+  }
+
   .rag-messages--empty {
     justify-content: center;
     align-items: center;
@@ -299,6 +355,10 @@
     font-weight: 700;
     color: var(--app-text-primary);
     text-align: center;
+  }
+
+  .rag-light-main--empty .rag-welcome {
+    margin: 0;
   }
 
   .rag-msg {
@@ -444,5 +504,104 @@
   .rag-clear {
     margin-left: 1rem;
     margin-top: 0.25rem;
+  }
+}
+
+/* Consultation light theme — tablets & phones (Stitch-style: compact rhythm, input in view) */
+@media (max-width: 1024px) {
+  .rag-chat--light {
+    .rag-messages {
+      padding: 1rem 0.65rem 0.5rem;
+      min-height: 0;
+    }
+
+    .rag-welcome {
+      font-size: clamp(1.45rem, 4.2vw, 1.95rem);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .rag-form--light {
+      padding: 0.35rem max(0.35rem, env(safe-area-inset-left)) 0.5rem max(0.35rem, env(safe-area-inset-right));
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .rag-chat--light {
+    .rag-messages {
+      flex: 1 1 auto;
+      padding: 0.5rem 0.4rem 0.35rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .rag-light-main--empty {
+      gap: clamp(0.85rem, 3vh, 1.5rem);
+      padding: 0.25rem 0;
+      min-height: min(52vh, 420px);
+    }
+
+    .rag-welcome {
+      font-size: clamp(1.25rem, 5.5vw, 1.65rem);
+      font-weight: 650;
+      margin-bottom: 0.75rem;
+      padding: 0 0.15rem;
+      text-align: center;
+    }
+
+    .rag-light-main--empty .rag-welcome {
+      margin-bottom: 0;
+    }
+
+    .rag-form--light {
+      flex-wrap: nowrap;
+      gap: 0.35rem;
+      align-items: stretch;
+      padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+    }
+
+    .rag-input-wrap {
+      min-height: 2.75rem;
+      padding: 0 0.35rem 0 0.65rem;
+      border-radius: 1.5rem;
+    }
+
+    /* 16px+ avoids iOS zoom-on-focus */
+    .rag-input--inside {
+      font-size: 1rem;
+      padding: 0.5rem 0.45rem 0.5rem 0.35rem;
+    }
+
+    .rag-input-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+    }
+
+    .rag-input-icon--send {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+
+    .rag-input-icon--send .rag-icon-send-arrow {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .rag-error {
+      margin-left: 0.4rem;
+      margin-right: 0.4rem;
+    }
+
+    .rag-clear {
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+@media (max-width: 380px) {
+  .rag-chat--light .rag-welcome {
+    font-size: 1.2rem;
   }
 }

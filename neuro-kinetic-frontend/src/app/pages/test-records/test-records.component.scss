@@ -159,15 +159,6 @@
     padding-right: 0.875rem !important;
   }
 
-  .test-records-pagination > .flex {
-    align-items: flex-start !important;
-  }
-
-  .test-records-pagination .flex.items-center.gap-3 {
-    width: 100%;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
 }
 
 @media (max-width: 480px) {

@@ -1,11 +1,11 @@
 .consultation-page {
   min-height: calc(100vh - 4rem);
+  min-height: calc(100dvh - 4rem);
   display: flex;
   flex-direction: column;
   max-width: none;
   margin: 0;
   padding: 0;
-  // background: var(--app-surface);
 }
 
 .consultation-main {
@@ -91,3 +91,37 @@
   background: var(--app-primary-hover);
 }
 
+/* Mobile / narrow — safe areas, readable notice, footer doesn’t crowd the composer */
+@media (max-width: 1024px) {
+  .consultation-page {
+    min-height: calc(100dvh - 3.75rem);
+  }
+
+  .consultation-main {
+    padding: 0.35rem max(0.5rem, env(safe-area-inset-left)) 0.25rem max(0.5rem, env(safe-area-inset-right));
+  }
+
+  .consultation-notice {
+    margin-bottom: 0.35rem;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .consultation-footer {
+    padding: 0.45rem max(0.75rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-bottom))
+      max(0.75rem, env(safe-area-inset-right));
+  }
+
+  .disclaimer {
+    font-size: 0.7rem;
+    line-height: 1.45;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .consultation-main {
+    padding-top: 0.25rem;
+  }
+}

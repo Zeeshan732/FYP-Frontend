@@ -1,12 +1,39 @@
+:host {
+  display: block;
+}
+
 .ft-root {
   padding: clamp(1rem, 1.5vw, 1.75rem) 0 clamp(2rem, 3vw, 3rem);
   color: #e5e7eb;
+}
+
+.ft-root--embedded {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0 max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .ft-container {
   max-width: 1200px;
   margin: 0 auto 2rem;
   padding: 0 clamp(1rem, 2vw, 2rem);
+}
+
+.ft-cam-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ft-root--embedded .ft-cam-flow {
+  margin-bottom: 0;
+  padding-left: clamp(0.5rem, 2vw, 1rem);
+  padding-right: clamp(0.5rem, 2vw, 1rem);
+  max-width: 100%;
 }
 
 .ft-container-embedded {
@@ -45,6 +72,32 @@
   margin-bottom: 0.75rem;
 }
 
+.ft-section-title--cam {
+  font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+.ft-rec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.ft-rec-badge-inline {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fecaca;
+  background: rgba(248, 113, 113, 0.2);
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+}
+
 .ft-text {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.7);
@@ -61,6 +114,13 @@
   cursor: pointer;
 }
 
+.ft-btn-primary--wide {
+  width: 100%;
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+  font-size: 1rem;
+}
+
 .ft-btn-secondary {
   background: transparent;
   color: rgba(255, 255, 255, 0.7);
@@ -71,11 +131,60 @@
   cursor: pointer;
 }
 
+.ft-btn-secondary--full {
+  width: 100%;
+  text-align: center;
+}
+
 .ft-actions-row {
   display: flex;
   gap: 1rem;
   margin-top: 1.25rem;
   flex-wrap: wrap;
+}
+
+.ft-actions-row--primary {
+  margin-top: 0.85rem;
+}
+
+.ft-actions-row--secondary {
+  margin-top: 0.5rem;
+}
+
+.ft-stop-record-block {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.ft-btn-stop-recording {
+  width: 100%;
+  display: block;
+  padding: 0.95rem 1.25rem;
+  border: none;
+  border-radius: 0.65rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(180deg, #e85d5d 0%, #c53030 100%);
+  box-shadow: 0 4px 14px rgba(197, 48, 48, 0.35);
+}
+
+.ft-btn-stop-recording:active {
+  transform: scale(0.99);
+}
+
+.ft-stop-record-hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+}
+
+.ft-rec-stats {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .ft-mode-header {
@@ -270,6 +379,10 @@
   min-width: 8rem;
 }
 
+.ft-btn-torch--grow {
+  flex: 1 1 auto;
+}
+
 .ft-cam-viewport {
   position: relative;
   border-radius: 0.75rem;
@@ -278,9 +391,27 @@
   margin-top: 0.75rem;
 }
 
-.ft-video {
+/* Full-bleed preview: avoids narrow “pillar” video on phones */
+.ft-cam-viewport--live {
+  width: 100%;
+  margin-top: 0.65rem;
+  aspect-ratio: 3 / 4;
+  max-height: min(58vh, 520px);
+  min-height: 200px;
+}
+
+.ft-cam-viewport:not(.ft-cam-viewport--live) .ft-video {
   width: 100%;
   height: auto;
+  display: block;
+}
+
+.ft-cam-viewport--live .ft-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
 

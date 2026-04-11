@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../services/api.service';
@@ -9,7 +9,7 @@ import { ChatConversation, ChatMessage, PagedResult } from '../../models/api.mod
   templateUrl: './chat-history.component.html',
   styleUrls: ['./chat-history.component.scss']
 })
-export class ChatHistoryComponent implements OnInit {
+export class ChatHistoryComponent implements OnInit, OnDestroy {
   items: ChatConversation[] = [];
   loading = false;
   deletingId: number | null = null;
@@ -37,6 +37,9 @@ export class ChatHistoryComponent implements OnInit {
   hasPrevious = false;
   hasNext = false;
 
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly searchDebounceMs = 400;
+
   constructor(
     private apiService: ApiService,
     private router: Router,
@@ -45,6 +48,27 @@ export class ChatHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.clearSearchDebounce();
+  }
+
+  private clearSearchDebounce(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
+  }
+
+  /** Debounced live search while typing */
+  onSearchTermChange(): void {
+    this.clearSearchDebounce();
+    this.searchDebounceTimer = setTimeout(() => {
+      this.searchDebounceTimer = null;
+      this.currentPage = 1;
+      this.load();
+    }, this.searchDebounceMs);
   }
 
   load(): void {
@@ -72,12 +96,15 @@ export class ChatHistoryComponent implements OnInit {
     });
   }
 
+  /** Immediate search (e.g. Enter) — skips pending debounced run */
   applyFilter(): void {
+    this.clearSearchDebounce();
     this.currentPage = 1;
     this.load();
   }
 
   clearFilter(): void {
+    this.clearSearchDebounce();
     this.searchTerm = '';
     this.currentPage = 1;
     this.load();

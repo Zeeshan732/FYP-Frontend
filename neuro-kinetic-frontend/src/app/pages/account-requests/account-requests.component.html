@@ -94,32 +94,36 @@
     </div>
 
     <div class="table-footer-card" *ngIf="!loading">
-      <div class="table-footer">
-        <div class="table-footer-text">
+      <div class="table-footer ns-pagination">
+        <div class="table-footer-text ns-pagination__summary">
           Showing {{ ((pageNumber - 1) * pageSize) + 1 }}-
           {{ Math.min(pageNumber * pageSize, totalCount) }} of {{ totalCount }}
         </div>
-        <div class="pager" aria-label="Pagination">
-          <button
-            class="pager-btn"
-            [disabled]="pageNumber === 1 || loading"
-            (click)="changePage('prev')"
-            title="Previous"
-          >
-            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button
-            class="pager-btn"
-            [disabled]="(pageNumber * pageSize) >= totalCount || loading"
-            (click)="changePage('next')"
-            title="Next"
-          >
-            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+        <div class="ns-pagination__pager">
+          <div class="pager" aria-label="Pagination">
+            <button
+              class="pager-btn"
+              type="button"
+              [disabled]="pageNumber === 1 || loading"
+              (click)="changePage('prev')"
+              title="Previous"
+            >
+              <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              class="pager-btn"
+              type="button"
+              [disabled]="(pageNumber * pageSize) >= totalCount || loading"
+              (click)="changePage('next')"
+              title="Next"
+            >
+              <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>

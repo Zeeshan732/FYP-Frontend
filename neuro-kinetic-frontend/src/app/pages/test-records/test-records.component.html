@@ -362,33 +362,43 @@
 
     <!-- Pagination -->
     <div *ngIf="!loading && totalPages > 0" class="max-w-[1600px] mx-auto">
-      <div class="test-records-pagination bg-app-surface border border-app-border rounded-lg p-4 shadow-sm">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="text-sm text-app-text-primary">
-            Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} records
+      <div class="ns-pagination ns-pagination--card shadow-sm">
+        <div class="ns-pagination__summary text-app-text-primary">
+          Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} records
+        </div>
+        <div class="ns-pagination__toolbar">
+          <div class="ns-pagination__rows">
+            <span class="ns-pagination__rows-label">Rows</span>
+            <select
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange()"
+              class="ns-pagination__select"
+              aria-label="Rows per page">
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="20">20</option>
+              <option [ngValue]="25">25</option>
+              <option [ngValue]="50">50</option>
+              <option [ngValue]="100">100</option>
+            </select>
           </div>
-          <div class="flex items-center gap-3">
-            <!-- Rows per page selector -->
-            <div class="flex items-center gap-2 text-app-text-primary text-sm">
-              <span>Rows:</span>
-              <select 
-                [(ngModel)]="pageSize"
-                (change)="onPageSizeChange()"
-                class="px-3 py-2 bg-app-surface border border-app-border rounded-app focus:ring-2 focus:ring-app-primary focus:border-app-primary text-app-text-primary">
-                <option [ngValue]="10">10</option>
-                <option [ngValue]="20">20</option>
-                <option [ngValue]="25">25</option>
-                <option [ngValue]="50">50</option>
-                <option [ngValue]="100">100</option>
-              </select>
-            </div>
-
-            <!-- Pager -->
-            <div class="flex items-center gap-2">
-              <p-button icon="pi pi-chevron-left" [outlined]="true" [rounded]="true" (onClick)="previousPage()" [disabled]="!hasPrevious" pTooltip="Previous" tooltipPosition="top"></p-button>
-              <span class="px-2 text-app-text-primary text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
-              <p-button icon="pi pi-chevron-right" [outlined]="true" [rounded]="true" (onClick)="nextPage()" [disabled]="!hasNext" pTooltip="Next" tooltipPosition="top"></p-button>
-            </div>
+          <div class="ns-pagination__pager">
+            <p-button
+              icon="pi pi-chevron-left"
+              [outlined]="true"
+              [rounded]="true"
+              (onClick)="previousPage()"
+              [disabled]="!hasPrevious"
+              pTooltip="Previous page"
+              tooltipPosition="top"></p-button>
+            <span class="ns-pagination__page-indicator text-app-text-primary">Page {{ currentPage }} of {{ totalPages }}</span>
+            <p-button
+              icon="pi pi-chevron-right"
+              [outlined]="true"
+              [rounded]="true"
+              (onClick)="nextPage()"
+              [disabled]="!hasNext"
+              pTooltip="Next page"
+              tooltipPosition="top"></p-button>
           </div>
         </div>
       </div>

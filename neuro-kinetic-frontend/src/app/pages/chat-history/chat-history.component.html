@@ -1,6 +1,6 @@
 <app-navigation></app-navigation>
 
-<section class="chat-history-shell min-h-screen bg-pagebg pb-20">
+<section class="chat-history-shell min-h-screen bg-pagebg">
   <div class="chat-history-inner w-full max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-5 xl:px-6 2xl:px-8 py-8">
     <div class="chat-history-controls max-w-[1600px] mx-auto mb-6">
       <div class="chat-history-controls-row">
@@ -9,39 +9,31 @@
           <span class="chat-history-sub">View, filter and manage previous conversations</span>
         </div>
 
-        <div class="chat-history-actions">
+        <div
+          class="chat-history-actions"
+          [class.chat-history-actions--no-bulk]="items.length === 0">
           <button
             *ngIf="items.length > 0"
             type="button"
-            class="chat-action-btn"
-            (click)="toggleSelectAll()">
-            <i class="pi" [ngClass]="isAllSelected ? 'pi-check-square' : 'pi-square'"></i>
-            {{ isAllSelected ? 'Unselect all' : 'Select all' }}
-          </button>
-
-          <button
-            *ngIf="items.length > 0"
-            type="button"
-            class="chat-action-btn chat-action-btn--danger"
+            class="chat-action-btn chat-action-btn--danger ch-tool ch-tool--trash"
             [disabled]="!hasAnySelection || bulkDeleting"
             (click)="openBulkDeleteDialog()">
             <i class="pi pi-trash"></i>
-           
           </button>
 
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            (keydown.enter)="applyFilter()"
-            placeholder="Search title or message..."
-            class="chat-search-input" />
-          <button type="button" class="chat-action-btn" (click)="applyFilter()">
-            <i class="pi pi-search"></i>
-          </button>
-          <button type="button" class="chat-sort-btn" (click)="toggleSortOrder()">
-            <i class="pi pi-sort-alt"></i>
-            {{ sortOrder === 'desc' ? 'Newest' : 'Oldest' }}
-          </button>
+          <div class="chat-search-field ch-tool ch-tool--query">
+            <i class="pi pi-search chat-search-field__icon" aria-hidden="true"></i>
+            <input
+              type="search"
+              [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearchTermChange()"
+              (keydown.enter)="$event.preventDefault(); applyFilter()"
+              placeholder="Search…"
+              title="Search by title or message. Results update as you type; press Enter to search immediately."
+              class="chat-search-input"
+              autocomplete="off"
+              enterkeyhint="search" />
+          </div>
         </div>
       </div>
     </div>
@@ -102,24 +94,42 @@
     </div>
 
     <div *ngIf="!loading && totalPages > 0" class="max-w-[1600px] mx-auto">
-      <div class="chat-pagination">
-        <div class="chat-pagination-info">
+      <div class="ns-pagination ns-pagination--card">
+        <div class="ns-pagination__summary">
           Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} chats
         </div>
-        <div class="chat-pagination-actions">
-          <div class="rows-select">
-            <span>Rows:</span>
-            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+        <div class="ns-pagination__toolbar">
+          <div class="ns-pagination__rows">
+            <span class="ns-pagination__rows-label">Rows</span>
+            <select
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange()"
+              class="ns-pagination__select"
+              aria-label="Rows per page">
               <option [ngValue]="10">10</option>
               <option [ngValue]="20">20</option>
               <option [ngValue]="25">25</option>
               <option [ngValue]="50">50</option>
             </select>
           </div>
-          <div class="pager">
-            <p-button icon="pi pi-chevron-left" [outlined]="true" [rounded]="true" (onClick)="previousPage()" [disabled]="!hasPrevious"></p-button>
-            <span>Page {{ currentPage }} of {{ totalPages }}</span>
-            <p-button icon="pi pi-chevron-right" [outlined]="true" [rounded]="true" (onClick)="nextPage()" [disabled]="!hasNext"></p-button>
+          <div class="ns-pagination__pager">
+            <p-button
+              icon="pi pi-chevron-left"
+              [outlined]="true"
+              [rounded]="true"
+              (onClick)="previousPage()"
+              [disabled]="!hasPrevious"
+              pTooltip="Previous page"
+              tooltipPosition="top"></p-button>
+            <span class="ns-pagination__page-indicator">Page {{ currentPage }} of {{ totalPages }}</span>
+            <p-button
+              icon="pi pi-chevron-right"
+              [outlined]="true"
+              [rounded]="true"
+              (onClick)="nextPage()"
+              [disabled]="!hasNext"
+              pTooltip="Next page"
+              tooltipPosition="top"></p-button>
           </div>
         </div>
       </div>

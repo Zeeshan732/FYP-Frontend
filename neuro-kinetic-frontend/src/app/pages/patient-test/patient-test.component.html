@@ -668,7 +668,7 @@
 <div class="pt-ft-modal-overlay" *ngIf="showFingerTapModal" (click)="closeFingerTapModal()">
   <div class="pt-ft-modal" (click)="$event.stopPropagation()">
     <button type="button" class="pt-ft-close pt-ft-close-floating" (click)="closeFingerTapModal()">×</button>
-    <div class="pt-ft-modal-body">
+    <div class="pt-ft-modal-body pt-ft-modal-body--fingertap">
       <app-finger-tap [embedded]="true" (requestClose)="closeFingerTapModal()"></app-finger-tap>
     </div>
   </div>

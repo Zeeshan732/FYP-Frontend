@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../services/api.service';
 import { ContactMessageItem, PagedResult } from '../../models/api.models';
@@ -8,7 +8,7 @@ import { ContactMessageItem, PagedResult } from '../../models/api.models';
   templateUrl: './contact-messages.component.html',
   styleUrls: ['./contact-messages.component.scss']
 })
-export class ContactMessagesComponent implements OnInit {
+export class ContactMessagesComponent implements OnInit, OnDestroy {
   items: ContactMessageItem[] = [];
   loading = false;
   error = '';
@@ -26,6 +26,9 @@ export class ContactMessagesComponent implements OnInit {
   hasNext = false;
   failedCount = 0;
 
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly searchDebounceMs = 400;
+
   /** NeuroSync confirmation modal (ns-modal) */
   showDeleteMessageDialog = false;
   messagePendingDelete: ContactMessageItem | null = null;
@@ -42,6 +45,32 @@ export class ContactMessagesComponent implements OnInit {
   constructor(private apiService: ApiService, private messageService: MessageService) {}
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.clearSearchDebounce();
+  }
+
+  private clearSearchDebounce(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
+  }
+
+  /** Live search while typing */
+  onSearchTermChange(): void {
+    this.clearSearchDebounce();
+    this.searchDebounceTimer = setTimeout(() => {
+      this.searchDebounceTimer = null;
+      this.currentPage = 1;
+      this.load();
+    }, this.searchDebounceMs);
+  }
+
+  onFilterSubjectChange(): void {
+    this.currentPage = 1;
     this.load();
   }
 
@@ -89,12 +118,15 @@ export class ContactMessagesComponent implements OnInit {
     });
   }
 
+  /** Run search immediately (e.g. Enter) */
   applyFilters(): void {
+    this.clearSearchDebounce();
     this.currentPage = 1;
     this.load();
   }
 
   clearFilters(): void {
+    this.clearSearchDebounce();
     this.searchTerm = '';
     this.filterSubject = '';
     this.failedOnly = false;

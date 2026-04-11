@@ -59,193 +59,198 @@
 <div
   *ngIf="isAuthenticated && !isLandingPage && currentRoute !== '/login' && currentRoute !== '/signup' && mobileSidebarOpen"
   class="mobile-sidebar-backdrop"
-  (click)="toggleSidebar()"
+  (click)="closeMobileSidebar()"
 ></div>
 
 <!-- Sidebar (Authenticated Users - NOT on Landing/Login/Signup Pages) -->
-<aside *ngIf="isAuthenticated && !isLandingPage && currentRoute !== '/login' && currentRoute !== '/signup'" 
-       class="neuro-sidebar fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out"
+<aside *ngIf="isAuthenticated && !isLandingPage && currentRoute !== '/login' && currentRoute !== '/signup'"
+       class="neuro-sidebar neuro-sidebar--v2 fixed left-0 top-0 h-full z-[65] transition-all duration-300 ease-in-out"
        [class.w-56]="!sidebarCollapsed"
        [class.w-20]="sidebarCollapsed"
-       [class.mobile-open]="mobileSidebarOpen">
-  <!-- Sidebar Content -->
-  <div class="flex flex-col h-full">
-    <!-- Sidebar Header -->
-    <div class="flex items-center p-4 border-b border-white/10 relative">
-      <div class="flex items-center space-x-3" [class.opacity-0]="sidebarCollapsed" [class.w-0]="sidebarCollapsed" [class.overflow-hidden]="sidebarCollapsed">
-        <div class="flex flex-col">
-          <div class="sidebar-logo whitespace-nowrap">
-            <img src="assets/logos/brand/logo.png" alt="NeuroSync" class="sidebar-logo-img">
-          </div>
-          <div *ngIf="roleLabel" class="sidebar-role text-[11px] uppercase tracking-wide">{{ roleLabel }}</div>
+       [class.mobile-open]="mobileSidebarOpen"
+       [attr.data-collapsed]="sidebarCollapsed">
+  <div class="neuro-sidebar__inner flex flex-col h-full">
+    <!-- Brand + collapse -->
+    <div class="neuro-sidebar__header">
+      <div class="neuro-sidebar__brand">
+        <div class="neuro-sidebar__logo-wrap">
+          <img src="assets/logos/brand/logo.png" alt="NeuroSync" class="neuro-sidebar__logo-img">
         </div>
+        <div *ngIf="roleLabel && !sidebarCollapsed" class="neuro-sidebar__role-chip">{{ roleLabel }}</div>
       </div>
-      <div class="flex-1"></div>
-      <div class="flex items-center gap-2">
-        <button (click)="toggleSidebar()" 
-                class="sidebar-toggle p-2 rounded-lg transition-colors">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" [class.rotate-180]="sidebarCollapsed">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-          </svg>
-        </button>
-      </div>
+      <button *ngIf="!isMobile"
+              type="button"
+              (click)="toggleSidebar()"
+              class="neuro-sidebar__collapse"
+              [attr.aria-expanded]="!sidebarCollapsed"
+              aria-label="Collapse sidebar">
+        <svg class="neuro-sidebar__collapse-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" [class.neuro-sidebar__collapse-icon--flipped]="sidebarCollapsed">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+        </svg>
+      </button>
+      <button *ngIf="isMobile"
+              type="button"
+              (click)="closeMobileSidebar()"
+              class="neuro-sidebar__close"
+              aria-label="Close menu">
+        <svg class="neuro-sidebar__close-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
 
-    <!-- Navigation Links: role-based visibility -->
-    <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+    <nav class="neuro-sidebar__nav flex-1 flex flex-col overflow-y-auto overscroll-contain">
       <!-- Patient -->
       <ng-container *ngIf="isPatient">
-        <a routerLink="/home" 
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+        <a routerLink="/home"
+           routerLinkActive="neuro-sidebar__link--active"
            [routerLinkActiveOptions]="{exact: true}"
-           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'Home' : ''">
-          <i class="pi pi-home sidebar-icon" aria-hidden="true"></i>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Home</span>
+          <i class="pi pi-home neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Home</span>
         </a>
 
-        <a routerLink="/patient-test" 
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+        <a routerLink="/patient-test"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'Take Test' : ''">
-          <i class="pi pi-microphone sidebar-icon" aria-hidden="true"></i>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Take Test</span>
+          <i class="pi pi-microphone neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Take Test</span>
         </a>
 
-        <a routerLink="/test-records" 
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+        <a routerLink="/test-records"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'My Tests' : ''">
-          <i class="pi pi-file sidebar-icon" aria-hidden="true"></i>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">My Tests</span>
+          <i class="pi pi-file neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">My Tests</span>
         </a>
 
         <a routerLink="/consultation"
            (click)="onConsultationClick($event)"
-           class="sidebar-link w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group text-left"
+           class="neuro-sidebar__link neuro-sidebar__link--full"
            [title]="sidebarCollapsed ? 'Consultation' : ''">
-          <i class="pi pi-question-circle sidebar-icon" aria-hidden="true"></i>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Consultation</span>
+          <i class="pi pi-question-circle neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Consultation</span>
         </a>
 
         <a routerLink="/chat-history"
            (click)="onChatHistoryClick()"
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'Chat History' : ''">
-          <i class="pi pi-comments sidebar-icon" aria-hidden="true"></i>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Chat History</span>
+          <i class="pi pi-comments neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Chat History</span>
         </a>
 
         <a routerLink="/profile-settings"
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'Profile Settings' : ''">
-          <i class="pi pi-user-edit sidebar-icon" aria-hidden="true"></i>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Profile Settings</span>
+          <i class="pi pi-user-edit neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Profile Settings</span>
         </a>
       </ng-container>
 
       <!-- Clinician -->
       <ng-container *ngIf="isClinician">
         <a routerLink="/clinician"
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
+           routerLinkActive="neuro-sidebar__link--active"
            [routerLinkActiveOptions]="{exact: true}"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'Dashboard' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="neuro-sidebar__icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Dashboard</span>
         </a>
 
         <a routerLink="/clinician/results"
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'Test Results' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="neuro-sidebar__icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
           </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Test Results</span>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Test Results</span>
         </a>
 
         <a routerLink="/notifications"
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'Notifications' : ''">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="neuro-sidebar__icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Notifications</span>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Notifications</span>
         </a>
 
         <a routerLink="/profile-settings"
-           routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-           class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
            [title]="sidebarCollapsed ? 'Profile Settings' : ''">
-          <i class="pi pi-user-edit sidebar-icon" aria-hidden="true"></i>
-          <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Profile Settings</span>
+          <i class="pi pi-user-edit neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Profile Settings</span>
         </a>
       </ng-container>
 
       <!-- Admin -->
       <ng-container *ngIf="isAdmin">
-        <a routerLink="/admin-dashboard" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'Admin Dashboard' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
-      </a>
-      <a *ngIf="isAdmin" routerLink="/account-requests" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'Account Requests' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h4m6 0h4a7 7 0 00-7-7z" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Account Requests</span>
-      </a>
-      <a *ngIf="isAdmin" routerLink="/admin-users" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'All Users' : ''">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">All Users</span>
-      </a>
-      <a *ngIf="isAdmin" routerLink="/contact-messages"
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group"
-         [title]="sidebarCollapsed ? 'Contact Messages' : ''">
-        <i class="pi pi-inbox sidebar-icon" aria-hidden="true"></i>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Contact Messages</span>
-      </a>
+        <a routerLink="/admin-dashboard"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
+           [title]="sidebarCollapsed ? 'Admin Dashboard' : ''">
+          <svg class="neuro-sidebar__icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Dashboard</span>
+        </a>
+        <a *ngIf="isAdmin" routerLink="/account-requests"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
+           [title]="sidebarCollapsed ? 'Account Requests' : ''">
+          <svg class="neuro-sidebar__icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h4m6 0h4a7 7 0 00-7-7z" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Account Requests</span>
+        </a>
+        <a *ngIf="isAdmin" routerLink="/admin-users"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
+           [title]="sidebarCollapsed ? 'All Users' : ''">
+          <svg class="neuro-sidebar__icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">All Users</span>
+        </a>
+        <a *ngIf="isAdmin" routerLink="/contact-messages"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
+           [title]="sidebarCollapsed ? 'Contact Messages' : ''">
+          <i class="pi pi-inbox neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Contact Messages</span>
+        </a>
       </ng-container>
 
-      <a routerLink="/contact" 
-         routerLinkActive="bg-app-primary/20 text-app-primary border-app-primary"
-         class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-lg text-app-text-primary hover:bg-app-surface-muted hover:text-app-primary transition-colors group mt-2"
+      <a routerLink="/contact"
+         routerLinkActive="neuro-sidebar__link--active"
+         class="neuro-sidebar__link neuro-sidebar__link--contact"
          [title]="sidebarCollapsed ? 'Contact' : ''">
-        <i class="pi pi-envelope sidebar-icon" aria-hidden="true"></i>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Contact</span>
+        <i class="pi pi-envelope neuro-sidebar__icon" aria-hidden="true"></i>
+        <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Contact</span>
       </a>
     </nav>
 
-    <!-- Sidebar Footer -->
-    <div class="p-4 border-t border-white/10">
-      <button (click)="logout()" 
-              class="sidebar-link sidebar-logout w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors group"
+    <div class="neuro-sidebar__footer">
+      <button type="button"
+              (click)="logout()"
+              class="neuro-sidebar__link neuro-sidebar__link--logout"
               [title]="sidebarCollapsed ? 'Logout' : ''">
-        <i class="pi pi-sign-out sidebar-icon" aria-hidden="true"></i>
-        <span [class.hidden]="sidebarCollapsed" class="whitespace-nowrap">Logout</span>
+        <i class="pi pi-sign-out neuro-sidebar__icon" aria-hidden="true"></i>
+        <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Logout</span>
       </button>
     </div>
   </div>
-
-  <!-- Notification dropdown removed per request -->
 </aside>

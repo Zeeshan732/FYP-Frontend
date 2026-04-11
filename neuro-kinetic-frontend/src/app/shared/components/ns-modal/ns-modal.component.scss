@@ -1,24 +1,38 @@
 .ns-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: 10800;
   background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px))
+    max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
   box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  .ns-modal-backdrop {
+    align-items: flex-start;
+    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  }
 }
 
 .ns-modal {
   width: 100%;
-  max-width: 440px;
+  max-width: min(440px, calc(100vw - 1.5rem));
   background: #112240;
   border: 0.5px solid #1e3a5f;
   border-radius: 12px;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   overflow: hidden;
   box-sizing: border-box;
+  margin: 0 auto;
+  max-height: min(90dvh, 90vh);
+  display: flex;
+  flex-direction: column;
 }
 
 .ns-modal--wide {
@@ -34,6 +48,7 @@
   background: #163560;
   border-bottom: 0.5px solid #1a3050;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .ns-modal__header--danger {
@@ -102,6 +117,10 @@
 .ns-modal__body {
   padding: 20px;
   box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .ns-modal__body-main {
@@ -135,6 +154,7 @@
   border-top: 0.5px solid #1a3050;
   background: #112240;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .ns-modal__icon-btn {
