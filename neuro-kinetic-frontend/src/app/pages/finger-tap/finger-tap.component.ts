@@ -85,13 +85,33 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   recordedDuration = 0;
   recordingElapsed = 0;
   private recordingTimer: any = null;
-  private readonly MAX_RECORDING_SECONDS = 20;
+  /** Live capture: 10–15s window so the clip has enough rhythm data (matches ML expectations). */
+  readonly MIN_RECORDING_SECONDS = 10;
+  readonly MAX_RECORDING_SECONDS = 15;
 
-  // Live tap detection
+  // Live tap detection & preview metrics (portrait ROI — same idea as ML service)
   tapCount = 0;
   private motionHistory: number[] = [];
   rhythmVariance: 'low' | 'moderate' | 'high' = 'low';
   waveformBars: number[] = new Array(32).fill(0);
+
+  /** Mean luminance 0–255 of the portrait ROI (for user guidance). */
+  liveBrightness = 0;
+  /** True when ROI is darker than the ML brightness gate (~50 on 0–255). */
+  brightnessLow = false;
+  /** Normalized motion 0+ (for waveform); based on mean absdiff in ROI vs baseline. */
+  private lastMotionNorm = 0;
+  /** User-facing: motion clearly above baseline (tapping likely). */
+  tappingActive = false;
+  private previewRaf: number | null = null;
+  private metricsCanvas: HTMLCanvasElement | null = null;
+  private metricsCtx: CanvasRenderingContext2D | null = null;
+  private prevGrayBuf: Uint8Array | null = null;
+  private grayBuf: Uint8Array | null = null;
+  private calibrationFrameIndex = 0;
+  private readonly CALIBRATION_FRAMES = 45;
+  private baselineMotion = 1e-6;
+  private lastTapCrossTime = 0;
 
   // Quality checks
   qualityChecks: {
@@ -316,6 +336,37 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.apiError = '';
   }
 
+  private extractHttpErrorMessage(err: HttpErrorResponse): string {
+    const e = err.error;
+    if (typeof e === 'string' && e.trim()) {
+      return e.trim();
+    }
+    if (e && typeof e === 'object' && 'message' in e && (e as { message?: unknown }).message != null) {
+      return String((e as { message: unknown }).message);
+    }
+    return err.message || 'Analysis failed.';
+  }
+
+  /** Map ML/API strings to clear, actionable copy (upload + live). */
+  private mapFingerTapError(raw: string): string {
+    const t = raw.trim();
+    if (
+      t.includes('Too dark') ||
+      t.includes('No clear tapping') ||
+      t.includes('Almost no movement') ||
+      t.includes('Could not analyze this video')
+    ) {
+      return t;
+    }
+    if (t.includes('Invalid video') || t.includes('Required activity not detected')) {
+      return (
+        'No clear tapping pattern was found. Film in portrait with good light, keep your hand centered, ' +
+        'and tap index finger to thumb steadily for the full recording.'
+      );
+    }
+    return t;
+  }
+
   async analyzeVideo(): Promise<void> {
     if (!this.selectedFile) return;
     this.apiError = '';
@@ -346,7 +397,7 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       }
     } catch (err) {
       const httpErr = err as HttpErrorResponse;
-      this.apiError = httpErr.error?.message || httpErr.message || 'Analysis failed.';
+      this.apiError = this.mapFingerTapError(this.extractHttpErrorMessage(httpErr));
       this.currentState = 'error';
     } finally {
       this.isProcessing = false;
@@ -357,23 +408,64 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   async requestCameraAccess(): Promise<void> {
     try {
+      this.stopPreviewLoop();
       this.torchSupported = false;
       this.torchOn = false;
-      this.stream = await navigator.mediaDevices.getUserMedia({
+      this.resetLiveMetrics();
+
+      const portraitConstraints: MediaStreamConstraints = {
         video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'environment'
+          facingMode: { ideal: 'user' },
+          width: { ideal: 720, min: 480 },
+          height: { ideal: 1280, min: 720 },
+          aspectRatio: { ideal: 9 / 16 }
         },
         audio: false
-      });
+      };
+
+      try {
+        this.stream = await navigator.mediaDevices.getUserMedia(portraitConstraints);
+      } catch {
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 720 },
+            height: { ideal: 1280 }
+          },
+          audio: false
+        });
+      }
+
+      const track = this.stream.getVideoTracks()[0];
+      if (track?.applyConstraints) {
+        try {
+          await track.applyConstraints({
+            aspectRatio: { ideal: 9 / 16 },
+            width: { ideal: 720 },
+            height: { ideal: 1280 }
+          });
+        } catch {
+          /* device may ignore — backend still crops portrait ROI */
+        }
+      }
+
       await this.initTorchFromStream();
       this.currentState = 'cam-ready';
 
       setTimeout(() => {
-        if (this.videoPreviewRef?.nativeElement && this.stream) {
-          this.videoPreviewRef.nativeElement.srcObject = this.stream;
-          this.videoPreviewRef.nativeElement.play();
+        const el = this.videoPreviewRef?.nativeElement;
+        if (el && this.stream) {
+          el.srcObject = this.stream;
+          el.playsInline = true;
+          el.muted = true;
+          const onReady = () => {
+            this.resetLiveMetrics();
+            void el.play().then(() => this.startPreviewLoop());
+          };
+          if (el.readyState >= 1) {
+            onReady();
+          } else {
+            el.onloadedmetadata = () => onReady();
+          }
         }
       }, 100);
     } catch {
@@ -383,6 +475,144 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
         'or use the upload option instead.';
       this.currentState = 'error';
     }
+  }
+
+  /** Center 9:16 crop in pixel space (matches ML portrait ROI for landscape streams). */
+  private getPortraitCropRect(videoWidth: number, videoHeight: number): { x: number; y: number; w: number; h: number } {
+    const w = videoWidth;
+    const h = videoHeight;
+    if (w > h) {
+      const tw = Math.round((h * 9) / 16);
+      if (tw >= w) {
+        const th = Math.round((w * 16) / 9);
+        const y0 = Math.max(0, Math.floor((h - th) / 2));
+        return { x: 0, y: y0, w, h: th };
+      }
+      const x0 = Math.max(0, Math.floor((w - tw) / 2));
+      return { x: x0, y: 0, w: tw, h: h };
+    }
+    return { x: 0, y: 0, w, h };
+  }
+
+  private resetLiveMetrics(): void {
+    this.liveBrightness = 0;
+    this.brightnessLow = false;
+    this.lastMotionNorm = 0;
+    this.tappingActive = false;
+    this.calibrationFrameIndex = 0;
+    this.baselineMotion = 1e-6;
+    this.lastTapCrossTime = 0;
+    this.prevGrayBuf = null;
+    this.grayBuf = null;
+  }
+
+  private startPreviewLoop(): void {
+    this.stopPreviewLoop();
+    const tick = (): void => {
+      this.previewRaf = requestAnimationFrame(tick);
+      this.sampleVideoFrame();
+    };
+    this.previewRaf = requestAnimationFrame(tick);
+  }
+
+  private stopPreviewLoop(): void {
+    if (this.previewRaf != null) {
+      cancelAnimationFrame(this.previewRaf);
+      this.previewRaf = null;
+    }
+  }
+
+  private sampleVideoFrame(): void {
+    if (!this.stream) {
+      return;
+    }
+    const v = this.videoPreviewRef?.nativeElement;
+    if (!v || v.readyState < 2) {
+      return;
+    }
+    const vw = v.videoWidth;
+    const vh = v.videoHeight;
+    if (vw < 32 || vh < 32) {
+      return;
+    }
+
+    if (!this.metricsCanvas) {
+      this.metricsCanvas = document.createElement('canvas');
+      this.metricsCtx = this.metricsCanvas.getContext('2d', { willReadFrequently: true });
+    }
+    const ctx = this.metricsCtx;
+    if (!ctx) {
+      return;
+    }
+
+    const crop = this.getPortraitCropRect(vw, vh);
+    const cw = 160;
+    const ch = Math.round((cw * 16) / 9);
+    this.metricsCanvas.width = cw;
+    this.metricsCanvas.height = ch;
+    ctx.drawImage(v, crop.x, crop.y, crop.w, crop.h, 0, 0, cw, ch);
+
+    const img = ctx.getImageData(0, 0, cw, ch);
+    const data = img.data;
+    const n = cw * ch;
+    if (!this.grayBuf || this.grayBuf.length !== n) {
+      this.grayBuf = new Uint8Array(n);
+      this.prevGrayBuf = new Uint8Array(n);
+    }
+
+    let lum = 0;
+    for (let i = 0, p = 0; i < n; i++, p += 4) {
+      const g = Math.round(0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2]);
+      this.grayBuf[i] = g;
+      lum += g;
+    }
+    this.liveBrightness = lum / n;
+    this.brightnessLow = this.liveBrightness < 50;
+
+    let motion = 0;
+    this.calibrationFrameIndex++;
+    if (this.calibrationFrameIndex === 1) {
+      this.prevGrayBuf!.set(this.grayBuf);
+      this.lastMotionNorm = 0;
+      this.tappingActive = false;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    for (let i = 0; i < n; i++) {
+      motion += Math.abs(this.grayBuf[i] - this.prevGrayBuf![i]);
+    }
+    motion /= n;
+    this.prevGrayBuf!.set(this.grayBuf);
+
+    if (this.calibrationFrameIndex <= this.CALIBRATION_FRAMES) {
+      this.baselineMotion += motion;
+      if (this.calibrationFrameIndex === this.CALIBRATION_FRAMES) {
+        this.baselineMotion /= this.CALIBRATION_FRAMES - 1;
+        this.baselineMotion = Math.max(this.baselineMotion, 0.15);
+      }
+      this.lastMotionNorm = 0;
+      this.tappingActive = false;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.lastMotionNorm = motion / (this.baselineMotion + 0.01);
+    this.tappingActive = this.lastMotionNorm > 1.35 && !this.brightnessLow;
+
+    if (this.currentState === 'cam-recording') {
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      const crossed =
+        this.lastMotionNorm > 1.25 &&
+        motion > this.baselineMotion * 1.8 &&
+        now - this.lastTapCrossTime > 180;
+      if (crossed) {
+        this.tapCount++;
+        this.lastTapCrossTime = now;
+      }
+    }
+
+    this.cdr.markForCheck();
   }
 
   /**
@@ -446,6 +676,7 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.tapCount = 0;
     this.recordingElapsed = 0;
     this.waveformBars = new Array(32).fill(0);
+    this.resetLiveMetrics();
 
     const mimeType = this.getSupportedVideoMimeType();
     const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
@@ -500,15 +731,14 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   private animateWaveform(): void {
-    this.waveformBars = [...this.waveformBars.slice(1), Math.random() * 100];
-    const last = this.waveformBars[this.waveformBars.length - 1];
-    if (last > 70) this.tapCount++;
+    const h = Math.min(100, Math.max(6, this.lastMotionNorm * 38));
+    this.waveformBars = [...this.waveformBars.slice(1), h];
   }
 
   private evaluateQuality(): void {
     this.qualityChecks = {
-      duration: this.recordedDuration >= 8,
-      tapsFound: this.tapCount >= 5,
+      duration: this.recordedDuration >= this.MIN_RECORDING_SECONDS,
+      tapsFound: this.tapCount >= 3,
       motionClarity: true,
       frameCoverage: true
     };
@@ -518,6 +748,7 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   stopCamera(): void {
+    this.stopPreviewLoop();
     this.extinguishTorch();
     this.torchSupported = false;
     this.stream?.getTracks().forEach(t => t.stop());
@@ -534,6 +765,11 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   async analyzeLiveRecording(): Promise<void> {
     if (!this.recordedBlob) return;
+    if (this.recordedDuration < this.MIN_RECORDING_SECONDS) {
+      this.apiError = `Recording too short — please record for at least ${this.MIN_RECORDING_SECONDS} seconds of tapping.`;
+      this.currentState = 'error';
+      return;
+    }
     const mime = this.recordedBlob.type || 'video/webm';
     const ext = mime.includes('mp4') ? 'mp4' : 'webm';
     const file = new File([this.recordedBlob], `live-recording.${ext}`, {
@@ -637,6 +873,13 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     return '';
+  }
+
+  /** After an API error in live mode, return to the camera permission step without a full reset. */
+  retryLiveFromError(): void {
+    this.apiError = '';
+    this.inputMode = 'live';
+    this.currentState = 'cam-permission';
   }
 
   switchToUpload(): void {
