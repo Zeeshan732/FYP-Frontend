@@ -109,15 +109,24 @@
         <span>Click to choose file</span>
       </label>
 
+      <p class="ft-upload-error" *ngIf="uploadValidationError">{{ uploadValidationError }}</p>
+      <ul class="ft-upload-warn" *ngIf="uploadWarnings.length && !uploadValidationError">
+        <li *ngFor="let w of uploadWarnings">{{ w }}</li>
+      </ul>
+
       <div *ngIf="selectedFile" class="ft-file-info">
         <div class="ft-file-name">{{ selectedFile.name }}</div>
+        <div class="ft-file-meta" *ngIf="selectedFile">
+          {{ (selectedFile.size / 1048576) | number:'1.1-1' }} MB
+          <span *ngIf="selectedVideoDurationSec != null"> · {{ selectedVideoDurationSec | number:'1.0-1' }}s</span>
+        </div>
         <button class="ft-btn-secondary" (click)="clearFile()">Remove</button>
       </div>
     </div>
 
     <div class="ft-actions-row">
       <button class="ft-btn-primary"
-              [disabled]="!selectedFile || isProcessing"
+              [disabled]="!canSubmitUpload"
               (click)="analyzeVideo()">
         Analyze Video
       </button>
@@ -305,8 +314,25 @@
     </div>
   </div>
 
+  <!-- Client-side transcode (FFmpeg.wasm) — avoids Azure/IIS 413 on large camera files -->
+  <div class="ft-container ft-centered" *ngIf="currentState === 'compressing'" [class.ft-container-embedded]="embedded">
+    <div class="ft-compress-panel">
+      <h2 class="ft-section-title">Optimizing video for upload</h2>
+      <p class="ft-text">{{ compressionPhase || 'Preparing…' }}</p>
+      <p class="ft-compress-sizes" *ngIf="compressionOriginalMb">
+        <span class="ft-compress-original">{{ compressionOriginalMb }}</span>
+        <span class="ft-compress-arrow" *ngIf="compressionResultMb"> → </span>
+        <span class="ft-compress-result" *ngIf="compressionResultMb">{{ compressionResultMb }}</span>
+      </p>
+      <div class="ft-progress-outer" role="progressbar" [attr.aria-valuenow]="compressionProgress" aria-valuemin="0" aria-valuemax="100">
+        <div class="ft-progress-inner" [style.width.%]="compressionProgress"></div>
+      </div>
+      <p class="ft-text ft-compress-note">This can take a minute on phones. Please keep this page open.</p>
+    </div>
+  </div>
+
   <!-- Processing -->
-  <div class="ft-container ft-centered" *ngIf="currentState === 'processing'" [class.ft-container-embedded]="embedded">
+  <div class="ft-container ft-centered ft-processing" *ngIf="currentState === 'processing'" [class.ft-container-embedded]="embedded">
     <app-loader
       variant="page"
       signal="tap"
@@ -314,6 +340,8 @@
       subtitle="We are extracting hand motion landmarks and evaluating movement regularity. This may take a few seconds."
       [steps]="processingSteps"
       [showCancel]="true"
+      [uploadPercent]="uploadProgressPercent"
+      [compact]="embedded"
       (cancelClick)="resetTest()">
     </app-loader>
   </div>

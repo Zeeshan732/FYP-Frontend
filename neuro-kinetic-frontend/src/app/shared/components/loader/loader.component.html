@@ -1,5 +1,9 @@
-<div class="ldr-page" *ngIf="variant === 'page' || variant === 'card'">
-  <div class="ldr-page-inner">
+<div
+  class="ldr-page"
+  [class.ldr-page--compact]="compact"
+  *ngIf="variant === 'page' || variant === 'card'"
+>
+  <!-- <div class="ldr-page-inner"> -->
     <div class="ldr-ring-wrap">
       <svg width="72" height="72" viewBox="0 0 72 72" class="ldr-ring-svg">
         <circle cx="36" cy="36" r="30" fill="none" [attr.stroke]="signalColorAlpha" stroke-width="4" />
@@ -83,6 +87,22 @@
     <h2 class="ldr-title">{{ title }}</h2>
     <p class="ldr-subtitle">{{ subtitle }}</p>
 
+    <div class="ldr-upload" *ngIf="uploadPercent !== null">
+      <div class="ldr-upload-head">
+        <span class="ldr-upload-label">Uploading to server</span>
+        <span class="ldr-upload-pct" aria-live="polite">{{ uploadPercent }}%</span>
+      </div>
+      <div
+        class="ldr-upload-track"
+        role="progressbar"
+        [attr.aria-valuenow]="uploadPercent"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <div class="ldr-upload-fill" [style.width.%]="uploadPercent"></div>
+      </div>
+    </div>
+
     <div class="ldr-steps" *ngIf="steps.length > 0">
       <div
         class="ldr-step"
@@ -113,7 +133,7 @@
     </div>
 
     <button class="ldr-cancel-btn" *ngIf="showCancel" (click)="cancelClick.emit()">Cancel</button>
-  </div>
+  
 </div>
 
 <div class="ldr-inline" *ngIf="variant === 'inline'">

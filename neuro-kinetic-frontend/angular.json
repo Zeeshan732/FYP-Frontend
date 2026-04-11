@@ -27,7 +27,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ffmpeg/core/dist/umd",
+                "output": "/ffmpeg"
+              }
             ],
             "styles": [
               "src/styles.scss"
@@ -50,8 +55,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "10kb",
-                  "maximumError": "15kb"
+                  "maximumWarning": "14kb",
+                  "maximumError": "20kb"
                 }
               ],
               "outputHashing": "all"
@@ -96,7 +101,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ffmpeg/core/dist/umd",
+                "output": "/ffmpeg"
+              }
             ],
             "styles": [
               "src/styles.scss"

@@ -148,38 +148,6 @@
   padding: 0.75rem 0.9rem;
 }
 
-.table-wrap {
-  border: 1px solid var(--app-border);
-  border-radius: 0.7rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  background: var(--app-surface);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* Prevent columns from collapsing; scroll horizontally on narrow viewports */
-.table-wrap table.neuro-table {
-  width: 100%;
-  min-width: 720px;
-  table-layout: auto;
-}
-
-table thead th {
-  padding: 0.9rem 1rem;
-  border-bottom: 1px solid var(--app-border);
-  color: var(--app-primary);
-  vertical-align: middle;
-}
-
-/* Default header alignment: left (do not force on .text-center — encapsulation beats Tailwind otherwise) */
-table thead th:not(.text-center) {
-  text-align: left;
-}
-
 .select-col {
   width: 54px;
 }
@@ -208,16 +176,6 @@ table thead th:not(.text-center) {
   height: 16px;
   accent-color: var(--app-primary);
   cursor: pointer;
-}
-
-table tbody td {
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  vertical-align: middle;
-}
-
-table tbody td:not(.text-center) {
-  text-align: left;
 }
 
 .title-cell {

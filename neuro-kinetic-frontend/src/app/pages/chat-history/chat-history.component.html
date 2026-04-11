@@ -44,47 +44,80 @@
 
     <app-skeleton *ngIf="loading" variant="table" [rows]="6" [cols]="5"></app-skeleton>
 
-    <div *ngIf="!loading && items.length > 0" class="max-w-[1600px] mx-auto mb-8">
-      <div class="table-wrap">
-        <table class="w-full neuro-table">
-          <thead>
-            <tr>
-              <th class="text-center select-col">
-                <input
-                  type="checkbox"
-                  [checked]="isAllSelected"
-                  (change)="toggleSelectAll()"
-                  aria-label="Select all chats" />
-              </th>
-              <th>Title</th>
-              <!-- <th>Last Message</th> -->
-              <th class="text-center col-messages">Messages</th>
-              <th class="text-center col-updated">Updated</th>
-              <th class="text-center col-actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of items">
-              <td class="text-center select-col">
-                <input
-                  type="checkbox"
-                  [checked]="selectedIds.has(item.id)"
-                  (change)="toggleSelection(item.id)"
-                  aria-label="Select chat row" />
-              </td>
-              <td class="title-cell">{{ item.title }}</td>
-              <!-- <td class="preview-cell">{{ item.lastMessagePreview || '—' }}</td> -->
-              <td class="text-center col-messages">{{ item.messageCount }}</td>
-              <td class="text-center col-updated">{{ item.updatedAt | date:'short' }}</td>
-              <td class="text-center col-actions">
-                <div class="actions-cell">
-                  <p-button icon="pi pi-eye" (onClick)="openConversation(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View messages" tooltipPosition="top"></p-button>
-                  <p-button icon="pi pi-trash" [loading]="deletingId === item.id" (onClick)="openDeleteChatDialog(item)" severity="danger" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="Delete chat" tooltipPosition="top"></p-button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div *ngIf="!loading && items.length > 0" class="max-w-[1600px] mx-auto mb-8 ns-data-shell">
+      <div class="ns-data-shell__desktop">
+        <div class="ns-data-shell__surface">
+          <div class="ns-data-shell__scroll ns-data-shell__scroll--chats overflow-x-auto">
+            <table class="w-full neuro-table">
+              <thead>
+                <tr>
+                  <th class="text-center select-col">
+                    <input
+                      type="checkbox"
+                      [checked]="isAllSelected"
+                      (change)="toggleSelectAll()"
+                      aria-label="Select all chats" />
+                  </th>
+                  <th>Title</th>
+                  <th class="text-center col-messages">Messages</th>
+                  <th class="text-center col-updated">Updated</th>
+                  <th class="text-center col-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of items">
+                  <td class="text-center select-col">
+                    <input
+                      type="checkbox"
+                      [checked]="selectedIds.has(item.id)"
+                      (change)="toggleSelection(item.id)"
+                      aria-label="Select chat row" />
+                  </td>
+                  <td class="title-cell">{{ item.title }}</td>
+                  <td class="text-center col-messages">{{ item.messageCount }}</td>
+                  <td class="text-center col-updated">{{ item.updatedAt | date:'short' }}</td>
+                  <td class="text-center col-actions">
+                    <div class="actions-cell">
+                      <p-button icon="pi pi-eye" (onClick)="openConversation(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View messages" tooltipPosition="top"></p-button>
+                      <p-button icon="pi pi-trash" [loading]="deletingId === item.id" (onClick)="openDeleteChatDialog(item)" severity="danger" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="Delete chat" tooltipPosition="top"></p-button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="ns-data-shell__cards" role="list" aria-label="Chat history">
+        <article *ngFor="let item of items" class="ns-data-card" role="listitem">
+          <div class="ns-data-card__head">
+            <div class="ns-data-card__title-block">
+              <div class="ns-data-card__title">{{ item.title }}</div>
+            </div>
+            <label class="ns-data-card__select">
+              <input
+                type="checkbox"
+                [checked]="selectedIds.has(item.id)"
+                (change)="toggleSelection(item.id)"
+                aria-label="Select chat row" />
+            </label>
+          </div>
+          <div class="ns-data-card__grid">
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Messages</span>
+              <span class="ns-data-card__value">{{ item.messageCount }}</span>
+            </div>
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Updated</span>
+              <span class="ns-data-card__value">{{ item.updatedAt | date:'short' }}</span>
+            </div>
+          </div>
+          <div class="ns-data-card__actions">
+            <p-button icon="pi pi-eye" (onClick)="openConversation(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View messages" tooltipPosition="top"></p-button>
+            <p-button icon="pi pi-trash" [loading]="deletingId === item.id" (onClick)="openDeleteChatDialog(item)" severity="danger" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="Delete chat" tooltipPosition="top"></p-button>
+          </div>
+        </article>
       </div>
     </div>
 

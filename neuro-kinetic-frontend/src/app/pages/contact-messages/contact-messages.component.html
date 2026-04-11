@@ -73,54 +73,90 @@
 
     <app-skeleton *ngIf="loading" variant="table" [rows]="6" [cols]="9"></app-skeleton>
 
-    <div *ngIf="!loading && items.length > 0" class="mb-8">
-      <div class="bg-app-surface border border-app-border rounded-lg overflow-hidden shadow-sm">
-        <div class="contact-messages-table-wrap overflow-x-auto">
-          <table class="contact-messages-table w-full neuro-table">
-            <thead class="border-b border-border">
-              <tr>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Name</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Email</th>
-                <!-- <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Organization</th> -->
-                <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Subject</th>
-                <!-- <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Message</th> -->
-                <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">Admin Email</th>
-                <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">User Ack</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Received</th>
-                <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of items">
-                <td class="px-3 sm:px-4 py-3 text-sm text-app-text-primary contact-messages-col-name">{{ item.firstName }} {{ item.lastName }}</td>
-                <td class="px-3 sm:px-4 py-3 text-sm text-app-text-primary contact-messages-col-email">{{ item.email }}</td>
-                <!-- <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.organization || '—' }}</td> -->
-                <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.subject }}</td>
-                <!-- <td class="px-4 py-3 text-sm text-app-text-primary message-cell">{{ item.message }}</td> -->
-                <td class="px-4 py-3 text-center">
-                  <span [class]="getEmailBadgeClass(item.adminEmailSent)">
-                    {{ getEmailStatusText(item.adminEmailSent) }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-center">
-                  <span [class]="getEmailBadgeClass(item.acknowledgementEmailSent)">
-                    {{ getEmailStatusText(item.acknowledgementEmailSent) }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.createdAt | date:'medium' }}</td>
-                <td class="px-4 py-3 text-center">
-                  <p-button
-                    icon="pi pi-trash"
-                    severity="danger"
-                    [loading]="deletingId === item.id"
-                    (onClick)="openDeleteMessageDialog(item)"
-                    styleClass="p-button-rounded p-button-text p-button-plain p-button-sm">
-                  </p-button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <div *ngIf="!loading && items.length > 0" class="mb-8 ns-data-shell">
+      <div class="ns-data-shell__desktop">
+        <div class="ns-data-shell__surface">
+          <div class="contact-messages-table-wrap ns-data-shell__scroll ns-data-shell__scroll--contacts overflow-x-auto">
+            <table class="contact-messages-table w-full neuro-table">
+              <thead class="border-b border-border">
+                <tr>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Name</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Email</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Subject</th>
+                  <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">Admin Email</th>
+                  <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">User Ack</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Received</th>
+                  <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of items">
+                  <td class="px-3 sm:px-4 py-3 text-sm text-app-text-primary contact-messages-col-name">{{ item.firstName }} {{ item.lastName }}</td>
+                  <td class="px-3 sm:px-4 py-3 text-sm text-app-text-primary contact-messages-col-email">{{ item.email }}</td>
+                  <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.subject }}</td>
+                  <td class="px-4 py-3 text-center">
+                    <span [class]="getEmailBadgeClass(item.adminEmailSent)">
+                      {{ getEmailStatusText(item.adminEmailSent) }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    <span [class]="getEmailBadgeClass(item.acknowledgementEmailSent)">
+                      {{ getEmailStatusText(item.acknowledgementEmailSent) }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.createdAt | date:'medium' }}</td>
+                  <td class="px-4 py-3 text-center">
+                    <p-button
+                      icon="pi pi-trash"
+                      severity="danger"
+                      [loading]="deletingId === item.id"
+                      (onClick)="openDeleteMessageDialog(item)"
+                      styleClass="p-button-rounded p-button-text p-button-plain p-button-sm">
+                    </p-button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
+
+      <div class="ns-data-shell__cards" role="list" aria-label="Contact messages">
+        <article *ngFor="let item of items" class="ns-data-card" role="listitem">
+          <div class="ns-data-card__head">
+            <div class="ns-data-card__title-block">
+              <div class="ns-data-card__title">{{ item.firstName }} {{ item.lastName }}</div>
+              <div class="ns-data-card__subtitle">{{ item.email }}</div>
+            </div>
+          </div>
+          <div class="ns-data-card__grid">
+            <div class="ns-data-card__cell ns-data-card__cell--full">
+              <span class="ns-data-card__label">Subject</span>
+              <span class="ns-data-card__value">{{ item.subject }}</span>
+            </div>
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Admin email</span>
+              <span [class]="getEmailBadgeClass(item.adminEmailSent)">{{ getEmailStatusText(item.adminEmailSent) }}</span>
+            </div>
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">User ack</span>
+              <span [class]="getEmailBadgeClass(item.acknowledgementEmailSent)">{{ getEmailStatusText(item.acknowledgementEmailSent) }}</span>
+            </div>
+            <div class="ns-data-card__cell ns-data-card__cell--full">
+              <span class="ns-data-card__label">Received</span>
+              <span class="ns-data-card__value">{{ item.createdAt | date:'medium' }}</span>
+            </div>
+          </div>
+          <div class="ns-data-card__actions">
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [loading]="deletingId === item.id"
+              (onClick)="openDeleteMessageDialog(item)"
+              styleClass="p-button-rounded p-button-text p-button-plain p-button-sm">
+            </p-button>
+          </div>
+        </article>
       </div>
     </div>
 

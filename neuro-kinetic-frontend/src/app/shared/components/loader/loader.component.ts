@@ -15,6 +15,10 @@ export class LoaderComponent {
   @Input() subtitle = 'Please wait a moment.';
   @Input() steps: { text: string; done: boolean; active: boolean }[] = [];
   @Input() showCancel = false;
+  /** When set (e.g. 0–100), shows an upload progress strip inside the card — keeps layout on one surface */
+  @Input() uploadPercent: number | null = null;
+  /** Tighter padding / full-bleed friendly (e.g. patient-test modal on phones) */
+  @Input() compact = false;
   @Output() cancelClick = new EventEmitter<void>();
 
   get signalColor(): string {

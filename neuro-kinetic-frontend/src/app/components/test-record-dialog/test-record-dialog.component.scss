@@ -1,4 +1,4 @@
-// Test Record Dialog – dark theme (design tokens)
+// Test Record Dialog – dark theme (design tokens + flexible viewport height)
 
 ::ng-deep .test-record-dialog {
   .p-dialog {
@@ -7,27 +7,34 @@
     box-shadow: var(--shadow-card);
     background: var(--color-surface) !important;
     border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    max-height: min(92dvh, 880px);
+    margin: clamp(0.35rem, 2vw, 0.75rem);
   }
 
   .p-dialog-header {
+    flex-shrink: 0;
     background: var(--color-blue) !important;
     border-bottom: none;
-    padding: 1.25rem 1.5rem;
+    padding: clamp(0.65rem, 2vw, 1rem) clamp(0.85rem, 2.5vw, 1.35rem);
 
     .p-dialog-title {
-      font-size: 1.25rem;
-      font-weight: 500;
+      font-size: clamp(1rem, 2.8vw, 1.2rem);
+      font-weight: 600;
       color: #ffffff;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.65rem;
+      line-height: 1.25;
 
       &::before {
         content: '';
-        width: 4px;
-        height: 22px;
-        background: rgba(255, 255, 255, 0.4);
+        width: 3px;
+        height: 1.1em;
+        background: rgba(255, 255, 255, 0.45);
         border-radius: 2px;
+        flex-shrink: 0;
       }
     }
 
@@ -43,14 +50,17 @@
   }
 
   .p-dialog-content {
+    flex: 1 1 auto;
+    min-height: 0;
     background: var(--color-surface) !important;
     color: var(--color-ink);
-    padding: 1.5rem 2rem;
-    max-height: 70vh;
+    padding: clamp(0.65rem, 2vw, 1.1rem) clamp(0.75rem, 2.5vw, 1.35rem);
+    overflow-x: hidden;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 
     &::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
     }
 
     &::-webkit-scrollbar-track {
@@ -69,15 +79,16 @@
   }
 
   .p-dialog-footer {
+    flex-shrink: 0;
     background: var(--color-surface) !important;
     border-top: 1px solid var(--color-border);
-    padding: 1.25rem 2rem;
+    padding: clamp(0.65rem, 2vw, 0.95rem) clamp(0.85rem, 2.5vw, 1.35rem);
   }
 }
 
 .test-record-form {
   .form-section {
-    margin-bottom: 2rem;
+    margin-bottom: clamp(1rem, 2.5vw, 1.35rem);
 
     &:last-child {
       margin-bottom: 0;
@@ -86,48 +97,76 @@
     .section-header {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.75rem;
+      gap: 0.5rem;
+      margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+      padding-bottom: 0.45rem;
       border-bottom: 1px solid var(--color-border);
 
       .section-icon {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         color: var(--color-blue);
+        flex-shrink: 0;
       }
 
       .section-title {
-        font-size: 1.125rem;
-        font-weight: 500;
+        font-size: clamp(0.9rem, 2.2vw, 1.02rem);
+        font-weight: 600;
         color: var(--color-ink);
         margin: 0;
+        letter-spacing: 0.02em;
       }
     }
 
     &.form-section--tight .section-header {
-      margin-bottom: 0.5rem;
-      padding-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
+      padding-bottom: 0.35rem;
     }
 
     .voice-features-content {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: clamp(0.45rem, 1.5vw, 0.65rem);
     }
 
     .voice-features-chart {
-      height: 10rem;
+      height: clamp(7rem, 22vh, 9.5rem);
+      min-height: 6.5rem;
     }
   }
 
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.75rem, 2vw, 1.1rem);
 
-    @media (max-width: 768px) {
+    @media (max-width: 639px) {
       grid-template-columns: 1fr;
+    }
+  }
+
+  /* Result + accuracy + status on one row on wider modals */
+  .form-grid--results {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    @media (max-width: 639px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &.test-record-form--dense {
+    .form-label .label-icon {
+      display: none;
+    }
+
+    .form-label {
+      gap: 0.25rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.8125rem;
+    }
+
+    .section-header {
+      margin-bottom: 0.5rem;
     }
   }
 
@@ -200,13 +239,14 @@
 
     .form-textarea {
       resize: vertical;
-      min-height: 100px;
+      min-height: 72px;
+      max-height: min(200px, 28vh);
       font-family: inherit;
     }
 
     .accuracy-indicator {
-      margin-top: 0.5rem;
-      height: 4px;
+      margin-top: 0.35rem;
+      height: 3px;
       background: var(--color-surface-2);
       border-radius: 2px;
       overflow: hidden;
@@ -236,10 +276,20 @@
   }
 }
 
+.voice-features-table-wrap {
+  max-height: min(200px, 34vh);
+  overflow: auto;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-border);
+  background: var(--color-page-bg);
+  -webkit-overflow-scrolling: touch;
+}
+
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+  flex-wrap: wrap;
 
   ::ng-deep {
     .cancel-button,

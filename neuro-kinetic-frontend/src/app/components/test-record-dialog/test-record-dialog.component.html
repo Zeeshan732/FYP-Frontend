@@ -4,12 +4,12 @@
   [closable]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width: '900px', maxWidth: '90vw' }"
+  [style]="dialogPanelStyle"
   [header]="isEditMode ? 'Edit Test Record' : 'View Test Record'"
   (onHide)="onClose()"
   styleClass="test-record-dialog">
   
-  <form [formGroup]="recordForm" *ngIf="record" class="test-record-form">
+  <form [formGroup]="recordForm" *ngIf="record" class="test-record-form test-record-form--dense">
     <!-- User Information Section -->
     <div class="form-section">
       <div class="section-header">
@@ -72,7 +72,7 @@
         <h3 class="section-title">Test Results</h3>
       </div>
       
-      <div class="form-grid">
+      <div class="form-grid form-grid--results">
         <!-- Test Result -->
         <div class="form-field">
           <label for="testResult" class="form-label">
@@ -191,7 +191,7 @@
               id="analysisNotes" 
               formControlName="analysisNotes"
               [disabled]="!isEditMode"
-              [rows]="4"
+              [rows]="isEditMode ? 4 : 3"
               class="form-textarea"
               placeholder="Enter analysis notes or additional comments...">
             </textarea>
@@ -225,9 +225,9 @@
           <canvas #voiceFeaturesChart class="w-full h-full"></canvas>
         </div>
 
-        <!-- Table View -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
+        <!-- Table View: own scroll so the modal body stays shorter -->
+        <div class="voice-features-table-wrap ns-data-shell__scroll overflow-x-auto">
+          <table class="w-full text-sm neuro-table">
             <thead>
               <tr class="border-b border-app-border">
                 <th class="px-3 py-2 text-left text-app-primary font-semibold text-xs">Feature</th>
@@ -258,7 +258,7 @@
         </svg>
         <h3 class="section-title">Ask about your results</h3>
       </div>
-      <p class="text-sm text-app-text-muted mb-3">Get structured guidance about this screening result.</p>
+      <p class="text-sm text-app-text-muted mb-2 leading-snug">Get structured guidance about this screening result.</p>
       <button
         type="button"
         (click)="openAskResultsDialog()"
