@@ -16,11 +16,15 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   password = '';
   resetEmail = '';
   sentResetEmail = '';
+  /** Step after email: OTP + new password (API: POST /auth/reset-password) */
+  resetOtp = '';
+  newPasswordReset = '';
+  confirmNewPasswordReset = '';
   error = '';
   info = '';
   loading = false;
   showContactAdmin = false;
-  modalView: 'login' | 'signup' | 'forgot' | 'email-sent' = 'login';
+  modalView: 'login' | 'signup' | 'forgot' | 'email-sent' | 'otp-reset' = 'login';
   selectedRole: 'patient' | 'clinician' = 'patient';
   showPassword = false;
   showConfirmPassword = false;
@@ -44,6 +48,9 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           this.password = '';
           this.resetEmail = '';
           this.sentResetEmail = '';
+          this.resetOtp = '';
+          this.newPasswordReset = '';
+          this.confirmNewPasswordReset = '';
           this.error = '';
           this.info = '';
           this.loading = false;
@@ -111,7 +118,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
     this.onBackdropClick(event);
   }
 
-  switchTo(view: 'login' | 'signup' | 'forgot' | 'email-sent'): void {
+  switchTo(view: 'login' | 'signup' | 'forgot' | 'email-sent' | 'otp-reset'): void {
     if (view === 'signup') {
       this.openSignupModal();
       return;
@@ -174,6 +181,52 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           return;
         }
         this.error = error?.error?.message || 'Failed to send reset link. Please try again.';
+      }
+    });
+  }
+
+  /** Step 2–3: submit OTP + new password (backend validates OTP in one call). */
+  submitOtpReset(): void {
+    const email = this.sentResetEmail?.trim() || this.resetEmail?.trim();
+    const otp = this.resetOtp?.trim().replace(/\s/g, '');
+    const pw = this.newPasswordReset;
+    const confirm = this.confirmNewPasswordReset;
+
+    if (!email) {
+      this.error = 'Email is missing. Request a new code from the previous step.';
+      return;
+    }
+    if (!otp || otp.length < 4) {
+      this.error = 'Enter the verification code from your email.';
+      return;
+    }
+    if (!pw || pw.length < 8) {
+      this.error = 'New password must be at least 8 characters.';
+      return;
+    }
+    if (pw !== confirm) {
+      this.error = 'Passwords do not match.';
+      return;
+    }
+
+    this.error = '';
+    this.loading = true;
+
+    this.passwordResetService.resetPassword(email, otp, pw).subscribe({
+      next: () => {
+        this.loading = false;
+        this.info = 'Password updated. You can sign in with your new password.';
+        this.resetOtp = '';
+        this.newPasswordReset = '';
+        this.confirmNewPasswordReset = '';
+        this.switchTo('login');
+      },
+      error: (err) => {
+        this.loading = false;
+        const msg = err?.error?.message || err?.message || '';
+        this.error =
+          msg ||
+          'Could not reset password. The code may be wrong or expired — request a new code.';
       }
     });
   }
