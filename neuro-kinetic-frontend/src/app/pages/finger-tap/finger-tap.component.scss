@@ -10,9 +10,14 @@
 .ft-root--embedded {
   flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0 max(0.75rem, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  padding: 0.35rem 0 max(0.75rem, env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
 .ft-container {
@@ -34,6 +39,21 @@
   padding-left: clamp(0.5rem, 2vw, 1rem);
   padding-right: clamp(0.5rem, 2vw, 1rem);
   max-width: 100%;
+  gap: 0.35rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Embedded (patient-test modal, etc.): full width, tighter gutters, scroll inside parent */
+.ft-root--embedded .ft-container.ft-container-embedded {
+  margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: max(0.25rem, env(safe-area-inset-top, 0px)) clamp(0.5rem, 3vw, 1rem) 0.75rem;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ft-container-embedded {
@@ -76,6 +96,36 @@
   font-size: clamp(1.05rem, 4.2vw, 1.35rem);
   line-height: 1.25;
   margin-bottom: 0.5rem;
+}
+
+.ft-root--embedded .ft-section-title--cam,
+.ft-root--embedded .ft-rec-header .ft-section-title--cam {
+  padding-right: 2.75rem; /* clear parent modal close control */
+}
+
+.ft-root--embedded .ft-precheck {
+  font-size: clamp(0.78rem, 2.9vw, 0.88rem);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.ft-root--embedded .ft-precheck li {
+  margin-bottom: 0.3rem;
+}
+
+.ft-root--embedded .ft-live-meter {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.65rem;
+}
+
+.ft-root--embedded .ft-flash-callout {
+  margin-top: 0.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.ft-root--embedded .ft-flash-callout-text {
+  font-size: clamp(0.8rem, 2.8vw, 0.88rem);
+  line-height: 1.35;
 }
 
 .ft-rec-header {
@@ -398,6 +448,38 @@
   aspect-ratio: 9 / 16;
   max-height: min(70vh, 640px);
   min-height: 220px;
+}
+
+/* Embedded modal: cap preview height so checklist + actions fit on small phones */
+.ft-root--embedded .ft-cam-viewport--live {
+  max-height: min(52dvh, 52svh, 480px);
+  min-height: min(200px, 36dvh);
+  width: 100%;
+  max-width: min(100%, 420px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-height: 700px) {
+  .ft-root--embedded .ft-cam-viewport--live {
+    max-height: min(42dvh, 380px);
+    min-height: 160px;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .ft-root--embedded .ft-cam-viewport--live {
+    max-height: min(38dvh, 240px);
+    min-height: 140px;
+  }
+}
+
+@media (max-width: 380px) {
+  .ft-root--embedded .ft-guide-box {
+    inset: 20% 16%;
+    font-size: 0.72rem;
+    padding: 0.2rem;
+  }
 }
 
 .ft-cam-viewport:not(.ft-cam-viewport--live) .ft-video {
@@ -951,7 +1033,7 @@
 }
 
 @media (max-width: 768px) {
-  .ft-root {
+  .ft-root:not(.ft-root--embedded) {
     padding-inline: 1rem;
   }
 

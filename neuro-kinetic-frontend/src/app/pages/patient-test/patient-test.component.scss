@@ -381,12 +381,15 @@
 
 .pt-ft-modal {
   width: min(920px, 94vw);
-  max-height: 92vh;
+  max-height: min(92vh, 92dvh);
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 14px;
   background: #0a1628;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .pt-ft-close {
@@ -404,6 +407,10 @@
 .pt-ft-modal-body {
   overflow: auto;
   padding: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* Let embedded finger-tap fill the modal and scroll internally */
@@ -413,6 +420,12 @@
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
+}
+
+/* Space below floating close so titles / checklist are not covered (all viewports) */
+.pt-ft-modal-body.pt-ft-modal-body--fingertap {
+  padding: max(44px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px))
+    max(12px, env(safe-area-inset-left, 0px));
 }
 
 /* Mobile: give finger-tap full width/height; avoid tiny scroll trap + overlapped controls */
@@ -426,6 +439,7 @@
     width: 100%;
     max-width: 100%;
     min-height: 100dvh;
+    min-height: 100svh;
     max-height: none;
     border-radius: 0;
     border-left: none;
@@ -435,7 +449,6 @@
   }
 
   .pt-ft-modal-body--fingertap {
-    padding: 0 0 max(12px, env(safe-area-inset-bottom));
     overflow-x: hidden;
     flex: 1;
     min-height: 0;
