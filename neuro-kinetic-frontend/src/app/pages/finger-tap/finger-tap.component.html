@@ -97,7 +97,7 @@
   </div>
 
   <!-- Upload state -->
-  <div class="ft-container" *ngIf="currentState === 'upload'">
+  <div class="ft-container" *ngIf="currentState === 'upload'" [class.ft-container-embedded]="embedded">
     <h2 class="ft-section-title">Upload finger-tapping video</h2>
 
     <div class="ft-upload-area">
@@ -128,7 +128,7 @@
   </div>
 
   <!-- Camera permission -->
-  <div class="ft-container" *ngIf="currentState === 'cam-permission'">
+  <div class="ft-container" *ngIf="currentState === 'cam-permission'" [class.ft-container-embedded]="embedded">
     <h2 class="ft-section-title">Camera access required</h2>
     <p class="ft-text">
       To record your finger-tapping test live, NeuroSync needs permission to access your camera.
@@ -148,7 +148,7 @@
   </div>
 
   <!-- Camera ready -->
-  <div class="ft-container ft-cam-flow" *ngIf="currentState === 'cam-ready'">
+  <div class="ft-container ft-cam-flow" *ngIf="currentState === 'cam-ready'" [class.ft-container-embedded]="embedded">
     <h2 class="ft-section-title ft-section-title--cam">Position your hand and start recording</h2>
 
     <ul class="ft-precheck" aria-label="Before you record">
@@ -227,7 +227,7 @@
   </div>
 
   <!-- Recording -->
-  <div class="ft-container ft-cam-flow" *ngIf="currentState === 'cam-recording'">
+  <div class="ft-container ft-cam-flow" *ngIf="currentState === 'cam-recording'" [class.ft-container-embedded]="embedded">
     <div class="ft-rec-header">
       <h2 class="ft-section-title ft-section-title--cam">Recording</h2>
       <span class="ft-rec-badge-inline" aria-live="polite">{{ formattedElapsed }}</span>
@@ -281,7 +281,7 @@
   </div>
 
   <!-- Review -->
-  <div class="ft-container" *ngIf="currentState === 'cam-review'">
+  <div class="ft-container" *ngIf="currentState === 'cam-review'" [class.ft-container-embedded]="embedded">
     <h2 class="ft-section-title">Review your recording</h2>
     <div class="ft-cam-viewport">
       <video [src]="recordedBlobUrl" controls class="ft-video"></video>
@@ -306,7 +306,7 @@
   </div>
 
   <!-- Processing -->
-  <div class="ft-container ft-centered" *ngIf="currentState === 'processing'">
+  <div class="ft-container ft-centered" *ngIf="currentState === 'processing'" [class.ft-container-embedded]="embedded">
     <app-loader
       variant="page"
       signal="tap"
@@ -577,7 +577,7 @@
   </div>
 
   <!-- Error -->
-  <div class="ft-container" *ngIf="currentState === 'error'">
+  <div class="ft-container" *ngIf="currentState === 'error'" [class.ft-container-embedded]="embedded">
     <h2 class="ft-section-title">Something went wrong</h2>
     <p class="ft-text">{{ apiError }}</p>
     <div class="ft-actions-row">
