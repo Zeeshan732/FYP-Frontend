@@ -151,6 +151,39 @@
   <div class="ft-container ft-cam-flow" *ngIf="currentState === 'cam-ready'">
     <h2 class="ft-section-title ft-section-title--cam">Position your hand and start recording</h2>
 
+    <ul class="ft-precheck" aria-label="Before you record">
+      <li [class.ft-precheck--ok]="liveBrightness >= 50">
+        <span class="ft-precheck-icon">{{ liveBrightness >= 50 ? '✓' : '○' }}</span>
+        Good lighting (aim for brightness in the green zone below)
+      </li>
+      <li class="ft-precheck--ok">
+        <span class="ft-precheck-icon">✓</span>
+        Hand centered in the dashed guide — portrait phone, arm’s length
+      </li>
+      <li class="ft-precheck--ok">
+        <span class="ft-precheck-icon">✓</span>
+        Phone steady — rest elbows or place the phone on a surface
+      </li>
+      <li class="ft-precheck--ok">
+        <span class="ft-precheck-icon">✓</span>
+        Ready to tap index finger to thumb for {{ MIN_RECORDING_SECONDS }}–{{ MAX_RECORDING_SECONDS }}s
+      </li>
+    </ul>
+
+    <div class="ft-live-meter" aria-live="polite">
+      <div class="ft-live-meter-label">Scene brightness</div>
+      <div class="ft-live-meter-track">
+        <div class="ft-live-meter-fill" [style.width.%]="liveBrightness / 2.55"></div>
+        <div class="ft-live-meter-threshold" style="left: 19.6%"></div>
+      </div>
+      <p class="ft-live-meter-hint" *ngIf="brightnessLow">
+        Move to better lighting for accurate results — or use Flash below if available.
+      </p>
+      <p class="ft-live-meter-hint ft-live-meter-hint--ok" *ngIf="!brightnessLow && liveBrightness > 0">
+        Lighting looks OK for analysis.
+      </p>
+    </div>
+
     <div class="ft-flash-callout" *ngIf="isMobileLike || torchSupported">
       <ng-container *ngIf="torchSupported">
         <p class="ft-flash-callout-text" *ngIf="torchOn">
@@ -169,6 +202,10 @@
     <div class="ft-cam-viewport ft-cam-viewport--live">
       <video #videoPreview autoplay muted playsinline class="ft-video"></video>
       <div class="ft-guide-box">Position hand here</div>
+      <div class="ft-tap-pulse-wrap" *ngIf="tappingActive">
+        <div class="ft-tap-pulse" aria-hidden="true"></div>
+        <span class="ft-tap-pulse-label">Motion in frame</span>
+      </div>
     </div>
 
     <div class="ft-actions-row ft-torch-row" *ngIf="torchSupported">
@@ -209,6 +246,17 @@
     <div class="ft-cam-viewport ft-cam-viewport--live">
       <video #videoPreview autoplay muted playsinline class="ft-video"></video>
       <div class="ft-rec-pill">REC</div>
+      <div class="ft-live-flags">
+        <span class="ft-live-flag" [class.ft-live-flag--warn]="brightnessLow">
+          {{ brightnessLow ? 'Lighting low' : 'Lighting OK' }}
+        </span>
+        <span class="ft-live-flag" [class.ft-live-flag--ok]="tappingActive">
+          {{ tappingActive ? 'Tapping motion seen' : 'Keep tapping steadily' }}
+        </span>
+      </div>
+      <div class="ft-tap-pulse-wrap ft-tap-pulse-wrap--corner" *ngIf="tappingActive">
+        <div class="ft-tap-pulse" aria-hidden="true"></div>
+      </div>
     </div>
 
     <!-- Primary control: always directly under preview so it is not missed on small screens -->
@@ -228,7 +276,7 @@
       <div class="ft-wave-bar" *ngFor="let h of waveformBars" [style.height.%]="h || 5"></div>
     </div>
     <p class="ft-text ft-rec-stats">
-      {{ tapCount }} taps detected — {{ formattedRemaining }} left
+      {{ tapCount }} motion peaks — {{ formattedRemaining }} until auto-stop (target {{ MIN_RECORDING_SECONDS }}–{{ MAX_RECORDING_SECONDS }}s)
     </p>
   </div>
 
@@ -241,8 +289,14 @@
     <p class="ft-text">
       Duration: {{ formattedDuration }} - Taps detected: {{ tapCount }} - Rhythm variance: {{ rhythmVariance }}
     </p>
+    <p class="ft-text ft-review-hint" *ngIf="recordedDuration < MIN_RECORDING_SECONDS">
+      Record at least {{ MIN_RECORDING_SECONDS }} seconds for a reliable analysis. Use Re-record if this clip is too short.
+    </p>
     <div class="ft-actions-row">
-      <button class="ft-btn-primary" (click)="analyzeLiveRecording()">
+      <button
+        class="ft-btn-primary"
+        [disabled]="recordedDuration < MIN_RECORDING_SECONDS"
+        (click)="analyzeLiveRecording()">
         Analyze Recording
       </button>
       <button class="ft-btn-secondary" (click)="reRecord()">
@@ -527,6 +581,13 @@
     <h2 class="ft-section-title">Something went wrong</h2>
     <p class="ft-text">{{ apiError }}</p>
     <div class="ft-actions-row">
+      <button
+        *ngIf="inputMode === 'live'"
+        class="ft-btn-primary"
+        type="button"
+        (click)="retryLiveFromError()">
+        Try live recording again
+      </button>
       <button class="ft-btn-secondary" type="button" (click)="resetTest()">
         Start over
       </button>
