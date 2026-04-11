@@ -18,10 +18,10 @@
     <div class="test-records-controls max-w-[1600px] mx-auto mb-6 relative">
       <div class="test-records-controls-row flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex flex-col gap-1 min-w-0">
-          <span class="text-xs font-semibold uppercase tracking-wide text-app-text-muted">
-            Test Records
-          </span>
-          <span class="text-xs text-app-text-muted">
+          <h1 class="test-records-page-title text-app-text-primary">
+            Test records
+          </h1>
+          <span class="text-xs sm:text-sm text-app-text-muted">
             Search by name or use filters to refine results
           </span>
         </div>
@@ -190,10 +190,12 @@
       [cols]="(isAdmin || isMedicalProfessional) ? 9 : 8">
     </app-skeleton>
 
-        <!-- Records Table -->
-    <div *ngIf="!loading && records.length > 0" class="max-w-[1600px] mx-auto mb-8">
-      <div class="bg-app-surface border border-app-border rounded-lg overflow-hidden shadow-sm">
-        <div class="test-records-table-wrap overflow-x-auto">
+        <!-- Records: desktop table + mobile cards -->
+    <div *ngIf="!loading && records.length > 0" class="max-w-[1600px] mx-auto mb-8 test-records-data ns-data-shell">
+      <!-- Desktop / tablet: wide table -->
+      <div class="ns-data-shell__desktop">
+        <div class="ns-data-shell__surface">
+        <div class="ns-data-shell__scroll ns-data-shell__scroll--records overflow-x-auto">
           <table class="w-full neuro-table">
             <thead class="border-b border-border">
               <tr>
@@ -338,6 +340,104 @@
             </tbody>
           </table>
         </div>
+        </div>
+      </div>
+
+      <!-- Mobile: stacked cards (no horizontal scroll) -->
+      <div
+        class="ns-data-shell__cards"
+        role="list"
+        aria-label="Test records"
+      >
+        <article
+          *ngFor="let record of records"
+          class="ns-data-card"
+          role="listitem"
+        >
+          <div class="ns-data-card__head">
+            <div class="ns-data-card__title-block">
+              <div class="ns-data-card__title">{{ recordDisplayName(record) }}</div>
+              <div
+                *ngIf="record.displayName && record.userName && record.displayName.trim() !== record.userName.trim()"
+                class="ns-data-card__subtitle"
+              >
+                {{ record.userName }}
+              </div>
+            </div>
+            <label *ngIf="canManageRecords" class="ns-data-card__select">
+              <input
+                type="checkbox"
+                [checked]="selectedIds.has(record.id)"
+                (change)="toggleSelection(record.id)"
+                aria-label="Select this test record"
+              />
+            </label>
+          </div>
+
+          <div class="ns-data-card__grid">
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Test date</span>
+              <span class="ns-data-card__value">{{ record.testDate | date:'short' }}</span>
+            </div>
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Category</span>
+              <span class="ns-data-card__value">{{ getTestCategoryLabel(record.testType) }}</span>
+            </div>
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Result</span>
+              <span
+                [class]="'ns-data-card__badge px-3 py-1 rounded text-xs font-semibold border ' + getResultBadgeColor(record.testResult)"
+              >
+                {{ record.testResult }}
+              </span>
+            </div>
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Status</span>
+              <span
+                [class]="'ns-data-card__badge px-3 py-1 rounded text-xs font-semibold border ' + getStatusBadgeColor(record.status)"
+              >
+                {{ record.status }}
+              </span>
+            </div>
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Risk</span>
+              <span class="ns-data-card__value">{{ getRiskDisplay(record) }}</span>
+            </div>
+            <div class="ns-data-card__cell">
+              <span class="ns-data-card__label">Accuracy</span>
+              <span class="ns-data-card__value tabular-nums">{{ formatAccuracyPercent(record.accuracy) }}</span>
+            </div>
+          </div>
+
+          <div class="ns-data-card__actions">
+            <p-button
+              icon="pi pi-eye"
+              (onClick)="viewRecord(record.id)"
+              severity="secondary"
+              styleClass="p-button-rounded p-button-text p-button-plain p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top">
+            </p-button>
+            <p-button
+              *ngIf="canManageRecords"
+              icon="pi pi-pencil"
+              (onClick)="editRecord(record.id)"
+              severity="info"
+              styleClass="p-button-rounded p-button-text p-button-plain p-button-sm"
+              pTooltip="Edit record"
+              tooltipPosition="top">
+            </p-button>
+            <p-button
+              *ngIf="canManageRecords"
+              icon="pi pi-trash"
+              (onClick)="openDeleteDialog(record.id)"
+              severity="danger"
+              styleClass="p-button-rounded p-button-text p-button-plain p-button-sm"
+              pTooltip="Delete record"
+              tooltipPosition="top">
+            </p-button>
+          </div>
+        </article>
       </div>
     </div>
 

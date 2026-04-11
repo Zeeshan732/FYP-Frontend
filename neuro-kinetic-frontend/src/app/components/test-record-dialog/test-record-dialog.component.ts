@@ -39,6 +39,12 @@ export class TestRecordDialogComponent implements OnInit, OnChanges, AfterViewIn
   loadingFeatures = false;
   analysisResult: AnalysisResult | null = null;
 
+  /** Responsive panel width; vertical bounds use min(dvh) in component SCSS */
+  readonly dialogPanelStyle: Record<string, string> = {
+    width: 'min(92vw, 900px)',
+    maxWidth: 'min(96vw, 900px)',
+  };
+
 
   constructor(
     private fb: FormBuilder,

@@ -679,6 +679,220 @@ a.text-app-primary,
   color: var(--color-ink);
 }
 
+/*
+ * Shared list-page table shell + mobile cards (Test Records, Chat History, Contact Messages).
+ * Visibility is global so Angular scoped rules cannot keep mobile cards visible beside the table.
+ */
+.ns-data-shell {
+  min-width: 0;
+  width: 100%;
+}
+
+.ns-data-shell__surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.ns-data-shell__scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  width: 100%;
+  min-width: 0;
+}
+
+.ns-data-shell__scroll > table.neuro-table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.ns-data-shell__scroll--chats > table.neuro-table {
+  min-width: 720px;
+}
+
+.ns-data-shell__scroll--records > table.neuro-table {
+  min-width: 980px;
+}
+
+@media (max-width: 768px) {
+  .ns-data-shell__scroll--records th,
+  .ns-data-shell__scroll--records td {
+    padding-left: 0.875rem !important;
+    padding-right: 0.875rem !important;
+  }
+}
+
+/* Chats + admin inbox: unified cell padding (Test Records keeps Tailwind on cells) */
+.ns-data-shell__scroll--chats .neuro-table thead th,
+.ns-data-shell__scroll--contacts .neuro-table thead th {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-blue);
+}
+
+.ns-data-shell__scroll--chats .neuro-table thead th:not(.text-center),
+.ns-data-shell__scroll--contacts .neuro-table thead th:not(.text-center) {
+  text-align: left;
+}
+
+.ns-data-shell__scroll--chats .neuro-table tbody td,
+.ns-data-shell__scroll--contacts .neuro-table tbody td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: middle;
+}
+
+.ns-data-shell__scroll--chats .neuro-table tbody td:not(.text-center),
+.ns-data-shell__scroll--contacts .neuro-table tbody td:not(.text-center) {
+  text-align: left;
+}
+
+.ns-data-shell__desktop {
+  display: none;
+}
+
+.ns-data-shell__cards {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.65rem, 2.5vw, 1rem);
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .ns-data-shell__desktop {
+    display: block;
+  }
+
+  .ns-data-shell__cards {
+    display: none;
+  }
+}
+
+.ns-data-card {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(0.85rem, 3.2vw, 1.1rem);
+  border-radius: clamp(10px, 2vw, 14px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.ns-data-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  min-width: 0;
+}
+
+.ns-data-card__title-block {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ns-data-card__title {
+  font-size: clamp(0.9375rem, 3.5vw, 1rem);
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.ns-data-card__subtitle {
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--color-muted);
+  word-break: break-all;
+}
+
+.ns-data-card__select {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem;
+  margin: -0.25rem;
+  cursor: pointer;
+}
+
+.ns-data-card__select input[type='checkbox'] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--app-primary);
+  cursor: pointer;
+}
+
+.ns-data-card__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+@media (min-width: 380px) {
+  .ns-data-card__grid {
+    gap: 0.75rem 1rem;
+  }
+}
+
+.ns-data-card__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.ns-data-card__cell--full {
+  grid-column: 1 / -1;
+}
+
+.ns-data-card__label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  line-height: 1.2;
+}
+
+.ns-data-card__value {
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.ns-data-card__badge {
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+.ns-data-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.15rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--color-border);
+  min-height: 2.75rem;
+}
+
+.ns-data-card__actions .p-button {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+}
+
 /* ---------- Shared pagination (tables & lists, mobile-first) ---------- */
 .ns-pagination {
   display: grid;

@@ -11,17 +11,27 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpEventType,
+  HttpRequest,
+  HttpResponse
+} from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { filter, map, tap, timeout } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserTestRecord, UserTestRecordRequest } from '../../models/api.models';
 import { Router } from '@angular/router';
+import { FingerTapVideoPrepService } from '../../services/finger-tap-video-prep.service';
 
 type ScreenState =
   | 'instructions'
   | 'mode-select'
   | 'upload'
+  | 'compressing'
   | 'processing'
   | 'result'
   | 'error'
@@ -60,6 +70,20 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   // Upload mode
   selectedFile: File | null = null;
+  /** Populated after metadata load — used to decide FFmpeg + duration warnings */
+  selectedVideoDurationSec: number | null = null;
+  uploadValidationError = '';
+  uploadWarnings: string[] = [];
+  /** 0–100 while uploading multipart */
+  uploadProgressPercent = 0;
+  /** Client-side transcode (FFmpeg.wasm) before API — avoids IIS ~28MB 413s */
+  compressionProgress = 0;
+  compressionPhase = '';
+  compressionOriginalMb = '';
+  compressionResultMb = '';
+  /** File actually sent to API (may differ from selectedFile after optimization) */
+  private preparedUploadFile: File | null = null;
+
   result: FingerTapResult | null = null;
 
   /** Set after a successful save to Test Records — required for PDF/CSV download. */
@@ -136,7 +160,8 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     private apiService: ApiService,
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private fingerTapVideoPrep: FingerTapVideoPrepService
   ) {}
 
   /** Phone / tablet — show stronger lighting guidance */
@@ -303,6 +328,15 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.savedTestRecordId = null;
     this.reportDownloadError = '';
     this.selectedFile = null;
+    this.preparedUploadFile = null;
+    this.selectedVideoDurationSec = null;
+    this.uploadValidationError = '';
+    this.uploadWarnings = [];
+    this.uploadProgressPercent = 0;
+    this.compressionProgress = 0;
+    this.compressionPhase = '';
+    this.compressionOriginalMb = '';
+    this.compressionResultMb = '';
     this.recordedBlob = null;
     this.recordedChunks = [];
     this.tapCount = 0;
@@ -314,26 +348,57 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   // ── Upload mode ─────────────────────────────
 
-  onFileSelected(event: Event): void {
+  async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-    const file = input.files[0];
-
-    const allowed = ['.mp4', '.avi', '.mov', '.mkv', '.webm'];
-    const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
-    if (!allowed.includes(ext)) {
-      this.apiError = 'Unsupported video format. Please upload MP4, MOV, AVI, MKV or WEBM.';
-      this.selectedFile = null;
+    if (!input.files || input.files.length === 0) {
       return;
     }
-
+    const file = input.files[0];
+    this.uploadValidationError = '';
+    this.uploadWarnings = [];
+    this.selectedVideoDurationSec = null;
+    this.preparedUploadFile = null;
     this.apiError = '';
+
+    const v = this.fingerTapVideoPrep.validateExtension(file);
+    if (!v.ok) {
+      this.uploadValidationError = v.errors.join(' ');
+      this.selectedFile = null;
+      input.value = '';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.uploadWarnings.push(...v.warnings);
+
+    try {
+      const d = await this.fingerTapVideoPrep.getVideoDurationSec(file);
+      this.selectedVideoDurationSec = d;
+      this.uploadWarnings.push(...this.fingerTapVideoPrep.durationWarnings(d));
+    } catch {
+      this.uploadWarnings.push(
+        'Could not read video length. Very large files will still be optimized before upload.'
+      );
+    }
+
+    if (file.size > 30 * 1024 * 1024) {
+      this.uploadWarnings.unshift('Large video detected — it will be optimized before upload (may take a moment).');
+    }
+
     this.selectedFile = file;
+    this.cdr.markForCheck();
   }
 
   clearFile(): void {
     this.selectedFile = null;
+    this.preparedUploadFile = null;
+    this.selectedVideoDurationSec = null;
+    this.uploadValidationError = '';
+    this.uploadWarnings = [];
     this.apiError = '';
+  }
+
+  get canSubmitUpload(): boolean {
+    return !!this.selectedFile && !this.uploadValidationError && !this.isProcessing;
   }
 
   private extractHttpErrorMessage(err: HttpErrorResponse): string {
@@ -368,21 +433,62 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   async analyzeVideo(): Promise<void> {
-    if (!this.selectedFile) return;
+    if (!this.selectedFile || this.uploadValidationError) {
+      return;
+    }
     this.apiError = '';
     this.isProcessing = true;
-    this.currentState = 'processing';
+    this.uploadProgressPercent = 0;
+    this.preparedUploadFile = null;
 
-    const formData = new FormData();
-    formData.append('video', this.selectedFile);
+    let file = this.selectedFile;
+    const duration = this.selectedVideoDurationSec;
 
     try {
-      const result = await this.http
-        .post<FingerTapResult>(`${this.apiUrl}/FingerTap/predict`, formData)
-        .toPromise();
+      if (this.fingerTapVideoPrep.shouldCompressApprox(file, duration)) {
+        this.currentState = 'compressing';
+        this.compressionProgress = 0;
+        this.compressionPhase = 'Video is large — optimizing for upload…';
+        this.compressionOriginalMb = this.fingerTapVideoPrep.fmtMb(file.size);
+        this.compressionResultMb = '';
+        this.cdr.markForCheck();
+
+        try {
+          file = await this.fingerTapVideoPrep.compressForUpload(file, (ratio, label) => {
+            this.compressionProgress = Math.round(ratio * 100);
+            this.compressionPhase = label;
+            this.cdr.markForCheck();
+          });
+        } catch (encErr) {
+          console.error('Finger-tap FFmpeg compression failed', encErr);
+          this.apiError =
+            'Could not optimize video in this browser. Please record a shorter clip (under 15 seconds) or send a smaller file.';
+          this.currentState = 'error';
+          return;
+        }
+
+        this.compressionResultMb = this.fingerTapVideoPrep.fmtMb(file.size);
+        this.preparedUploadFile = file;
+      } else {
+        this.preparedUploadFile = file;
+      }
+
+      this.currentState = 'processing';
+      this.processingSteps = [
+        { text: 'Uploading video', done: false, active: true },
+        { text: 'Extracting hand landmarks', done: false, active: false },
+        { text: 'Computing movement regularity', done: false, active: false }
+      ];
+      this.cdr.markForCheck();
+
+      const result = await this.uploadFingerTapWithRetries(file);
 
       if (result) {
-        // Requirement: do not show final result inside popup.
+        this.processingSteps = [
+          { text: 'Uploading video', done: true, active: false },
+          { text: 'Extracting hand landmarks', done: true, active: false },
+          { text: 'Computing movement regularity', done: true, active: false }
+        ];
         if (this.embedded) {
           this.requestClose.emit();
           this.router.navigate(['/finger-tap'], { state: { fingerTapResult: result } });
@@ -396,12 +502,112 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
         this.currentState = 'error';
       }
     } catch (err) {
-      const httpErr = err as HttpErrorResponse;
-      this.apiError = this.mapFingerTapError(this.extractHttpErrorMessage(httpErr));
+      this.apiError = this.mapUploadFailure(err);
       this.currentState = 'error';
     } finally {
       this.isProcessing = false;
+      this.uploadProgressPercent = 0;
     }
+  }
+
+  /** Upload with progress + retries (transient network only — not 413/400). */
+  private async uploadFingerTapWithRetries(file: File): Promise<FingerTapResult | null> {
+    let lastErr: unknown;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        return await this.postFingerTapMultipart(file);
+      } catch (err) {
+        lastErr = err;
+        const httpErr = err as HttpErrorResponse;
+        if (httpErr.status === 413 && attempt === 0 && this.selectedFile) {
+          this.currentState = 'compressing';
+          this.compressionPhase = 'Video file too large — applying stronger compression…';
+          this.cdr.markForCheck();
+          try {
+            const compressed = await this.fingerTapVideoPrep.compressForUpload(
+              file,
+              (r, l) => {
+                this.compressionProgress = Math.round(r * 100);
+                this.compressionPhase = l;
+                this.cdr.markForCheck();
+              },
+              { aggressive: true }
+            );
+            file = compressed;
+            this.preparedUploadFile = compressed;
+            this.currentState = 'processing';
+            continue;
+          } catch {
+            throw err;
+          }
+        }
+        if (httpErr.status === 413) {
+          throw err;
+        }
+        if (httpErr.status === 400 || httpErr.status === 401 || httpErr.status === 403) {
+          throw err;
+        }
+        if ((err as Error)?.name === 'TimeoutError') {
+          if (attempt >= 3) {
+            throw err;
+          }
+        } else if (httpErr.status >= 400 && httpErr.status < 500 && httpErr.status !== 408) {
+          throw err;
+        }
+        if (attempt < 3) {
+          await new Promise(r => setTimeout(r, 2000 * 2 ** attempt));
+        }
+      }
+    }
+    throw lastErr;
+  }
+
+  private async postFingerTapMultipart(file: File): Promise<FingerTapResult> {
+    const formData = new FormData();
+    const name = file.name.toLowerCase().endsWith('.mp4') ? file.name : 'finger-tap-upload.mp4';
+    formData.append('video', file, name);
+
+    const req = new HttpRequest('POST', `${this.apiUrl}/FingerTap/predict`, formData, {
+      reportProgress: true,
+      responseType: 'json'
+    });
+
+    return firstValueFrom(
+      this.http.request<FingerTapResult>(req).pipe(
+        tap(event => {
+          if (event.type === HttpEventType.UploadProgress && event.total) {
+            this.uploadProgressPercent = Math.round((100 * event.loaded) / event.total);
+            this.cdr.markForCheck();
+          }
+        }),
+        timeout(120000),
+        filter((e): e is HttpResponse<FingerTapResult> => e.type === HttpEventType.Response),
+        map(e => {
+          const b = e.body;
+          if (!b) {
+            throw new Error('No result returned from analysis.');
+          }
+          return b;
+        })
+      )
+    );
+  }
+
+  private mapUploadFailure(err: unknown): string {
+    if ((err as Error)?.name === 'TimeoutError') {
+      return 'Upload timed out. Check your connection and try again.';
+    }
+    const httpErr = err as HttpErrorResponse;
+    if (httpErr.status === 0) {
+      return 'Upload failed. Check your connection and try again.';
+    }
+    if (httpErr.status === 413) {
+      return (
+        'Video file too large for the server even after optimization. Please record a shorter clip ' +
+        '(under 15 seconds) or lower camera quality, then try again.'
+      );
+    }
+    return this.mapFingerTapError(this.extractHttpErrorMessage(httpErr));
   }
 
   // ── Camera / live recording ─────────────────
@@ -784,6 +990,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       type: mime
     });
     this.selectedFile = file;
+    this.selectedVideoDurationSec = this.recordedDuration;
+    this.uploadValidationError = '';
+    this.uploadWarnings = [];
     await this.analyzeVideo();
   }
 

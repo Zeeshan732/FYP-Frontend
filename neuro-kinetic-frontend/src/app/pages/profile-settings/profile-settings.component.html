@@ -1,17 +1,19 @@
 <app-navigation></app-navigation>
 
-<section class="profile-shell min-h-screen bg-pagebg pb-20">
-  <div class="profile-inner w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <div class="profile-header mb-6">
-      <h1>Profile Settings</h1>
-      <p>Update your personal information and password.</p>
+<section class="profile-settings profile-shell min-h-screen bg-pagebg pb-20">
+  <div class="profile-inner profile-settings__inner w-full max-w-[1400px] mx-auto">
+    <header class="profile-header profile-settings__header mb-6">
+      <h1 class="profile-settings__title">Profile Settings</h1>
+      <p class="profile-settings__lead">Update your personal information and password.</p>
+    </header>
+
+    <div class="profile-settings__skeleton" *ngIf="loading">
+      <app-skeleton variant="table" [rows]="4" [cols]="2"></app-skeleton>
     </div>
 
-    <app-skeleton *ngIf="loading" variant="table" [rows]="4" [cols]="2"></app-skeleton>
-
-    <div *ngIf="!loading" class="profile-grid">
-      <div class="app-card profile-card">
-        <h3>Personal Information</h3>
+    <div *ngIf="!loading" class="profile-grid profile-settings__grid">
+      <div class="app-card profile-card profile-settings__card">
+        <h3 class="profile-settings__card-title">Personal Information</h3>
         <div class="form-grid">
           <label>
             <span>First Name</span>
@@ -38,15 +40,15 @@
             <input type="text" [(ngModel)]="profile.researchFocus" />
           </label>
         </div>
-        <div class="actions">
-          <button type="button" class="primary" [disabled]="savingProfile" (click)="saveProfile()">
+        <div class="actions profile-settings__actions">
+          <button type="button" class="primary profile-settings__btn" [disabled]="savingProfile" (click)="saveProfile()">
             {{ savingProfile ? 'Saving...' : 'Save Profile' }}
           </button>
         </div>
       </div>
 
-      <div class="app-card profile-card">
-        <h3>Change Password</h3>
+      <div class="app-card profile-card profile-settings__card">
+        <h3 class="profile-settings__card-title">Change Password</h3>
         <div class="form-grid single">
           <label>
             <span>Current Password</span>
@@ -73,8 +75,8 @@
               autocomplete="new-password" />
           </label>
         </div>
-        <div class="actions">
-          <button type="button" class="primary" [disabled]="changingPassword" (click)="changePassword()">
+        <div class="actions profile-settings__actions">
+          <button type="button" class="primary profile-settings__btn" [disabled]="changingPassword" (click)="changePassword()">
             {{ changingPassword ? 'Updating...' : 'Change Password' }}
           </button>
         </div>

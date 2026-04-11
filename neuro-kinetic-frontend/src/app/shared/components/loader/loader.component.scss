@@ -1,29 +1,72 @@
+/* Stitches-style design tokens (plain CSS variables — Angular-friendly, no runtime CSS-in-JS) */
+:host {
+  --ldr-accent: #1d9e75;
+  --ldr-surface: #0f172a;
+  --ldr-surface-elevated: #111f38;
+  --ldr-border: rgba(255, 255, 255, 0.09);
+  --ldr-text: #ffffff;
+  --ldr-muted: rgba(255, 255, 255, 0.48);
+  --ldr-radius: clamp(12px, 2.5vw, 16px);
+  --ldr-pad-x: clamp(1rem, 4vw, 1.75rem);
+  --ldr-pad-y: clamp(1.25rem, 4vw, 2rem);
+  --ldr-gap: clamp(0.75rem, 2.5vw, 1.25rem);
+  --ldr-title-size: clamp(1.05rem, 3.8vw, 1.35rem);
+  --ldr-sub-size: clamp(0.8rem, 2.8vw, 0.9rem);
+  --ldr-step-size: clamp(0.78rem, 2.6vw, 0.85rem);
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .ldr-page {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px 32px;
   width: 100%;
+  max-width: 100%;
+  min-height: min(70dvh, 560px);
+  padding: var(--ldr-pad-y) var(--ldr-pad-x);
+  padding-bottom: max(var(--ldr-pad-y), env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+
+.ldr-page--compact {
+  min-height: 0;
+  padding: clamp(0.5rem, 2vw, 1rem) clamp(0.35rem, 2vw, 0.75rem)
+    max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
 
 .ldr-page-inner {
-  text-align: center;
-  max-width: 420px;
   width: 100%;
-  background: #112240;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 28px 24px;
+  max-width: min(100%, 440px);
+  margin-inline: auto;
+  text-align: center;
+  background: var(--ldr-surface-elevated);
+  border: 1px solid var(--ldr-border);
+  border-radius: var(--ldr-radius);
+  padding: clamp(1.25rem, 4.5vw, 2rem) clamp(1rem, 4vw, 1.75rem);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  box-sizing: border-box;
+}
+
+.ldr-page--compact .ldr-page-inner {
+  max-width: min(100%, 520px);
+  padding: clamp(1rem, 3.5vw, 1.5rem) clamp(0.85rem, 3vw, 1.35rem);
 }
 
 .ldr-ring-wrap {
   position: relative;
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 24px;
+  width: clamp(64px, 18vw, 80px);
+  height: clamp(64px, 18vw, 80px);
+  margin: 0 auto var(--ldr-gap);
 }
 
 .ldr-ring-svg {
+  width: 100%;
+  height: 100%;
   transform: rotate(-90deg);
 }
 
@@ -38,49 +81,110 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  svg {
+    width: clamp(20px, 5.5vw, 26px);
+    height: clamp(20px, 5.5vw, 26px);
+  }
 }
 
 .ldr-title {
-  font-size: 20px;
-  font-weight: 500;
-  color: #ffffff;
-  margin-bottom: 8px;
+  font-size: var(--ldr-title-size);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ldr-text);
+  margin: 0 0 0.5rem;
+  padding: 0 clamp(0.25rem, 2vw, 0.5rem);
 }
 
 .ldr-subtitle {
-  font-size: 14px;
-  color: rgba(255,255,255,0.45);
-  line-height: 1.7;
-  margin-bottom: 28px;
+  font-size: var(--ldr-sub-size);
+  color: var(--ldr-muted);
+  line-height: 1.65;
+  margin: 0 0 clamp(1rem, 3vw, 1.35rem);
+  padding: 0 clamp(0.15rem, 1.5vw, 0.35rem);
+  max-width: 38rem;
+  margin-inline: auto;
+}
+
+/* Integrated upload strip — same card, no floating line on narrow viewports */
+.ldr-upload {
+  text-align: left;
+  margin-bottom: clamp(0.85rem, 2.5vw, 1.15rem);
+  padding: 0.65rem 0.75rem;
+  border-radius: clamp(8px, 2vw, 10px);
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ldr-upload-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+.ldr-upload-label {
+  font-size: clamp(0.72rem, 2.4vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(34, 197, 94, 0.92);
+}
+
+.ldr-upload-pct {
+  font-size: clamp(0.78rem, 2.5vw, 0.88rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: rgba(226, 232, 240, 0.95);
+}
+
+.ldr-upload-track {
+  height: clamp(7px, 1.8vw, 9px);
+  border-radius: 999px;
+  background: rgba(30, 41, 59, 0.95);
+  overflow: hidden;
+}
+
+.ldr-upload-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #15803d, #22c55e, #4ade80);
+  transition: width 0.2s ease-out;
+  min-width: 0;
 }
 
 .ldr-steps {
   text-align: left;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px;
-  padding: 14px 18px;
-  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: clamp(8px, 2vw, 11px);
+  padding: clamp(0.65rem, 2.2vw, 0.9rem) clamp(0.75rem, 2.5vw, 1rem);
+  margin-bottom: clamp(0.85rem, 2.5vw, 1.15rem);
 }
 
 .ldr-step {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 9px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  align-items: flex-start;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
+  padding: clamp(0.45rem, 1.5vw, 0.55rem) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .ldr-step-icon {
-  width: 20px;
-  height: 20px;
+  width: clamp(18px, 4.5vw, 22px);
+  height: clamp(18px, 4.5vw, 22px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .ldr-step-icon-active {
@@ -88,7 +192,7 @@
 }
 
 .ldr-step-icon-pending {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .ldr-step-dot-pulse {
@@ -99,24 +203,38 @@
 }
 
 .ldr-step-text {
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: var(--ldr-step-size);
+  line-height: 1.45;
   transition: color 0.3s;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .ldr-cancel-btn {
+  width: 100%;
+  max-width: 280px;
+  margin-inline: auto;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 8px;
-  color: rgba(255,255,255,0.5);
-  font-size: 13px;
-  padding: 8px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: clamp(8px, 2vw, 10px);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: clamp(0.8rem, 2.6vw, 0.88rem);
+  padding: clamp(0.55rem, 2vw, 0.65rem) clamp(1rem, 3vw, 1.25rem);
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
 
   &:hover {
-    border-color: rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.8);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  &:active {
+    transform: scale(0.99);
   }
 }
 
@@ -133,7 +251,7 @@
 
 .ldr-inline-text {
   font-size: 14px;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .ldr-btn-wrap {
@@ -161,16 +279,49 @@
 }
 
 @keyframes ldr-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes ldr-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 @keyframes ldr-bounce {
-  0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-8px); }
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
 }
 
+/* Short viewports: avoid excessive vertical min-height */
+@media (max-height: 520px) {
+  .ldr-page:not(.ldr-page--compact) {
+    min-height: 0;
+    align-items: flex-start;
+  }
+}
+
+@media (min-width: 640px) {
+  .ldr-page-inner {
+    max-width: 440px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ldr-page-inner {
+    max-width: 460px;
+    padding: 2rem 2rem 1.75rem;
+  }
+}
