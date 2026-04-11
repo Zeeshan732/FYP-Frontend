@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../../services/modal.service';
 import { AuthService } from '../../../services/auth.service';
@@ -31,17 +32,41 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   passwordStrength: 0 | 1 | 2 | 3 | 4 = 0;
   private subscription: Subscription = new Subscription();
 
+  /** Must match API `RequestPasswordResetOTPAsync` expiry */
+  readonly OTP_VALID_SECONDS = 60;
+  /** Seconds remaining after code is sent; null = no active window */
+  otpCountdownSec: number | null = null;
+  otpExpired = false;
+  private otpIntervalId: ReturnType<typeof setInterval> | null = null;
+
   constructor(
     private modalService: ModalService,
     private authService: AuthService,
     private passwordResetService: PasswordResetService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private messageService: MessageService
   ) {}
+
+  private toastOk(summary: string, detail: string): void {
+    this.messageService.add({ severity: 'success', summary, detail, life: 4800 });
+  }
+
+  private toastErr(summary: string, detail: string): void {
+    this.messageService.add({ severity: 'error', summary, detail, life: 8000 });
+  }
+
+  private toastWarn(summary: string, detail: string): void {
+    this.messageService.add({ severity: 'warn', summary, detail, life: 6500 });
+  }
 
   ngOnInit() {
     this.subscription.add(
       this.modalService.loginModal$.subscribe(isOpen => {
         this.isOpen = isOpen;
+        if (!isOpen) {
+          this.clearOtpTimer();
+        }
         // Reset form when modal opens
         if (isOpen) {
           this.email = '';
@@ -57,13 +82,64 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           this.showContactAdmin = false;
           this.modalView = 'login';
           this.showPassword = false;
+          this.otpCountdownSec = null;
+          this.otpExpired = false;
+          this.clearOtpTimer();
         }
       })
     );
   }
 
   ngOnDestroy() {
+    this.clearOtpTimer();
     this.subscription.unsubscribe();
+  }
+
+  /** Display MM:SS for the active OTP window */
+  get otpCountdownMmSs(): string {
+    if (this.otpCountdownSec == null || this.otpCountdownSec < 0) {
+      return '00:00';
+    }
+    const m = Math.floor(this.otpCountdownSec / 60);
+    const s = this.otpCountdownSec % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  private clearOtpTimer(): void {
+    if (this.otpIntervalId != null) {
+      clearInterval(this.otpIntervalId);
+      this.otpIntervalId = null;
+    }
+  }
+
+  private startOtpCountdown(): void {
+    this.clearOtpTimer();
+    this.otpExpired = false;
+    this.otpCountdownSec = this.OTP_VALID_SECONDS;
+    this.otpIntervalId = setInterval(() => {
+      if (this.otpCountdownSec == null) {
+        return;
+      }
+      if (this.otpCountdownSec <= 1) {
+        this.clearOtpTimer();
+        this.otpCountdownSec = 0;
+        this.onOtpWindowExpired();
+        this.cdr.markForCheck();
+        return;
+      }
+      this.otpCountdownSec--;
+      this.cdr.markForCheck();
+    }, 1000);
+  }
+
+  private onOtpWindowExpired(): void {
+    this.otpExpired = true;
+    this.otpCountdownSec = 0;
+    this.modalService.openGlobalNotice(
+      'Verification code expired',
+      'Your one-time password is no longer valid. Please request a new verification code and try again.'
+    );
+    this.switchTo('forgot');
   }
 
   closeModal() {
@@ -123,6 +199,11 @@ export class LoginModalComponent implements OnInit, OnDestroy {
       this.openSignupModal();
       return;
     }
+    if (view === 'login') {
+      this.clearOtpTimer();
+      this.otpCountdownSec = null;
+      this.otpExpired = false;
+    }
     this.modalView = view;
     this.error = '';
     this.info = '';
@@ -166,27 +247,43 @@ export class LoginModalComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.loading = false;
         this.sentResetEmail = email;
-        this.info = response?.message || `Reset link sent to ${email}`;
+        this.otpExpired = false;
         this.switchTo('email-sent');
+        this.info = response?.message || `Verification code sent to ${email}`;
+        this.startOtpCountdown();
+        this.toastOk(
+          'Verification code sent',
+          `If an account exists for ${email}, check your inbox for the 6-digit code.`
+        );
       },
       error: (error) => {
         this.loading = false;
         const apiMessage = (error?.error?.message || '').toString().toLowerCase();
         if (error?.status === 404 || apiMessage.includes('not found') || apiMessage.includes('does not exist')) {
           this.error = 'No account found with this email address.';
+          this.toastErr('Could not send code', this.error);
           return;
         }
         if (error?.status === 400 || apiMessage.includes('invalid')) {
           this.error = 'Please enter a valid email address.';
+          this.toastErr('Invalid email', this.error);
           return;
         }
         this.error = error?.error?.message || 'Failed to send reset link. Please try again.';
+        this.toastErr('Request failed', this.error);
       }
     });
   }
 
   /** Step 2–3: submit OTP + new password (backend validates OTP in one call). */
   submitOtpReset(): void {
+    if (this.otpExpired) {
+      this.modalService.openGlobalNotice(
+        'Verification code expired',
+        'Please request a new verification code from the password reset screen, then enter it within 60 seconds.'
+      );
+      return;
+    }
     const email = this.sentResetEmail?.trim() || this.resetEmail?.trim();
     const otp = this.resetOtp?.trim().replace(/\s/g, '');
     const pw = this.newPasswordReset;
@@ -215,10 +312,14 @@ export class LoginModalComponent implements OnInit, OnDestroy {
     this.passwordResetService.resetPassword(email, otp, pw).subscribe({
       next: () => {
         this.loading = false;
+        this.clearOtpTimer();
+        this.otpCountdownSec = null;
+        this.otpExpired = false;
         this.info = 'Password updated. You can sign in with your new password.';
         this.resetOtp = '';
         this.newPasswordReset = '';
         this.confirmNewPasswordReset = '';
+        this.toastOk('Password updated', 'You can sign in with your new password.');
         this.switchTo('login');
       },
       error: (err) => {
@@ -227,6 +328,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         this.error =
           msg ||
           'Could not reset password. The code may be wrong or expired — request a new code.';
+        this.toastErr('Password reset failed', this.error);
       }
     });
   }
@@ -234,6 +336,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (!this.email || !this.password) {
       this.error = 'Please enter both email and password';
+      this.toastWarn('Missing information', this.error);
       return;
     }
 
@@ -248,16 +351,19 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           this.error = response.message || (response.status === 'Pending'
             ? 'Your account is under review.'
             : 'Your account request was rejected.');
+          this.toastWarn('Cannot sign in yet', this.error);
           return;
         }
 
         if (!response.token || !response.user) {
           this.error = response.message || 'Login could not be completed. Please try again.';
+          this.toastErr('Sign in incomplete', this.error);
           return;
         }
 
+        this.toastOk('Signed in', 'Welcome back to NeuroSync.');
         this.closeModal();
-        
+
         // Small delay to ensure auth data is fully set before redirect
         setTimeout(() => {
           // Double-check authentication before redirect
@@ -266,6 +372,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
           } else {
             console.error('Authentication check failed after login');
             this.error = 'Login successful but authentication check failed. Please try again.';
+            this.toastErr('Sign in error', this.error);
             this.modalService.openLoginModal(); // Reopen modal to show error
           }
         }, 100);
@@ -275,7 +382,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         console.error('Login error details:', error);
         console.error('Error status:', error.status);
         console.error('Error message:', error.message);
-        
+
         if (error.status === 0) {
           this.error = 'Unable to connect to the server. Please ensure the backend is running.';
         } else if (error.status === 401) {
@@ -308,6 +415,7 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         } else {
           this.error = `Login failed (${error.status || 'Unknown error'}). Please check your credentials and try again.`;
         }
+        this.toastErr('Sign in failed', this.error);
       }
     });
   }

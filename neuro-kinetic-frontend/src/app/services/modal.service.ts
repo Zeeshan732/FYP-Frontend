@@ -7,6 +7,13 @@ export interface AskResultsDialogState {
   mode: 'voice' | 'gait' | 'multimodal';
 }
 
+/** App-root global notice (e.g. OTP expired) — PrimeNG dialog in app.component */
+export interface GlobalNoticeState {
+  visible: boolean;
+  title: string;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,6 +24,12 @@ export class ModalService {
     visible: false,
     riskPercent: null,
     mode: 'voice'
+  });
+
+  private globalNoticeSubject = new BehaviorSubject<GlobalNoticeState>({
+    visible: false,
+    title: '',
+    message: ''
   });
 
   // Login modal
@@ -55,10 +68,22 @@ export class ModalService {
     });
   }
 
+  /** Global notice dialog (root level) */
+  globalNotice$ = this.globalNoticeSubject.asObservable();
+
+  openGlobalNotice(title: string, message: string) {
+    this.globalNoticeSubject.next({ visible: true, title, message });
+  }
+
+  closeGlobalNotice() {
+    this.globalNoticeSubject.next({ visible: false, title: '', message: '' });
+  }
+
   // Close all modals
   closeAllModals() {
     this.loginModalSubject.next(false);
     this.signupModalSubject.next(false);
     this.askResultsDialogSubject.next({ ...this.askResultsDialogSubject.value, visible: false });
+    this.closeGlobalNotice();
   }
 }

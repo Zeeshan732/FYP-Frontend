@@ -43,3 +43,14 @@
     padding-right: 0;
   }
 }
+
+::ng-deep .app-global-notice-dialog .p-dialog-content {
+  padding-top: 0.5rem;
+}
+
+.app-global-notice-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(226, 232, 240, 0.92);
+}

@@ -173,8 +173,14 @@
         <h2 class="nl-forgot-title">Check your email</h2>
         <p class="nl-forgot-sub">
           We've sent a <strong>6-digit code</strong> to
-          <strong>{{ sentResetEmail || resetEmail }}</strong>. It expires in <strong>2 minutes</strong>.
+          <strong>{{ sentResetEmail || resetEmail }}</strong>.
+          Enter it within <strong>60 seconds</strong> (see timer below).
         </p>
+
+        <div class="nl-otp-countdown" *ngIf="otpCountdownSec !== null && !otpExpired" aria-live="polite">
+          <span class="nl-otp-countdown-label">Code expires in</span>
+          <span class="nl-otp-countdown-time">{{ otpCountdownMmSs }}</span>
+        </div>
 
         <div class="nl-reset-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -185,7 +191,11 @@
           Didn't receive it? Check spam or request a new code from the previous step.
         </div>
 
-        <button type="button" class="nl-submit" (click)="switchTo('otp-reset')">
+        <button
+          type="button"
+          class="nl-submit"
+          (click)="switchTo('otp-reset')"
+          [disabled]="otpExpired || (otpCountdownSec !== null && otpCountdownSec <= 0)">
           Enter code and new password
         </button>
 
@@ -213,6 +223,11 @@
         <p class="nl-forgot-sub">
           Email: <strong>{{ sentResetEmail || resetEmail }}</strong>
         </p>
+
+        <div class="nl-otp-countdown" *ngIf="otpCountdownSec !== null && !otpExpired" aria-live="polite">
+          <span class="nl-otp-countdown-label">Time remaining</span>
+          <span class="nl-otp-countdown-time">{{ otpCountdownMmSs }}</span>
+        </div>
 
         <div *ngIf="error" class="nl-msg nl-error">{{ error }}</div>
 
@@ -251,7 +266,11 @@
             [disabled]="loading">
         </div>
 
-        <button type="button" class="nl-submit" (click)="submitOtpReset()" [disabled]="loading">
+        <button
+          type="button"
+          class="nl-submit"
+          (click)="submitOtpReset()"
+          [disabled]="loading || otpExpired">
           <span *ngIf="!loading">Update password</span>
           <span *ngIf="loading">Updating...</span>
         </button>

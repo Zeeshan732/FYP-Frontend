@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
 import { SidebarService } from './services/sidebar.service';
-import { ModalService, AskResultsDialogState } from './services/modal.service';
+import { ModalService, AskResultsDialogState, GlobalNoticeState } from './services/modal.service';
 
 @Component({
   selector: 'app-root',
@@ -18,10 +18,12 @@ export class AppComponent implements OnInit, OnDestroy {
   isCompactViewport = false;
   currentRoute: string = '';
   askResultsDialogState: AskResultsDialogState = { visible: false, riskPercent: null, mode: 'voice' };
+  globalNotice: GlobalNoticeState = { visible: false, title: '', message: '' };
   private authSubscription?: Subscription;
   private sidebarSubscription?: Subscription;
   private routerSubscription?: Subscription;
   private askResultsDialogSubscription?: Subscription;
+  private globalNoticeSubscription?: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -59,6 +61,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.askResultsDialogSubscription = this.modalService.askResultsDialog$.subscribe(state => {
       this.askResultsDialogState = state;
     });
+
+    this.globalNoticeSubscription = this.modalService.globalNotice$.subscribe(state => {
+      this.globalNotice = state;
+    });
   }
 
   @HostListener('window:resize')
@@ -74,6 +80,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.modalService.closeAskResultsDialog();
   }
 
+  onGlobalNoticeVisible(visible: boolean): void {
+    if (!visible) {
+      this.modalService.closeGlobalNotice();
+    }
+  }
+
+  closeGlobalNotice(): void {
+    this.modalService.closeGlobalNotice();
+  }
+
   private toggleChatbaseVisibility(show: boolean): void {
     if (typeof document !== 'undefined' && document.body) {
       if (show) {
@@ -87,6 +103,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.toggleChatbaseVisibility(false);
     this.askResultsDialogSubscription?.unsubscribe();
+    this.globalNoticeSubscription?.unsubscribe();
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }

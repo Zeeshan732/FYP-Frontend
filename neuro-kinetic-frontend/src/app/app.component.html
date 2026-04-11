@@ -12,6 +12,28 @@
   <router-outlet></router-outlet>
 </div>
 
+<!-- Global notice (e.g. password reset OTP expired) -->
+<p-dialog
+  [visible]="globalNotice.visible"
+  (visibleChange)="onGlobalNoticeVisible($event)"
+  [header]="globalNotice.title"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: 'min(440px, 94vw)' }"
+  styleClass="app-global-notice-dialog">
+  <p class="app-global-notice-text">{{ globalNotice.message }}</p>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="OK"
+      class="p-button-sm"
+      (click)="closeGlobalNotice()"></button>
+  </ng-template>
+</p-dialog>
+
 <!-- PrimeNG Toast -->
 <p-toast></p-toast>
 
