@@ -413,9 +413,10 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       this.torchOn = false;
       this.resetLiveMetrics();
 
+      /** Rear-facing camera films the hand from phone placement; front camera is wrong for this test. */
       const portraitConstraints: MediaStreamConstraints = {
         video: {
-          facingMode: { ideal: 'user' },
+          facingMode: { ideal: 'environment' },
           width: { ideal: 720, min: 480 },
           height: { ideal: 1280, min: 720 },
           aspectRatio: { ideal: 9 / 16 }
@@ -426,13 +427,20 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       try {
         this.stream = await navigator.mediaDevices.getUserMedia(portraitConstraints);
       } catch {
-        this.stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 720 },
-            height: { ideal: 1280 }
-          },
-          audio: false
-        });
+        try {
+          this.stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' } },
+            audio: false
+          });
+        } catch {
+          this.stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 720 },
+              height: { ideal: 1280 }
+            },
+            audio: false
+          });
+        }
       }
 
       const track = this.stream.getVideoTracks()[0];
