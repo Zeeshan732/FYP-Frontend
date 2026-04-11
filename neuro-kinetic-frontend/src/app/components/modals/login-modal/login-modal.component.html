@@ -124,7 +124,7 @@
         </div>
 
         <h2 class="nl-forgot-title">Reset your password</h2>
-        <p class="nl-forgot-sub">Enter your email and we'll send you a reset link</p>
+        <p class="nl-forgot-sub">Enter your email and we'll send you a verification code</p>
 
         <div *ngIf="error" class="nl-msg nl-error">{{ error }}</div>
 
@@ -140,7 +140,7 @@
         </div>
 
         <button type="button" class="nl-submit" (click)="sendResetLink()" [disabled]="loading">
-          <span *ngIf="!loading">Send reset link</span>
+          <span *ngIf="!loading">Send verification code</span>
           <span *ngIf="loading">Sending...</span>
         </button>
 
@@ -172,9 +172,15 @@
 
         <h2 class="nl-forgot-title">Check your email</h2>
         <p class="nl-forgot-sub">
-          We've sent a reset link to
-          <strong>{{ sentResetEmail || resetEmail }}</strong>. It expires in 15 minutes.
+          We've sent a <strong>6-digit code</strong> to
+          <strong>{{ sentResetEmail || resetEmail }}</strong>.
+          Enter it within <strong>60 seconds</strong> (see timer below).
         </p>
+
+        <div class="nl-otp-countdown" *ngIf="otpCountdownSec !== null && !otpExpired" aria-live="polite">
+          <span class="nl-otp-countdown-label">Code expires in</span>
+          <span class="nl-otp-countdown-time">{{ otpCountdownMmSs }}</span>
+        </div>
 
         <div class="nl-reset-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -182,11 +188,95 @@
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
-          Didn't receive it? Check your spam folder or wait a minute before requesting another link.
+          Didn't receive it? Check spam or request a new code from the previous step.
         </div>
+
+        <button
+          type="button"
+          class="nl-submit"
+          (click)="switchTo('otp-reset')"
+          [disabled]="otpExpired || (otpCountdownSec !== null && otpCountdownSec <= 0)">
+          Enter code and new password
+        </button>
 
         <div class="nl-back-wrap">
           <button type="button" class="nl-back-link" (click)="switchTo('login')">&larr; Back to sign in</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nl-card" *ngIf="modalView === 'otp-reset'">
+      <div class="nl-topbar">
+        <div class="nl-logo">
+          <img src="assets/logos/brand/logo.png" alt="NeuroSync" class="nl-logo-img">
+        </div>
+        <button class="nl-close" type="button" (click)="closeModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="nl-body nl-forgot-body">
+        <h2 class="nl-forgot-title">Verify code &amp; set password</h2>
+        <p class="nl-forgot-sub">
+          Email: <strong>{{ sentResetEmail || resetEmail }}</strong>
+        </p>
+
+        <div class="nl-otp-countdown" *ngIf="otpCountdownSec !== null && !otpExpired" aria-live="polite">
+          <span class="nl-otp-countdown-label">Time remaining</span>
+          <span class="nl-otp-countdown-time">{{ otpCountdownMmSs }}</span>
+        </div>
+
+        <div *ngIf="error" class="nl-msg nl-error">{{ error }}</div>
+
+        <div class="nl-field">
+          <label>Verification code</label>
+          <input
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            [(ngModel)]="resetOtp"
+            name="resetOtp"
+            maxlength="10"
+            placeholder="6-digit code"
+            [disabled]="loading">
+        </div>
+
+        <div class="nl-field">
+          <label>New password</label>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            [(ngModel)]="newPasswordReset"
+            name="newPasswordReset"
+            autocomplete="new-password"
+            placeholder="At least 8 characters"
+            [disabled]="loading">
+        </div>
+
+        <div class="nl-field">
+          <label>Confirm new password</label>
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            [(ngModel)]="confirmNewPasswordReset"
+            name="confirmNewPasswordReset"
+            autocomplete="new-password"
+            placeholder="Repeat password"
+            [disabled]="loading">
+        </div>
+
+        <button
+          type="button"
+          class="nl-submit"
+          (click)="submitOtpReset()"
+          [disabled]="loading || otpExpired">
+          <span *ngIf="!loading">Update password</span>
+          <span *ngIf="loading">Updating...</span>
+        </button>
+
+        <div class="nl-back-wrap">
+          <button type="button" class="nl-back-link" (click)="switchTo('email-sent')">&larr; Back</button>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../../services/modal.service';
 import { AuthService } from '../../../services/auth.service';
@@ -42,7 +43,8 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   constructor(
     private modalService: ModalService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -188,25 +190,36 @@ export class SignupModalComponent implements OnInit, OnDestroy {
     this.authService.register(registrationData).subscribe({
       next: (response) => {
         this.loading = false;
-        
-        // Check if account was approved/activated
+
         const isApproved = response.status === 'Approved' || response.status === 'Activated';
         const isLoggedIn = !!response.token && !!response.user;
-        
+
         if (isApproved) {
-          // Other accounts are approved/activated and auto-logged in
           this.info = response.message || 'Account created successfully.';
         } else {
-          // Account is pending approval
           this.info = response.message || 'Registration submitted. Your account is under review.';
         }
-        
-        // Close modal and redirect based on account status
+
+        if (isLoggedIn) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Welcome to NeuroSync',
+            detail: this.info,
+            life: 5500
+          });
+        } else {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Registration received',
+            detail: this.info,
+            life: 6500
+          });
+        }
+
         setTimeout(() => {
           this.modalService.closeSignupModal();
-          
+
           if (isLoggedIn) {
-            // Redirect based on role
             const createdRole = response.user?.role;
             if (createdRole === 'MedicalProfessional') {
               this.router.navigate(['/clinician']);
@@ -214,10 +227,9 @@ export class SignupModalComponent implements OnInit, OnDestroy {
               this.router.navigate(['/patient-test']);
             }
           } else {
-            // Pending accounts, redirect to login page
             this.router.navigate(['/login']);
           }
-        }, 2000); // 2 second delay to show success message
+        }, 2000);
       },
       error: (error) => {
         this.loading = false;
@@ -229,6 +241,12 @@ export class SignupModalComponent implements OnInit, OnDestroy {
         } else {
           this.error = 'Registration failed. Please try again.';
         }
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Registration failed',
+          detail: this.error,
+          life: 9000
+        });
         console.error('Registration error:', error);
       }
     });

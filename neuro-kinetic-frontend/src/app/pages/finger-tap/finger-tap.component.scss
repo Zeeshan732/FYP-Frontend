@@ -232,6 +232,44 @@
   font-size: 0.9rem;
 }
 
+.ft-flash-hint {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.5rem;
+  background: rgba(46, 134, 222, 0.12);
+  border: 1px solid rgba(46, 134, 222, 0.35);
+  font-size: 0.88rem;
+}
+
+.ft-flash-callout {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  background: rgba(250, 204, 21, 0.08);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+}
+
+.ft-flash-callout--compact {
+  margin-bottom: 0.35rem;
+  padding: 0.55rem 0.85rem;
+}
+
+.ft-flash-callout-text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.ft-torch-row {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.ft-btn-torch {
+  min-width: 8rem;
+}
+
 .ft-cam-viewport {
   position: relative;
   border-radius: 0.75rem;

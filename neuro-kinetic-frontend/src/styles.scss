@@ -689,6 +689,11 @@ a.text-app-primary,
 }
 
 /* Alerts / Toasts â€” design tokens */
+/* Toast container above modals (login modal backdrop z-index 9999) */
+.p-toast {
+  z-index: 10050 !important;
+}
+
 .p-toast-message-success {
   background: #E1F5EE !important;
   border: 1px solid #1D9E75 !important;

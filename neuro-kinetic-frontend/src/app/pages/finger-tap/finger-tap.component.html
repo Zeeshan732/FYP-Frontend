@@ -133,6 +133,10 @@
     <p class="ft-text">
       To record your finger-tapping test live, NeuroSync needs permission to access your camera.
     </p>
+    <p class="ft-text ft-flash-hint" *ngIf="isMobileLike">
+      <strong>Tip:</strong> On phones, good lighting helps the analysis. After the preview starts, use the on-screen
+      <strong>Flash</strong> control when available, or turn on your device flashlight from quick settings.
+    </p>
     <div class="ft-actions-row">
       <button class="ft-btn-primary" (click)="requestCameraAccess()">
         Allow camera access
@@ -146,10 +150,33 @@
   <!-- Camera ready -->
   <div class="ft-container" *ngIf="currentState === 'cam-ready'">
     <h2 class="ft-section-title">Position your hand and start recording</h2>
+
+    <div class="ft-flash-callout" *ngIf="isMobileLike || torchSupported">
+      <ng-container *ngIf="torchSupported">
+        <p class="ft-flash-callout-text" *ngIf="torchOn">
+          Flash is <strong>on</strong> for clearer video. You can turn it off below if it is too bright.
+        </p>
+        <p class="ft-flash-callout-text" *ngIf="!torchOn">
+          For clearer video in low light, turn <strong>Flash on</strong> using the button below (when supported by your browser).
+        </p>
+      </ng-container>
+      <p class="ft-flash-callout-text" *ngIf="!torchSupported && isMobileLike">
+        This browser cannot control the camera LED. Please turn on your <strong>phone flashlight</strong> from quick settings
+        for a steadier, clearer recording.
+      </p>
+    </div>
+
     <div class="ft-cam-viewport">
       <video #videoPreview autoplay muted playsinline class="ft-video"></video>
       <div class="ft-guide-box">Position hand here</div>
     </div>
+
+    <div class="ft-actions-row ft-torch-row" *ngIf="torchSupported">
+      <button type="button" class="ft-btn-secondary ft-btn-torch" (click)="toggleTorch()">
+        Flash: {{ torchOn ? 'On' : 'Off' }}
+      </button>
+    </div>
+
     <div class="ft-actions-row">
       <button class="ft-btn-primary" (click)="startRecording()">
         Start Recording
@@ -163,9 +190,26 @@
   <!-- Recording -->
   <div class="ft-container" *ngIf="currentState === 'cam-recording'">
     <h2 class="ft-section-title">Recording...</h2>
+
+    <div class="ft-flash-callout ft-flash-callout--compact" *ngIf="torchSupported || isMobileLike">
+      <p class="ft-flash-callout-text" *ngIf="torchSupported && torchOn">Flash on — better visibility for analysis.</p>
+      <p class="ft-flash-callout-text" *ngIf="torchSupported && !torchOn">
+        Consider turning <strong>Flash on</strong> below if the scene is dark.
+      </p>
+      <p class="ft-flash-callout-text" *ngIf="!torchSupported && isMobileLike">
+        If the video looks dark, enable your <strong>device flashlight</strong> from the status bar.
+      </p>
+    </div>
+
     <div class="ft-cam-viewport">
       <video #videoPreview autoplay muted playsinline class="ft-video"></video>
       <div class="ft-rec-pill">REC - {{ formattedElapsed }}</div>
+    </div>
+
+    <div class="ft-actions-row ft-torch-row" *ngIf="torchSupported">
+      <button type="button" class="ft-btn-secondary ft-btn-torch" (click)="toggleTorch()">
+        Flash: {{ torchOn ? 'On' : 'Off' }}
+      </button>
     </div>
     <div class="ft-waveform">
       <div class="ft-wave-bar" *ngFor="let h of waveformBars" [style.height.%]="h || 5"></div>

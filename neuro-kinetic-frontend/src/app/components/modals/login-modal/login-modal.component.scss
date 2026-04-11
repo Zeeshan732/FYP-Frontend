@@ -396,6 +396,36 @@
   }
 }
 
+.nl-otp-countdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 0 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(29, 158, 117, 0.35);
+  background: rgba(29, 158, 117, 0.08);
+}
+
+.nl-otp-countdown-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.nl-otp-countdown-time {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #5ee9b5;
+}
+
+.nl-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 @media (max-width: 640px) {
   .modal-backdrop {
     padding: calc(64px + 0.35rem) 0.75rem 1.5rem;

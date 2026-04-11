@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -67,6 +68,13 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   pdfDownloading = false;
   csvDownloading = false;
 
+  /**
+   * Camera LED / torch: supported on many Android devices (Chrome).
+   * iOS Safari usually does not expose torch via web — use on-screen hint for manual flashlight.
+   */
+  torchSupported = false;
+  torchOn = false;
+
   // Camera / MediaRecorder
   private stream: MediaStream | null = null;
   private mediaRecorder: MediaRecorder | null = null;
@@ -107,8 +115,18 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     private http: HttpClient,
     private apiService: ApiService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  /** Phone / tablet — show stronger lighting guidance */
+  get isMobileLike(): boolean {
+    if (typeof navigator === 'undefined') {
+      return false;
+    }
+    const ua = navigator.userAgent || '';
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     // Embedded popup hides the instructions screen (*ngIf="!embedded"); jump straight to mode-select
@@ -339,6 +357,8 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   async requestCameraAccess(): Promise<void> {
     try {
+      this.torchSupported = false;
+      this.torchOn = false;
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 1280 },
@@ -347,6 +367,7 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
         },
         audio: false
       });
+      await this.initTorchFromStream();
       this.currentState = 'cam-ready';
 
       setTimeout(() => {
@@ -362,6 +383,60 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
         'or use the upload option instead.';
       this.currentState = 'error';
     }
+  }
+
+  /**
+   * Uses Image Capture / track constraints `torch` where available (often Chrome on Android with back camera).
+   */
+  private async initTorchFromStream(): Promise<void> {
+    this.torchSupported = false;
+    this.torchOn = false;
+    const track = this.stream?.getVideoTracks()[0];
+    if (!track?.getCapabilities) {
+      this.cdr.markForCheck();
+      return;
+    }
+    const caps = track.getCapabilities() as MediaTrackCapabilities & { torch?: boolean };
+    if (!caps.torch) {
+      this.cdr.markForCheck();
+      return;
+    }
+    this.torchSupported = true;
+    try {
+      await track.applyConstraints({ advanced: [{ torch: true }] } as unknown as MediaTrackConstraints);
+      this.torchOn = true;
+    } catch {
+      this.torchOn = false;
+    }
+    this.cdr.markForCheck();
+  }
+
+  async toggleTorch(): Promise<void> {
+    const track = this.stream?.getVideoTracks()[0];
+    if (!track || !this.torchSupported) {
+      return;
+    }
+    const next = !this.torchOn;
+    try {
+      await track.applyConstraints({ advanced: [{ torch: next }] } as unknown as MediaTrackConstraints);
+      this.torchOn = next;
+    } catch {
+      /* keep previous state */
+    }
+    this.cdr.markForCheck();
+  }
+
+  private extinguishTorch(): void {
+    const track = this.stream?.getVideoTracks()[0];
+    if (!track || !this.torchSupported || !this.torchOn) {
+      return;
+    }
+    try {
+      track.applyConstraints({ advanced: [{ torch: false }] } as unknown as MediaTrackConstraints);
+    } catch {
+      /* ignore */
+    }
+    this.torchOn = false;
   }
 
   startRecording(): void {
@@ -395,6 +470,14 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
     this.mediaRecorder.start(100);
     this.currentState = 'cam-recording';
+
+    // Template switches to a new <video>; re-attach the same MediaStream so preview stays live.
+    setTimeout(() => {
+      if (this.videoPreviewRef?.nativeElement && this.stream) {
+        this.videoPreviewRef.nativeElement.srcObject = this.stream;
+        void this.videoPreviewRef.nativeElement.play();
+      }
+    }, 0);
 
     this.recordingTimer = setInterval(() => {
       this.recordingElapsed++;
@@ -435,6 +518,8 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   stopCamera(): void {
+    this.extinguishTorch();
+    this.torchSupported = false;
     this.stream?.getTracks().forEach(t => t.stop());
     this.stream = null;
   }
