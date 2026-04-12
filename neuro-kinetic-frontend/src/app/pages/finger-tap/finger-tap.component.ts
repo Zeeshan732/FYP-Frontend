@@ -26,6 +26,7 @@ import { AuthService } from '../../services/auth.service';
 import { UserTestRecord, UserTestRecordRequest } from '../../models/api.models';
 import { Router } from '@angular/router';
 import { FingerTapVideoPrepService } from '../../services/finger-tap-video-prep.service';
+import { jsPDF } from 'jspdf';
 
 type ScreenState =
   | 'instructions'
@@ -92,7 +93,7 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   result: FingerTapResult | null = null;
 
-  /** Set after a successful save to Test Records — required for PDF/CSV download. */
+  /** Set after a successful save to Test Records (server-side reports). Client PDF/CSV use `result` directly. */
   savedTestRecordId: number | null = null;
   reportDownloadError = '';
   pdfDownloading = false;
@@ -1126,56 +1127,175 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   downloadPdfReport(): void {
     this.reportDownloadError = '';
-    if (this.savedTestRecordId == null) {
-      this.reportDownloadError =
-        'Sign in and complete the test to save a report. PDF download is available after your result is saved to Test Records.';
+    if (!this.result) {
       return;
     }
     this.pdfDownloading = true;
-    this.apiService.downloadPdfReportByTestRecordId(this.savedTestRecordId).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `NeuroSync_FingerTap_${this.savedTestRecordId}_${Date.now()}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-        this.pdfDownloading = false;
-      },
-      error: () => {
-        this.pdfDownloading = false;
-        this.reportDownloadError = 'Failed to download PDF report. Please try again.';
-      }
-    });
+    try {
+      const result = this.result;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pageW = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let y = 20;
+
+      doc.setFontSize(20);
+      doc.setTextColor(40, 40, 40);
+      doc.text('NeuroSync — Finger Tapping Test Report', margin, y);
+      y += 10;
+
+      doc.setFontSize(10);
+      doc.setTextColor(120, 120, 120);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, margin, y);
+      y += 15;
+
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y, pageW - margin, y);
+      y += 10;
+
+      const p = result.probability;
+      doc.setFontSize(48);
+      doc.setTextColor(
+        p > 0.6 ? 230 : p > 0.4 ? 200 : 60,
+        p > 0.6 ? 100 : p > 0.4 ? 160 : 180,
+        40
+      );
+      doc.text(`${(p * 100).toFixed(1)}%`, margin, y + 15);
+      y += 25;
+
+      doc.setFontSize(12);
+      doc.setTextColor(80, 80, 80);
+      doc.text("Parkinson's Risk Score", margin, y);
+      y += 15;
+
+      const details: [string, string][] = [
+        ['Test Type', 'Finger Tapping'],
+        ['Modality', result.modality ?? 'finger_tap'],
+        ['Probability', result.probability.toFixed(3)],
+        ['Risk Level', this.riskLabel],
+        ['Classification', result.label ?? '']
+      ];
+
+      doc.setFontSize(11);
+      details.forEach(([label, value]) => {
+        doc.setTextColor(120, 120, 120);
+        doc.text(`${label}:`, margin, y);
+        doc.setTextColor(40, 40, 40);
+        doc.text(String(value), margin + 50, y);
+        y += 8;
+      });
+
+      y += 10;
+
+      doc.setFontSize(9);
+      doc.setTextColor(150, 150, 150);
+      const disclaimer =
+        'This report is for informational purposes only and does not constitute a medical diagnosis. ' +
+        'Please consult a qualified neurologist for clinical evaluation.';
+      const lines = doc.splitTextToSize(disclaimer, pageW - margin * 2);
+      doc.text(lines, margin, y);
+
+      doc.save(`neurosync_fingertap_${Date.now()}.pdf`);
+      this.showToast('Report downloaded ✅');
+    } catch (e) {
+      console.error('PDF export failed', e);
+      this.reportDownloadError = 'Could not generate PDF. Please try again.';
+    } finally {
+      this.pdfDownloading = false;
+      this.cdr.markForCheck();
+    }
   }
 
   downloadCsvReport(): void {
     this.reportDownloadError = '';
-    if (this.savedTestRecordId == null) {
-      this.reportDownloadError =
-        'Sign in and complete the test to save a report. CSV download is available after your result is saved to Test Records.';
+    if (!this.result) {
       return;
     }
     this.csvDownloading = true;
-    this.apiService.downloadCsvReportByTestRecordId(this.savedTestRecordId).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
+    try {
+      const result = this.result;
+      const headers = [
+        'Date',
+        'Test',
+        'Modality',
+        'Risk Score (%)',
+        'Probability',
+        'Risk Level',
+        'Label'
+      ];
+      const row = [
+        new Date().toISOString(),
+        'Finger Tapping',
+        result.modality ?? 'finger_tap',
+        (result.probability * 100).toFixed(1),
+        result.probability.toFixed(3),
+        this.riskLabel,
+        result.label ?? ''
+      ];
+      const csvContent = [headers.join(','), row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')].join(
+        '\n'
+      );
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const filename = `neurosync_result_${Date.now()}.csv`;
+
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as unknown as { MSStream?: unknown }).MSStream;
+
+      if (isIOS) {
+        window.open(url, '_blank');
+      } else {
         const link = document.createElement('a');
         link.href = url;
-        link.download = `NeuroSync_FingerTap_${this.savedTestRecordId}_${Date.now()}.csv`;
+        link.download = filename;
+        link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-        this.csvDownloading = false;
-      },
-      error: () => {
-        this.csvDownloading = false;
-        this.reportDownloadError = 'Failed to download CSV report. Please try again.';
       }
-    });
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      this.showToast('Report downloaded ✅');
+    } catch (e) {
+      console.error('CSV export failed', e);
+      this.reportDownloadError = 'Could not download CSV. Please try again.';
+    } finally {
+      this.csvDownloading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  private showToast(message: string, durationMs = 3000): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.setAttribute('role', 'status');
+    toast.style.cssText = [
+      'position:fixed',
+      'bottom:32px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'background:#1a6b3c',
+      'color:#fff',
+      'padding:10px 20px',
+      'border-radius:24px',
+      'font-size:14px',
+      'font-weight:600',
+      'z-index:99999',
+      'box-shadow:0 4px 12px rgba(0,0,0,0.3)',
+      'pointer-events:none',
+      'max-width:min(90vw,360px)',
+      'text-align:center'
+    ].join(';');
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), durationMs);
   }
 
   private getSupportedVideoMimeType(): string {

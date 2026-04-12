@@ -354,7 +354,7 @@
   </div>
 
   <!-- Result -->
-  <div class="ftr-wrap" *ngIf="currentState === 'result' && result">
+  <div class="ftr-wrap ftr-results-page" *ngIf="currentState === 'result' && result">
     <div class="ftr-header">
       <div class="ftr-header-left">
         <div class="ftr-header-title">
@@ -374,27 +374,11 @@
         </div>
         <p class="ftr-report-hint" *ngIf="reportDownloadError">{{ reportDownloadError }}</p>
         <p class="ftr-report-hint" *ngIf="!isLoggedIn">
-          Sign in to save this result and download PDF/CSV reports.
+          Sign in to save this result to Test Records (PDF/CSV below work without signing in).
         </p>
       </div>
       <div class="ftr-header-actions">
-        <button
-          type="button"
-          class="ftr-btn-ghost"
-          [disabled]="pdfDownloading || savedTestRecordId == null"
-          (click)="downloadPdfReport()"
-          title="{{ savedTestRecordId == null ? 'Sign in — your result is saved to Test Records first' : 'Download PDF report' }}">
-          {{ pdfDownloading ? 'Preparing…' : '📄 PDF' }}
-        </button>
-        <button
-          type="button"
-          class="ftr-btn-ghost"
-          [disabled]="csvDownloading || savedTestRecordId == null"
-          (click)="downloadCsvReport()"
-          title="{{ savedTestRecordId == null ? 'Sign in — your result is saved to Test Records first' : 'Download CSV report' }}">
-          {{ csvDownloading ? 'Preparing…' : '📊 CSV' }}
-        </button>
-        <button class="ftr-btn-ghost" (click)="resetTest()">
+        <button class="ftr-btn-ghost" type="button" (click)="resetTest()">
           <svg width="12" height="12" viewBox="0 0 24 24"
                fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="1 4 1 10 7 10"/>
@@ -402,16 +386,34 @@
           </svg>
           Test again
         </button>
-        <button class="ftr-btn-ghost" routerLink="/dashboard">Dashboard</button>
+        <button class="ftr-btn-ghost" type="button" routerLink="/dashboard">Dashboard</button>
       </div>
     </div>
 
+    <div class="ftr-download-section" *ngIf="result">
+      <button
+        type="button"
+        class="ftr-btn-download ftr-btn-download--csv"
+        [disabled]="csvDownloading"
+        (click)="downloadCsvReport()">
+        {{ csvDownloading ? 'Preparing…' : '⬇ Download CSV' }}
+      </button>
+      <button
+        type="button"
+        class="ftr-btn-download ftr-btn-download--pdf"
+        [disabled]="pdfDownloading"
+        (click)="downloadPdfReport()">
+        {{ pdfDownloading ? 'Preparing…' : '⬇ Download PDF Report' }}
+      </button>
+    </div>
+
     <div class="ftr-card">
-      <div class="ftr-badge"
-           [style.background]="riskBg"
-           [style.border-color]="riskBorder">
-        <div class="ftr-badge-main">
-          <div class="ftr-badge-icon" [style.background]="riskIconBg">
+      <div
+        class="ftr-badge ftr-result-card-primary"
+        [style.background]="riskBg"
+        [style.border-color]="riskBorder">
+        <div class="ftr-badge-main ftr-result-header">
+          <div class="ftr-badge-icon ftr-result-icon" [style.background]="riskIconBg">
             <svg *ngIf="isHealthy" width="18" height="18"
                  viewBox="0 0 24 24" fill="none"
                  [attr.stroke]="riskColor"
@@ -431,30 +433,31 @@
             </svg>
           </div>
           <div class="ftr-badge-text">
-            <div class="ftr-badge-title" [style.color]="riskColor">
+            <h2 class="ftr-badge-title ftr-result-title" [style.color]="riskColor">
               {{ isHealthy
                 ? 'Healthy movement pattern detected'
                 : 'Parkinsonian movement pattern detected' }}
-            </div>
-            <div class="ftr-badge-sub">
-              AI model confidence · finger-tapping modality
-            </div>
+            </h2>
+            <p class="ftr-badge-sub ftr-result-subtitle">
+              AI model confidence<span class="ftr-badge-sub-sep">&nbsp;·&nbsp;</span>finger-tapping modality
+            </p>
           </div>
         </div>
-        <div class="ftr-risk-pill"
-             [style.background]="riskIconBg"
-             [style.border-color]="riskBorder"
-             [style.color]="riskColor">
+        <div
+          class="ftr-risk-pill ftr-risk-badge"
+          [style.background]="riskIconBg"
+          [style.border-color]="riskBorder"
+          [style.color]="riskColor">
           {{ riskLabel }}
         </div>
       </div>
 
       <div class="ftr-main-row">
-        <div class="ftr-big-num-wrap">
-          <div class="ftr-big-num" [style.color]="riskColor">
+        <div class="ftr-big-num-wrap ftr-score-display">
+          <div class="ftr-big-num ftr-risk-score-number" [style.color]="riskColor">
             {{ riskPercentInt }}<span class="ftr-dec">{{ riskPercentDec }}</span><span class="ftr-pct">%</span>
           </div>
-          <div class="ftr-big-num-label">Parkinson's risk score</div>
+          <div class="ftr-big-num-label ftr-score-label">Parkinson's risk score</div>
         </div>
 
         <div class="ftr-right-col">
@@ -465,16 +468,16 @@
                 {{ riskPercentFormatted }}%
               </span>
             </div>
-            <div class="ftr-bar-track">
-              <div class="ftr-bar-fill"
+            <div class="ftr-bar-track ftr-risk-bar-track">
+              <div class="ftr-bar-fill ftr-risk-bar-fill"
                    [style.width.%]="result.riskPercent"
                    [style.background]="barGradient">
               </div>
             </div>
-            <div class="ftr-bar-legend">
-              <span>0% Low</span>
-              <span>50% Moderate</span>
-              <span>100% High</span>
+            <div class="ftr-bar-legend ftr-risk-bar-labels">
+              <span class="ftr-bar-legend-i"><span class="ftr-legend-muted">0%</span> Low</span>
+              <span class="ftr-bar-legend-i"><span class="ftr-legend-muted">50%</span> Mod</span>
+              <span class="ftr-bar-legend-i"><span class="ftr-legend-muted">100%</span> High</span>
             </div>
           </div>
 
