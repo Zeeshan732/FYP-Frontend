@@ -19,8 +19,13 @@ export const FT_COMPRESS_THRESHOLD_BYTES = 20 * 1024 * 1024;
 export const FT_NORMALIZE_THRESHOLD_BYTES = 10 * 1024 * 1024;
 
 export const FT_MAX_OUTPUT_BYTES = 10 * 1024 * 1024;
-export const FT_MAX_DURATION_SEC = 20;
-export const FT_WARN_DURATION_SEC = 30;
+/**
+ * Longest clip we transcode in full (FFmpeg `-t`). 10–30s uploads stay intact; only
+ * unusually long files hit duration-based compression.
+ */
+export const FT_MAX_ENCODE_DURATION_SEC = 120;
+/** Re-encode cap after 413 / oversized output — matches normal cap so clips are not chopped to 12s. */
+export const FT_MAX_ENCODE_AGGRESSIVE_SEC = 120;
 
 const INPUT_NAME = 'ft_in.mp4';
 const OUTPUT_NAME = 'ft_out.mp4';
@@ -43,7 +48,7 @@ export class FingerTapVideoPrepService {
     if (file.size > FT_COMPRESS_THRESHOLD_BYTES) {
       return true;
     }
-    if (durationSec != null && durationSec > FT_MAX_DURATION_SEC) {
+    if (durationSec != null && durationSec > FT_MAX_ENCODE_DURATION_SEC) {
       return true;
     }
     if (file.size > FT_NORMALIZE_THRESHOLD_BYTES) {
@@ -100,16 +105,16 @@ export class FingerTapVideoPrepService {
 
   durationWarnings(durationSec: number): string[] {
     const w: string[] = [];
-    if (durationSec > FT_WARN_DURATION_SEC) {
-      w.push(`Video is longer than ${FT_WARN_DURATION_SEC}s. For best results use a clip under ${FT_MAX_DURATION_SEC}s.`);
-    } else if (durationSec > FT_MAX_DURATION_SEC) {
-      w.push(`Videos longer than ${FT_MAX_DURATION_SEC}s will be trimmed for analysis.`);
+    if (durationSec > FT_MAX_ENCODE_DURATION_SEC) {
+      w.push(
+        `Video is longer than ${FT_MAX_ENCODE_DURATION_SEC}s. For best results use a shorter clip or expect longer processing.`
+      );
     }
     return w;
   }
 
   /**
-   * Transcode to portrait 480×854-ish, H.264, capped bitrate, max 20s (or 12s on retry).
+   * Transcode to portrait 480×854-ish, H.264, capped bitrate — full length up to FT_MAX_ENCODE_*.
    * Loads FFmpeg.wasm from /ffmpeg/* (copied from @ffmpeg/core at build time).
    */
   async compressForUpload(
@@ -124,7 +129,7 @@ export class FingerTapVideoPrepService {
 
     await ffmpeg.writeFile(INPUT_NAME, await fetchFile(file));
 
-    const maxSec = opts?.aggressive ? 12 : FT_MAX_DURATION_SEC;
+    const maxSec = opts?.aggressive ? FT_MAX_ENCODE_AGGRESSIVE_SEC : FT_MAX_ENCODE_DURATION_SEC;
     const crf = opts?.aggressive ? 32 : 28;
 
     onProgress(0.08, 'Optimizing video for analysis…');
