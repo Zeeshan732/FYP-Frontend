@@ -68,6 +68,13 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     { text: 'Computing movement regularity', done: false, active: false },
   ];
 
+  /** Shown on the loader only while the video is uploading (not during ML analysis) */
+  readonly fingerTapUploadCareHints = [
+    'Stay seated and keep the phone steady until the upload bar reaches 100%.',
+    'Avoid switching apps or locking the screen — that can interrupt the upload.',
+    'Use Wi‑Fi if possible; if upload fails, wait a moment and try analyzing again.',
+  ];
+
   // Upload mode
   selectedFile: File | null = null;
   /** Populated after metadata load — used to decide FFmpeg pre-upload compression */
