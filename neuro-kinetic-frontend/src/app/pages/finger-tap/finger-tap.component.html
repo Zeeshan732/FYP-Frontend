@@ -208,9 +208,9 @@
     <div class="ft-cam-viewport ft-cam-viewport--live">
       <video #videoPreview autoplay muted playsinline class="ft-video"></video>
       <div class="ft-guide-box">Position hand here</div>
-      <div class="ft-tap-pulse-wrap" *ngIf="tappingActive">
-        <div class="ft-tap-pulse" aria-hidden="true"></div>
-        <span class="ft-tap-pulse-label">Motion in frame</span>
+      <div class="ft-tap-pulse-wrap">
+        <div class="ft-tap-pulse" [class.ft-tap-pulse--inactive]="!tappingActive" aria-hidden="true"></div>
+        <span class="ft-tap-pulse-label" [class.ft-tap-pulse-label--dim]="!tappingActive">Motion in frame</span>
       </div>
     </div>
 
@@ -256,12 +256,15 @@
         <span class="ft-live-flag" [class.ft-live-flag--warn]="brightnessLow">
           {{ brightnessLow ? 'Lighting low' : 'Lighting OK' }}
         </span>
-        <span class="ft-live-flag" [class.ft-live-flag--ok]="tappingActive">
-          {{ tappingActive ? 'Tapping motion seen' : 'Keep tapping steadily' }}
+        <span
+          class="ft-live-flag"
+          [class.ft-live-flag--ok]="debouncedTapFlagVariant === 'ok'"
+          [class.ft-live-flag--warn]="debouncedTapFlagVariant === 'warn'">
+          {{ debouncedTapFlagText }}
         </span>
       </div>
-      <div class="ft-tap-pulse-wrap ft-tap-pulse-wrap--corner" *ngIf="tappingActive">
-        <div class="ft-tap-pulse" aria-hidden="true"></div>
+      <div class="ft-tap-pulse-wrap ft-tap-pulse-wrap--corner">
+        <div class="ft-tap-pulse" [class.ft-tap-pulse--inactive]="!tappingActive" aria-hidden="true"></div>
       </div>
     </div>
 
@@ -281,9 +284,15 @@
     <div class="ft-waveform">
       <div class="ft-wave-bar" *ngFor="let h of waveformBars" [style.height.%]="h || 5"></div>
     </div>
-    <p class="ft-text ft-rec-stats">
-      {{ tapCount }} motion peaks — {{ formattedRemaining }} until auto-stop (target {{ MIN_RECORDING_SECONDS }}–{{ MAX_RECORDING_SECONDS }}s)
-    </p>
+    <div class="ft-rec-progress" role="group" aria-label="Recording progress">
+      <div class="ft-rec-progress-track">
+        <div class="ft-rec-progress-fill" [style.width.%]="recordingProgressPercent"></div>
+      </div>
+      <p class="ft-rec-progress-caption">
+        Recording… stop anytime, or auto-stops at {{ MAX_RECORDING_SECONDS }}s (target {{ MIN_RECORDING_SECONDS }}–{{ MAX_RECORDING_SECONDS }}s)
+      </p>
+    </div>
+    <p class="ft-text ft-rec-stats">{{ recordingFooterText }}</p>
   </div>
 
   <!-- Review -->
