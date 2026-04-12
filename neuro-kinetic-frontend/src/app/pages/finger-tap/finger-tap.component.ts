@@ -108,6 +108,10 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   recordedDuration = 0;
   recordingElapsed = 0;
   private recordingTimer: any = null;
+  /** From MediaStream track (when exposed); sent with upload to override bogus container FPS */
+  private recordingVideoFrameRate: number | null = null;
+  /** Optional multipart hints for live recordings — forwarded to ML for FPS resolution */
+  private fingerTapUploadHints: { fps?: string; duration?: string; tap_count?: string } | null = null;
   /** Live capture: at least 10s; auto-stop allows up to 40s for ~30s-style clips. */
   readonly MIN_RECORDING_SECONDS = 10;
   readonly MAX_RECORDING_SECONDS = 40;
@@ -362,6 +366,8 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.tapCount = 0;
     this.recordingElapsed = 0;
     this.recordedDuration = 0;
+    this.fingerTapUploadHints = null;
+    this.recordingVideoFrameRate = null;
     this.apiError = '';
     this.currentState = this.embedded ? 'mode-select' : 'instructions';
   }
@@ -438,6 +444,12 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
         'and tap index finger to thumb steadily for the full recording.'
       );
     }
+    if (t.includes('taps_per_second') || t.toLowerCase().includes('fps')) {
+      return (
+        'Video timing could not be read reliably. Please tap Analyze again, or re-record. ' +
+        'If this keeps happening, try uploading a short MP4 from your gallery instead of live capture.'
+      );
+    }
     return t;
   }
 
@@ -510,6 +522,7 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     } finally {
       this.isProcessing = false;
       this.uploadProgressPercent = 0;
+      this.fingerTapUploadHints = null;
     }
   }
 
@@ -567,8 +580,24 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   private async postFingerTapMultipart(file: File): Promise<FingerTapResult> {
     const formData = new FormData();
-    const name = file.name.toLowerCase().endsWith('.mp4') ? file.name : 'finger-tap-upload.mp4';
+    const lower = file.name.toLowerCase();
+    const name =
+      lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.mov')
+        ? file.name
+        : file.type.includes('mp4')
+          ? 'finger-tap-upload.mp4'
+          : 'finger-tap-upload.webm';
     formData.append('video', file, name);
+    const h = this.fingerTapUploadHints;
+    if (h?.duration) {
+      formData.append('duration', h.duration);
+    }
+    if (h?.fps) {
+      formData.append('fps', h.fps);
+    }
+    if (h?.tap_count) {
+      formData.append('tap_count', h.tap_count);
+    }
 
     const req = new HttpRequest('POST', `${this.apiUrl}/FingerTap/predict`, formData, {
       reportProgress: true,
@@ -929,6 +958,15 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   startRecording(): void {
     if (!this.stream) return;
 
+    this.recordingVideoFrameRate = null;
+    const vtrack = this.stream.getVideoTracks()[0];
+    if (vtrack?.getSettings) {
+      const s = vtrack.getSettings() as MediaTrackSettings & { frameRate?: number };
+      if (typeof s.frameRate === 'number' && s.frameRate > 0 && s.frameRate <= 120) {
+        this.recordingVideoFrameRate = s.frameRate;
+      }
+    }
+
     this.recordedChunks = [];
     this.tapCount = 0;
     this.recordingElapsed = 0;
@@ -939,7 +977,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.lastDebouncedTapFlagAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
     const mimeType = this.getSupportedVideoMimeType();
-    const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
+    const options: MediaRecorderOptions = mimeType
+      ? { mimeType, videoBitsPerSecond: 1_000_000 }
+      : {};
     try {
       this.mediaRecorder = new MediaRecorder(this.stream, options);
     } catch {
@@ -1041,6 +1081,13 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.selectedFile = file;
     this.selectedVideoDurationSec = this.recordedDuration;
     this.uploadValidationError = '';
+    this.fingerTapUploadHints = {
+      duration: String(this.recordedDuration),
+      tap_count: String(this.tapCount)
+    };
+    if (this.recordingVideoFrameRate != null) {
+      this.fingerTapUploadHints.fps = String(this.recordingVideoFrameRate);
+    }
     await this.analyzeVideo();
   }
 
@@ -1126,9 +1173,12 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   private getSupportedVideoMimeType(): string {
     const candidates = [
+      'video/mp4',
+      'video/mp4;codecs=avc1',
+      'video/mp4;codecs=avc1.42E01E',
       'video/webm;codecs=vp8',
-      'video/webm',
-      'video/mp4'
+      'video/webm;codecs=vp9',
+      'video/webm'
     ];
 
     for (const type of candidates) {
