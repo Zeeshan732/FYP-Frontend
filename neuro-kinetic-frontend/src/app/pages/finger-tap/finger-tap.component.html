@@ -110,9 +110,6 @@
       </label>
 
       <p class="ft-upload-error" *ngIf="uploadValidationError">{{ uploadValidationError }}</p>
-      <ul class="ft-upload-warn" *ngIf="uploadWarnings.length && !uploadValidationError">
-        <li *ngFor="let w of uploadWarnings">{{ w }}</li>
-      </ul>
 
       <div *ngIf="selectedFile" class="ft-file-info">
         <div class="ft-file-name">{{ selectedFile.name }}</div>

@@ -70,10 +70,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   // Upload mode
   selectedFile: File | null = null;
-  /** Populated after metadata load — used to decide FFmpeg + duration warnings */
+  /** Populated after metadata load — used to decide FFmpeg pre-upload compression */
   selectedVideoDurationSec: number | null = null;
   uploadValidationError = '';
-  uploadWarnings: string[] = [];
   /** 0–100 while uploading multipart */
   uploadProgressPercent = 0;
   /** Client-side transcode (FFmpeg.wasm) before API — avoids IIS ~28MB 413s */
@@ -109,9 +108,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   recordedDuration = 0;
   recordingElapsed = 0;
   private recordingTimer: any = null;
-  /** Live capture: 10–15s window so the clip has enough rhythm data (matches ML expectations). */
+  /** Live capture: at least 10s; auto-stop allows up to 40s for ~30s-style clips. */
   readonly MIN_RECORDING_SECONDS = 10;
-  readonly MAX_RECORDING_SECONDS = 15;
+  readonly MAX_RECORDING_SECONDS = 40;
 
   // Live tap detection & preview metrics (portrait ROI — same idea as ML service)
   tapCount = 0;
@@ -331,7 +330,6 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.preparedUploadFile = null;
     this.selectedVideoDurationSec = null;
     this.uploadValidationError = '';
-    this.uploadWarnings = [];
     this.uploadProgressPercent = 0;
     this.compressionProgress = 0;
     this.compressionPhase = '';
@@ -355,7 +353,6 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     }
     const file = input.files[0];
     this.uploadValidationError = '';
-    this.uploadWarnings = [];
     this.selectedVideoDurationSec = null;
     this.preparedUploadFile = null;
     this.apiError = '';
@@ -368,20 +365,11 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       this.cdr.markForCheck();
       return;
     }
-    this.uploadWarnings.push(...v.warnings);
-
     try {
       const d = await this.fingerTapVideoPrep.getVideoDurationSec(file);
       this.selectedVideoDurationSec = d;
-      this.uploadWarnings.push(...this.fingerTapVideoPrep.durationWarnings(d));
     } catch {
-      this.uploadWarnings.push(
-        'Could not read video length. Very large files will still be optimized before upload.'
-      );
-    }
-
-    if (file.size > 30 * 1024 * 1024) {
-      this.uploadWarnings.unshift('Large video detected — it will be optimized before upload (may take a moment).');
+      this.selectedVideoDurationSec = null;
     }
 
     this.selectedFile = file;
@@ -393,7 +381,6 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.preparedUploadFile = null;
     this.selectedVideoDurationSec = null;
     this.uploadValidationError = '';
-    this.uploadWarnings = [];
     this.apiError = '';
   }
 
@@ -986,7 +973,6 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.selectedFile = file;
     this.selectedVideoDurationSec = this.recordedDuration;
     this.uploadValidationError = '';
-    this.uploadWarnings = [];
     await this.analyzeVideo();
   }
 
