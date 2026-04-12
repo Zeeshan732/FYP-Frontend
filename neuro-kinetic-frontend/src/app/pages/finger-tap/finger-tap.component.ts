@@ -114,7 +114,8 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   // Live tap detection & preview metrics (portrait ROI — same idea as ML service)
   tapCount = 0;
-  private motionHistory: number[] = [];
+  /** Rolling window of per-frame motion norms (after calibration) for smoothed UI feedback */
+  private motionNormHistory: number[] = [];
   rhythmVariance: 'low' | 'moderate' | 'high' = 'low';
   waveformBars: number[] = new Array(32).fill(0);
 
@@ -133,8 +134,17 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   private grayBuf: Uint8Array | null = null;
   private calibrationFrameIndex = 0;
   private readonly CALIBRATION_FRAMES = 45;
+  private readonly MOTION_NORM_HISTORY_LEN = 25;
+  /** Hysteresis: turn "tapping" UI on above this rolling average; off below the lower threshold */
+  private readonly TAPPING_HYST_ON = 1.1;
+  private readonly TAPPING_HYST_OFF = 0.7;
   private baselineMotion = 1e-6;
   private lastTapCrossTime = 0;
+
+  /** Recording overlay: debounced copy for the tapping status flag (max ~1 update / 2s) */
+  debouncedTapFlagText = '';
+  debouncedTapFlagVariant: 'calibrating' | 'ok' | 'warn' = 'calibrating';
+  private lastDebouncedTapFlagAt = 0;
 
   // Quality checks
   qualityChecks: {
@@ -216,13 +226,6 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     return `${m}:${s}`;
   }
 
-  get formattedRemaining(): string {
-    const rem = this.MAX_RECORDING_SECONDS - this.recordingElapsed;
-    const m = Math.floor(rem / 60).toString().padStart(2, '0');
-    const s = (rem % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  }
-
   get formattedDuration(): string {
     const m = Math.floor(this.recordedDuration / 60).toString().padStart(2, '0');
     const s = (this.recordedDuration % 60).toString().padStart(2, '0');
@@ -291,6 +294,25 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   get riskPercentDec(): string {
     const s = this.riskPercentFormatted;
     return '.' + s.split('.')[1];
+  }
+
+  /** 0–100 fill for the recording progress track (auto-stop at MAX_RECORDING_SECONDS) */
+  get recordingProgressPercent(): number {
+    return Math.min(100, (this.recordingElapsed / this.MAX_RECORDING_SECONDS) * 100);
+  }
+
+  /** Replaces the old “motion peaks + countdown” line with calmer, phase-based copy */
+  get recordingFooterText(): string {
+    if (this.currentState !== 'cam-recording') {
+      return '';
+    }
+    if (this.tapCount < 5) {
+      return 'Calibrating... tap index finger to thumb';
+    }
+    if (this.recordingElapsed >= this.MAX_RECORDING_SECONDS - 5) {
+      return `Almost done — ${this.tapCount} taps recorded`;
+    }
+    return `${this.tapCount} taps recorded so far`;
   }
 
   // ── Navigation / mode select ────────────────
@@ -694,11 +716,15 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.brightnessLow = false;
     this.lastMotionNorm = 0;
     this.tappingActive = false;
+    this.motionNormHistory = [];
     this.calibrationFrameIndex = 0;
     this.baselineMotion = 1e-6;
     this.lastTapCrossTime = 0;
     this.prevGrayBuf = null;
     this.grayBuf = null;
+    this.debouncedTapFlagText = '';
+    this.debouncedTapFlagVariant = 'calibrating';
+    this.lastDebouncedTapFlagAt = 0;
   }
 
   private startPreviewLoop(): void {
@@ -793,7 +819,21 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     this.lastMotionNorm = motion / (this.baselineMotion + 0.01);
-    this.tappingActive = this.lastMotionNorm > 1.35 && !this.brightnessLow;
+
+    this.motionNormHistory.push(this.lastMotionNorm);
+    if (this.motionNormHistory.length > this.MOTION_NORM_HISTORY_LEN) {
+      this.motionNormHistory.shift();
+    }
+    const avgMotionNorm =
+      this.motionNormHistory.length > 0
+        ? this.motionNormHistory.reduce((a, b) => a + b, 0) / this.motionNormHistory.length
+        : this.lastMotionNorm;
+
+    if (!this.tappingActive && avgMotionNorm > this.TAPPING_HYST_ON && !this.brightnessLow) {
+      this.tappingActive = true;
+    } else if (this.tappingActive && (avgMotionNorm < this.TAPPING_HYST_OFF || this.brightnessLow)) {
+      this.tappingActive = false;
+    }
 
     if (this.currentState === 'cam-recording') {
       const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
@@ -805,9 +845,31 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
         this.tapCount++;
         this.lastTapCrossTime = now;
       }
+      this.refreshDebouncedRecordingTapFlag(now);
     }
 
     this.cdr.markForCheck();
+  }
+
+  private refreshDebouncedRecordingTapFlag(nowMs: number): void {
+    let desiredText: string;
+    let desiredVariant: 'calibrating' | 'ok' | 'warn';
+    if (this.recordingElapsed < 2) {
+      desiredText = 'Calibrating baseline...';
+      desiredVariant = 'calibrating';
+    } else if (this.tappingActive) {
+      desiredText = 'Tapping detected ✓';
+      desiredVariant = 'ok';
+    } else {
+      desiredText = 'Tap steadily to begin';
+      desiredVariant = 'warn';
+    }
+
+    if (nowMs - this.lastDebouncedTapFlagAt >= 2000) {
+      this.debouncedTapFlagText = desiredText;
+      this.debouncedTapFlagVariant = desiredVariant;
+      this.lastDebouncedTapFlagAt = nowMs;
+    }
   }
 
   /**
@@ -872,6 +934,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.recordingElapsed = 0;
     this.waveformBars = new Array(32).fill(0);
     this.resetLiveMetrics();
+    this.debouncedTapFlagText = 'Calibrating baseline...';
+    this.debouncedTapFlagVariant = 'calibrating';
+    this.lastDebouncedTapFlagAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
     const mimeType = this.getSupportedVideoMimeType();
     const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
@@ -909,7 +974,10 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       this.recordingElapsed++;
       this.animateWaveform();
 
-      if (this.recordingElapsed >= this.MAX_RECORDING_SECONDS) {
+      if (
+        this.recordingElapsed >= this.MAX_RECORDING_SECONDS &&
+        this.recordingElapsed >= this.MIN_RECORDING_SECONDS
+      ) {
         this.stopRecording();
       }
     }, 1000);

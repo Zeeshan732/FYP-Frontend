@@ -720,7 +720,13 @@
   height: 48px;
   border-radius: 50%;
   border: 3px solid rgba(34, 197, 94, 0.85);
-  animation: ft-tap-pulse-anim 1s ease-out infinite;
+  transition: opacity 0.5s ease;
+  animation: ft-tap-pulse-anim 1.5s ease-in-out infinite;
+}
+
+.ft-tap-pulse--inactive {
+  opacity: 0;
+  animation: none;
 }
 
 .ft-tap-pulse-label {
@@ -729,6 +735,11 @@
   font-weight: 600;
   color: rgba(187, 247, 208, 0.95);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  transition: opacity 0.45s ease;
+}
+
+.ft-tap-pulse-label--dim {
+  opacity: 0.45;
 }
 
 @keyframes ft-tap-pulse-anim {
@@ -776,6 +787,31 @@
   border-radius: 2px;
   min-height: 2px;
   transition: height 0.1s linear;
+}
+
+.ft-rec-progress {
+  margin-top: 0.65rem;
+}
+
+.ft-rec-progress-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(30, 41, 59, 0.95);
+  overflow: hidden;
+}
+
+.ft-rec-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.55), rgba(34, 197, 94, 0.95));
+  transition: width 0.35s ease-out;
+}
+
+.ft-rec-progress-caption {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(148, 163, 184, 0.95);
 }
 
 .ftr-wrap {
