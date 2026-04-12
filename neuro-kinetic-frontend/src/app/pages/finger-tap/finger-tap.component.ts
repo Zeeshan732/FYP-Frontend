@@ -459,19 +459,13 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
             this.compressionPhase = label;
             this.cdr.markForCheck();
           });
+          this.compressionResultMb = this.fingerTapVideoPrep.fmtMb(file.size);
         } catch (encErr) {
-          console.error('Finger-tap FFmpeg compression failed', encErr);
-          this.apiError =
-            'Could not optimize video in this browser. Please record a shorter clip (under 15 seconds) or send a smaller file.';
-          this.currentState = 'error';
-          return;
+          console.error('Finger-tap FFmpeg compression failed — uploading original file', encErr);
+          // `file` stays as selectedFile; browser-side encoding often fails on mobile despite valid clips.
         }
-
-        this.compressionResultMb = this.fingerTapVideoPrep.fmtMb(file.size);
-        this.preparedUploadFile = file;
-      } else {
-        this.preparedUploadFile = file;
       }
+      this.preparedUploadFile = file;
 
       this.currentState = 'processing';
       this.processingSteps = [

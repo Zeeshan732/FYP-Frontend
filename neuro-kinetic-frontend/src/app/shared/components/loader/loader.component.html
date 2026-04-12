@@ -3,7 +3,7 @@
   [class.ldr-page--compact]="compact"
   *ngIf="variant === 'page' || variant === 'card'"
 >
-  <!-- <div class="ldr-page-inner"> -->
+  <div class="ldr-page-inner">
     <div class="ldr-ring-wrap">
       <svg width="72" height="72" viewBox="0 0 72 72" class="ldr-ring-svg">
         <circle cx="36" cy="36" r="30" fill="none" [attr.stroke]="signalColorAlpha" stroke-width="4" />
@@ -133,7 +133,7 @@
     </div>
 
     <button class="ldr-cancel-btn" *ngIf="showCancel" (click)="cancelClick.emit()">Cancel</button>
-  
+  </div>
 </div>
 
 <div class="ldr-inline" *ngIf="variant === 'inline'">
