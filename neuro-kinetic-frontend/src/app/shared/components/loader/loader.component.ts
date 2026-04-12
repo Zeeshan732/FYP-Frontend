@@ -17,6 +17,8 @@ export class LoaderComponent {
   @Input() showCancel = false;
   /** When set (e.g. 0–100), shows an upload progress strip inside the card — keeps layout on one surface */
   @Input() uploadPercent: number | null = null;
+  /** Short care tips while upload is in progress (only shown with uploadPercent) */
+  @Input() uploadCareHints: string[] | null = null;
   /** Tighter padding / full-bleed friendly (e.g. patient-test modal on phones) */
   @Input() compact = false;
   @Output() cancelClick = new EventEmitter<void>();

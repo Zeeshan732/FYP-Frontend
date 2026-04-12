@@ -103,6 +103,14 @@
       </div>
     </div>
 
+    <ul
+      class="ldr-upload-hints"
+      *ngIf="uploadPercent !== null && uploadCareHints?.length"
+      aria-label="While uploading"
+    >
+      <li *ngFor="let hint of uploadCareHints">{{ hint }}</li>
+    </ul>
+
     <div class="ldr-steps" *ngIf="steps.length > 0">
       <div
         class="ldr-step"
