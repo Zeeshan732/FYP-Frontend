@@ -5,17 +5,19 @@
      [class.scrolled]="isScrolled">
   <div class="navbar-inner">
     <a routerLink="/landing" class="navbar-brand">
-      <img src="assets/logos/brand/logo.png" alt="NeuroSync" class="brand-logo-img">
+      <div class="logo-wrapper">
+        <img src="assets/logos/brand/logo.png" alt="NeuroSync" class="brand-logo-img">
+      </div>
     </a>
     <div class="navbar-links">
-      <a routerLink="/landing" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-      <a routerLink="/about" routerLinkActive="active">About</a>
-      <a routerLink="/blog" routerLinkActive="active">Blog</a>
-      <a routerLink="/contact" routerLinkActive="active">Contact</a>
+      <a routerLink="/landing" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Home</a>
+      <a routerLink="/about" routerLinkActive="active" class="nav-link">About</a>
+      <a routerLink="/blog" routerLinkActive="active" class="nav-link">Blog</a>
+      <a routerLink="/contact" routerLinkActive="active" class="nav-link">Contact</a>
     </div>
     <div class="navbar-actions">
       <button type="button" (click)="openLoginModal()" class="btn-ghost">Login</button>
-      <button type="button" (click)="openSignupModal()" class="btn-primary">Sign Up</button>
+      <button type="button" (click)="openSignupModal()" class="btn-primary btn-gradient">Sign Up</button>
     </div>
     <button
       type="button"
@@ -33,10 +35,10 @@
   </div>
   <!-- Mobile menu dropdown -->
   <div *ngIf="mobileMenuOpen" class="navbar-mobile-menu">
-    <a routerLink="/landing" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMobileMenu()">Home</a>
-    <a routerLink="/about" routerLinkActive="active" (click)="closeMobileMenu()">About</a>
-    <a routerLink="/blog" routerLinkActive="active" (click)="closeMobileMenu()">Blog</a>
-    <a routerLink="/contact" routerLinkActive="active" (click)="closeMobileMenu()">Contact</a>
+    <a routerLink="/landing" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMobileMenu()" class="nav-link">Home</a>
+    <a routerLink="/about" routerLinkActive="active" (click)="closeMobileMenu()" class="nav-link">About</a>
+    <a routerLink="/blog" routerLinkActive="active" (click)="closeMobileMenu()" class="nav-link">Blog</a>
+    <a routerLink="/contact" routerLinkActive="active" (click)="closeMobileMenu()" class="nav-link">Contact</a>
     <button type="button" (click)="openLoginModal()" class="btn-ghost">Login</button>
     <button type="button" (click)="openSignupModal()" class="btn-primary">Sign Up</button>
   </div>
@@ -231,6 +233,13 @@
            [title]="sidebarCollapsed ? 'Contact Messages' : ''">
           <i class="pi pi-inbox neuro-sidebar__icon" aria-hidden="true"></i>
           <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Contact Messages</span>
+        </a>
+        <a *ngIf="isAdmin" routerLink="/admin-blogs"
+           routerLinkActive="neuro-sidebar__link--active"
+           class="neuro-sidebar__link"
+           [title]="sidebarCollapsed ? 'Blog Management' : ''">
+          <i class="pi pi-file-edit neuro-sidebar__icon" aria-hidden="true"></i>
+          <span [class.hidden]="sidebarCollapsed" class="neuro-sidebar__label">Blog Management</span>
         </a>
       </ng-container>
 

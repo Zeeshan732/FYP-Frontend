@@ -36,7 +36,7 @@
               class="form-input readonly-input"
               readonly />
           </div>
-          <p *ngIf="record?.userName && patientEmailLine" class="text-xs text-app-text-muted mt-1.5">
+          <p *ngIf="record.userName && patientEmailLine" class="text-xs text-app-text-muted mt-1.5">
             {{ patientEmailLine }}
           </p>
         </div>
@@ -197,56 +197,6 @@
             </textarea>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Voice Feature Extraction Section -->
-    <div class="form-section form-section--tight" *ngIf="!isEditMode && record?.status === 'Completed'">
-      <div class="section-header">
-        <svg class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-        </svg>
-        <h3 class="section-title">Voice Feature Extraction</h3>
-      </div>
-
-      <!-- Loading State -->
-      <div *ngIf="loadingFeatures" class="text-center py-4">
-        <app-loader
-          variant="inline"
-          signal="voice"
-          title="Loading voice features...">
-        </app-loader>
-      </div>
-
-      <!-- Voice Features Chart and Table -->
-      <div *ngIf="!loadingFeatures && voiceFeatures" class="voice-features-content">
-        <!-- Chart View -->
-        <div class="voice-features-chart">
-          <canvas #voiceFeaturesChart class="w-full h-full"></canvas>
-        </div>
-
-        <!-- Table View: own scroll so the modal body stays shorter -->
-        <div class="voice-features-table-wrap ns-data-shell__scroll overflow-x-auto">
-          <table class="w-full text-sm neuro-table">
-            <thead>
-              <tr class="border-b border-app-border">
-                <th class="px-3 py-2 text-left text-app-primary font-semibold text-xs">Feature</th>
-                <th class="px-3 py-2 text-right text-app-primary font-semibold text-xs">Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let key of objectKeys(voiceFeatures)" class="border-b border-app-border hover:bg-app-surface-muted">
-                <td class="px-3 py-2 text-app-text-primary text-xs">{{ formatFeatureName(key) }}</td>
-                <td class="px-3 py-2 text-right text-app-primary font-mono text-xs">{{ voiceFeatures[key] | number: '1.2-2' }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- No Features Available -->
-      <div *ngIf="!loadingFeatures && !voiceFeatures" class="text-center py-4">
-        <p class="text-sm text-app-text-muted">Voice feature data not available for this test record.</p>
       </div>
     </div>
 

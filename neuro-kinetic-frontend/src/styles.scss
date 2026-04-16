@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "styles/tokens.css";
 @import "primeng/resources/themes/lara-light-blue/theme.css";
 @import "primeng/resources/primeng.css";
@@ -15,6 +16,20 @@
 
 /* Legacy app vars mapped to design tokens (for existing classes) */
 :root {
+  --color-bg: #090e1a;
+  --color-bg-footer: #060b18;
+  --color-surface: rgba(13, 22, 48, 0.75);
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-cyan: rgba(0, 212, 255, 0.12);
+  --color-accent: #00d4ff;
+  --color-teal: #0affe0;
+  --color-text-primary: #f0f6ff;
+  --color-text-muted: #8b9ec4;
+  --color-text-subtle: #6b7fa3;
+  --radius-card: 12px;
+  --radius-input: 8px;
+  --radius-pill: 999px;
+  --transition-base: all 0.3s ease-out;
   --app-bg: var(--color-page-bg);
   --app-primary: var(--color-blue);
   --app-primary-hover: var(--color-blue-hover);
@@ -30,6 +45,33 @@
   --app-radius-lg: var(--radius-card);
   --app-card-radius: var(--radius-card);
   --app-shadow: var(--shadow-card);
+}
+
+.ns-input,
+.ns-textarea,
+.ns-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-input);
+  color: var(--color-text-primary);
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  outline: none;
+  transition: var(--transition-base);
+}
+
+.ns-input::placeholder,
+.ns-textarea::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.ns-input:focus,
+.ns-textarea:focus,
+.ns-select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
 }
 
 /* Universal box-sizing */
@@ -502,10 +544,17 @@ button,
   color: #ffffff !important;
   border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
+.p-dialog {
+  background: #112240 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
 .p-dialog .p-dialog-content {
-  background: var(--color-surface) !important;
+  background: #112240 !important;
   color: var(--color-ink);
   border-radius: 0 0 var(--radius-card) var(--radius-card);
+}
+.p-dialog .p-dialog-footer {
+  background: #112240 !important;
 }
 
 /* Dialogs / overlays — fit small screens + safe areas (PrimeNG) */
@@ -1587,6 +1636,17 @@ table {
 /* Landing: full-bleed width — global shell max-width + inline padding were adding
    ~80px+ side “margin” in DevTools. Inner sections use .hero__shell / own containers. */
 .app-shell > app-landing {
+  max-width: none !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* About/Contact also manage their own centered containers; keep shell neutral */
+.app-shell > app-about,
+.app-shell > app-contact {
   max-width: none !important;
   width: 100% !important;
   margin-left: 0 !important;

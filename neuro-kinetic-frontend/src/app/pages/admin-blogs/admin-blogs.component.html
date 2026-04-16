@@ -1,0 +1,95 @@
+<section class="admin-blogs-page">
+  <div class="admin-blogs-wrap">
+    <div class="admin-blogs-header">
+      <h1>Blog Management</h1>
+      <p>Add, update, and delete blog posts. Changes appear on the public blog page.</p>
+    </div>
+
+    <div class="admin-blogs-grid">
+      <div class="admin-blogs-card">
+        <h2>{{ isEditing ? 'Edit Blog Post' : 'Add Blog Post' }}</h2>
+
+        <div class="form-grid">
+          <label>
+            Category
+            <select [(ngModel)]="form.category">
+              <option *ngFor="let c of categories" [ngValue]="c.value">{{ c.label }}</option>
+            </select>
+          </label>
+
+          <label>
+            Icon type
+            <select [(ngModel)]="form.iconType">
+              <option value="voice">Voice</option>
+              <option value="gait">Gait</option>
+              <option value="tap">Tap</option>
+              <option value="research">Research</option>
+              <option value="case-study">Case Study</option>
+            </select>
+          </label>
+
+          <label>
+            Title
+            <input type="text" [(ngModel)]="form.title" />
+          </label>
+
+          <label>
+            Tag
+            <input type="text" [(ngModel)]="form.tag" />
+          </label>
+
+          <label>
+            Tag color
+            <input type="text" [(ngModel)]="form.tagColor" placeholder="#2E86DE" />
+          </label>
+
+          <label>
+            Card background
+            <input type="text" [(ngModel)]="form.thumbBg" placeholder="#0F2340" />
+          </label>
+
+          <label>
+            Thumbnail label
+            <input type="text" [(ngModel)]="form.thumbLabel" />
+          </label>
+
+          <label>
+            Date
+            <input type="text" [(ngModel)]="form.date" placeholder="Mar 10" />
+          </label>
+        </div>
+
+        <label>
+          Meta override (optional)
+          <input type="text" [(ngModel)]="form.metaOverride" placeholder="Anonymised · Mar 2026" />
+        </label>
+
+        <label>
+          Description
+          <textarea rows="5" [(ngModel)]="form.desc"></textarea>
+        </label>
+
+        <div class="actions">
+          <button type="button" class="btn-primary" (click)="save()">{{ isEditing ? 'Update Post' : 'Add Post' }}</button>
+          <button *ngIf="isEditing" type="button" class="btn-ghost" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="admin-blogs-card">
+        <h2>All Posts ({{ posts.length }})</h2>
+        <div class="post-list">
+          <div class="post-item" *ngFor="let post of posts">
+            <div class="post-main">
+              <div class="post-title">{{ post.title }}</div>
+              <div class="post-meta">{{ post.category }} · {{ post.tag }}</div>
+            </div>
+            <div class="post-actions">
+              <button type="button" class="btn-mini" (click)="edit(post)"><i class="pi pi-pencil text-app-primary"></i></button>
+              <button type="button" class="btn-mini btn-danger" (click)="delete(post)"><i class="pi pi-trash text-app-danger"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

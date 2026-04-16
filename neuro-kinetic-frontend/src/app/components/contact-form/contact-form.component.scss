@@ -1,3 +1,5 @@
+@use "../../../styles/mixins" as m;
+
 :host {
   display: block;
 }
@@ -62,6 +64,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.btn-gradient {
+  @include m.gradient-button;
+}
+
+.form-section-label {
+  @include m.section-label;
+  display: block;
+  margin-bottom: 16px;
 }
 
 .btn-send:hover:not(:disabled) {

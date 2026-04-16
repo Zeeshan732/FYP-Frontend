@@ -1,14 +1,14 @@
 <form class="contact-form" (ngSubmit)="submit()">
   <div *ngIf="mode === 'landing' " class="space-y-8">
     <div class="space-y-6">
-      <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Personal Information</h4>
+      <h4 class="form-label form-section-label" style="font-weight: 600; margin-bottom: 12px;">Personal Information</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="form-group">
           <label class="form-label">First Name</label>
           <input
             type="text"
             required
-            class="form-input"
+            class="form-input ns-input"
             name="firstName"
             placeholder="Enter your first name"
             [(ngModel)]="firstName"
@@ -19,7 +19,7 @@
           <input
             type="text"
             required
-            class="form-input"
+            class="form-input ns-input"
             name="lastName"
             placeholder="Enter your last name"
             [(ngModel)]="lastName"
@@ -29,14 +29,14 @@
     </div>
 
     <div class="space-y-6">
-      <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Contact Information</h4>
+      <h4 class="form-label form-section-label" style="font-weight: 600; margin-bottom: 12px;">Contact Information</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="form-group">
           <label class="form-label">Email Address</label>
           <input
             type="email"
             required
-            class="form-input"
+            class="form-input ns-input"
             name="email"
             placeholder="your.email@example.com"
             [(ngModel)]="email"
@@ -46,7 +46,7 @@
           <label class="form-label">Organization</label>
           <input
             type="text"
-            class="form-input"
+            class="form-input ns-input"
             name="organization"
             placeholder="Your organization name"
             [(ngModel)]="organization"
@@ -56,18 +56,18 @@
     </div>
 
     <div class="space-y-6">
-      <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Professional Information</h4>
+      <h4 class="form-label form-section-label" style="font-weight: 600; margin-bottom: 12px;">Professional Information</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="form-group">
           <label class="form-label">Your Role</label>
-          <select class="form-input" name="role" [(ngModel)]="role" [disabled]="submitting" required>
+          <select class="form-input ns-select" name="role" [(ngModel)]="role" [disabled]="submitting" required>
             <option *ngFor="let r of roleOptions" [ngValue]="r.value">{{ r.label }}</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Area of Interest</label>
           <select
-            class="form-input"
+            class="form-input ns-select"
             name="interest"
             [(ngModel)]="interest"
             [disabled]="submitting"
@@ -79,12 +79,12 @@
     </div>
 
     <div class="space-y-6">
-      <h4 class="form-label" style="font-weight: 600; margin-bottom: 12px;">Your Message</h4>
+      <h4 class="form-label form-section-label" style="font-weight: 600; margin-bottom: 12px;">Your Message</h4>
       <div class="form-group">
         <label class="form-label" style="display:none;">Message</label>
         <textarea
           rows="5"
-          class="form-input resize-none"
+          class="form-input ns-textarea resize-none"
           name="message"
           placeholder="Please describe your specific needs and how we can help you..."
           [(ngModel)]="message"
@@ -93,7 +93,7 @@
     </div>
 
     <div class="pt-4">
-      <button type="submit" class="btn-send" [disabled]="!canSubmit">
+      <button type="submit" class="btn-gradient btn-send" [disabled]="!canSubmit">
         <span class="flex items-center justify-center">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
@@ -114,7 +114,7 @@
           required
           name="firstName"
           [(ngModel)]="firstName"
-          [disabled]="submitting" />
+          [disabled]="submitting" class="ns-input" />
       </div>
       <div class="form-group">
         <label class="form-label">Last Name</label>
@@ -123,7 +123,7 @@
           required
           name="lastName"
           [(ngModel)]="lastName"
-          [disabled]="submitting" />
+          [disabled]="submitting" class="ns-input" />
       </div>
     </div>
 
@@ -134,27 +134,27 @@
         required
         name="email"
         [(ngModel)]="email"
-        [disabled]="submitting" />
+        [disabled]="submitting" class="ns-input" />
     </div>
 
     <div class="form-group">
       <label class="form-label">Organization</label>
-      <input type="text" name="organization" [(ngModel)]="organization" [disabled]="submitting" />
+      <input type="text" name="organization" [(ngModel)]="organization" [disabled]="submitting" class="ns-input" />
     </div>
 
     <div class="form-group">
       <label class="form-label">Subject</label>
-      <select name="subject" [(ngModel)]="subject" required [disabled]="submitting">
+      <select name="subject" [(ngModel)]="subject" required [disabled]="submitting" class="ns-select">
         <option *ngFor="let s of subjectOptions" [ngValue]="s">{{ s }}</option>
       </select>
     </div>
 
     <div class="form-group">
       <label class="form-label">Message</label>
-      <textarea rows="5" name="message" [(ngModel)]="message" required [disabled]="submitting"></textarea>
+      <textarea rows="5" name="message" [(ngModel)]="message" required [disabled]="submitting" class="ns-textarea"></textarea>
     </div>
 
-    <button type="submit" class="btn-send" [disabled]="!canSubmit">
+    <button type="submit" class="btn-gradient btn-send" [disabled]="!canSubmit">
       {{ submitting ? 'Sending...' : 'Send Message' }}
     </button>
   </div>

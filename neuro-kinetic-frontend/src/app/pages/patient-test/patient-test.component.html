@@ -417,7 +417,7 @@
 
             <div class="record-actions flex gap-4 justify-center">
               <button 
-                (click)="startRecording()"
+                (click)="restartRecording()"
                 class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"
               >
                 Record Again
@@ -455,145 +455,118 @@
       </div>
 
       <!-- Main Results Card -->
-      <div class="patient-test-card app-card bg-app-surface rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
-        <div class="patient-test-card-accent h-1 w-full bg-gradient-to-r from-app-primary to-app-primary-hover"></div>
-        <div class="p-8">
-        <h2 class="text-2xl font-bold text-app-primary mb-6 text-center">Test Results</h2>
-        
-        <div class="space-y-6">
-          <!-- Prediction Badge (Updated) -->
-          <div class="text-center">
-            <div [class]="'inline-block px-6 py-3 rounded-2xl border text-lg font-semibold ' + getPredictionBadgeColorValue()">
-              {{ getDisplayPrediction() }}
-            </div>
+      <div class="ptv-wrap">
+        <div class="ptv-header">
+          <div class="ptv-header-left">
+            <div class="ptv-header-title">Voice Test Result</div>
+            <div class="ptv-header-sub">This is a screening tool, not a clinical diagnosis</div>
           </div>
-
-          <!-- Risk Percentage (NEW - Primary Display) -->
-          <div *ngIf="analysisResult?.riskPercent !== undefined || analysisResult?.confidenceScore !== undefined" class="app-card bg-app-surface rounded-2xl border border-app-border p-6 text-center">
-            <p class="text-app-text-primary mb-2">Risk Assessment</p>
-            <p [class]="'text-4xl font-bold ' + getRiskPercentClassValue()">
-              {{ getRiskPercentDisplay() | number:'1.0-1' }}%
-            </p>
-            <p *ngIf="analysisResult && analysisResult.riskLevel" class="text-sm text-app-text-muted mt-2">
-              {{ analysisResult.riskLevel }} Risk Level
-            </p>
-          </div>
-
-          <!-- Accuracy (Fallback if no riskPercent) -->
-          <div *ngIf="!analysisResult?.riskPercent && !analysisResult?.confidenceScore" class="app-card bg-app-surface rounded-2xl border border-app-border p-6 text-center">
-            <p class="text-app-text-primary mb-2">Confidence Score</p>
-            <p class="text-4xl font-bold text-app-primary">{{ testResult.accuracy }}%</p>
-          </div>
-
-          <!-- Risk Level Badge -->
-          <div *ngIf="analysisResult && analysisResult.riskLevel" class="text-center">
-            <p class="text-sm text-app-text-muted mb-2">Risk Level</p>
-            <div [class]="'inline-block px-6 py-3 rounded-2xl border text-lg font-semibold ' + getRiskLevelColor(analysisResult.riskLevel)">
-              {{ analysisResult.riskLevel }}
-            </div>
-          </div>
-
-          <!-- Confidence Score (Secondary Display) -->
-          <div *ngIf="analysisResult && analysisResult.confidenceScore !== undefined && analysisResult.riskPercent !== undefined" class="app-card bg-app-surface rounded-2xl border border-app-border p-4 text-center">
-            <p class="text-sm text-app-text-muted mb-1">Model Confidence</p>
-            <p class="text-2xl font-semibold text-app-primary">{{ getConfidenceScoreDisplay() | number:'1.0-1' }}%</p>
-          </div>
-
-          <!-- Test Details -->
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div class="app-card bg-app-surface rounded-2xl border border-app-border p-4">
-              <p class="text-sm text-app-text-muted mb-1">Test Date</p>
-              <p class="text-app-text-primary font-semibold">{{ testResult.testDate | date:'short' }}</p>
-            </div>
-            <div class="app-card bg-app-surface rounded-2xl border border-app-border p-4">
-              <p class="text-sm text-app-text-muted mb-1">Status</p>
-              <p class="text-app-text-primary font-semibold">{{ testResult.status }}</p>
-            </div>
-            <div *ngIf="analysisResult && analysisResult.modelVersion" class="app-card bg-app-surface rounded-2xl border border-app-border p-4">
-              <p class="text-sm text-app-text-muted mb-1">Model Version</p>
-              <p class="text-app-text-primary font-semibold">{{ analysisResult.modelVersion }}</p>
-            </div>
-          </div>
-
-          <!-- Simulation/Model Badge -->
-          <div *ngIf="analysisResult" class="text-center">
-            <div *ngIf="analysisResult.isSimulation" class="inline-block px-4 py-2 bg-yellow-500/20 border border-yellow-500 text-yellow-300 rounded-2xl text-sm">
-              ⚠️ Simulation Mode
-            </div>
-            <div *ngIf="!analysisResult.isSimulation && analysisResult.modelVersion" class="inline-block px-4 py-2 bg-app-primary/20 border border-app-primary text-app-primary rounded-2xl text-sm">
-              ✅ ML Model v{{ analysisResult.modelVersion }}
-            </div>
-          </div>
-
-          <!-- Voice Feature Extraction (Chart + Table) -->
-          <div *ngIf="voiceFeatures" class="app-card bg-app-surface rounded-2xl border border-app-border p-4 mt-4">
-            <p class="text-sm font-semibold text-app-primary mb-3">Voice Feature Extraction</p>
-            
-            <!-- Chart View -->
-            <!-- <div class="h-64 mb-6">
-              <canvas #voiceFeaturesChart class="w-full h-full"></canvas>
-            </div> -->
-
-            <!-- Table View -->
-            <div class="ns-data-shell__scroll overflow-x-auto">
-              <table class="w-full text-sm neuro-table">
-                <thead>
-                  <tr class="border-b border-white/10">
-                    <th class="px-4 py-2 text-left text-app-primary font-semibold">Feature</th>
-                    <th class="px-4 py-2 text-right text-app-primary font-semibold">Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let key of objectKeys(voiceFeatures)" class="border-b border-white/5 hover:bg-app-surface">
-                    <td class="px-4 py-2 text-app-text-primary">{{ formatFeatureName(key) }}</td>
-                    <td class="px-4 py-2 text-right text-app-primary font-mono">{{ voiceFeatures[key] | number: '1.2-2' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Notes -->
-          <div *ngIf="testResult.analysisNotes" class="app-card bg-app-surface rounded-2xl border border-app-border p-4">
-            <p class="text-sm text-app-text-muted mb-2">Analysis Notes</p>
-            <p class="text-app-text-primary">{{ testResult.analysisNotes }}</p>
-          </div>
-
-          <!-- Download Reports -->
-          <div *ngIf="currentSessionId" class="app-card bg-app-surface rounded-2xl border border-app-border p-4">
-            <p class="text-sm text-app-text-muted mb-3">Download Reports</p>
-            <div class="report-actions flex gap-3">
-              <button 
-                (click)="downloadPdfReport()"
-                class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl transition-colors font-semibold text-sm"
-              >
-                📄 Download PDF
-              </button>
-              <button 
-                (click)="downloadCsvReport()"
-                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-colors font-semibold text-sm"
-              >
-                📊 Download CSV
-              </button>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="result-actions flex gap-4 justify-center pt-4">
-            <button 
-              (click)="startNewTest()"
-              class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors font-semibold"
-            >
-              Take Another Test
-            </button>
-            <button 
-              (click)="viewMyTests()"
-              class="bg-app-primary hover:bg-app-primary-hover text-white px-6 py-3 rounded-xl transition-colors font-semibold"
-            >
-              View My Tests
-            </button>
+          <div class="ptv-header-actions">
+            <button class="ptv-btn-ghost" type="button" (click)="startNewTest()">Test again</button>
+            <button class="ptv-btn-ghost" type="button" (click)="viewMyTests()">My tests</button>
           </div>
         </div>
+
+        <div class="ptv-report-actions" *ngIf="currentSessionId">
+          <button (click)="downloadCsvReport()" class="ptv-btn-download ptv-btn-download--csv">⬇ Download CSV</button>
+          <button (click)="downloadPdfReport()" class="ptv-btn-download ptv-btn-download--pdf">⬇ Download PDF Report</button>
+        </div>
+
+        <div class="ptv-card">
+          <div class="ptv-badge">
+            <div class="ptv-badge-main">
+              <div class="ptv-badge-icon">🎙</div>
+              <div class="ptv-badge-text">
+                <h2 class="ptv-badge-title">{{ getDisplayPrediction() }}</h2>
+                <p class="ptv-badge-sub">AI model confidence · voice modality</p>
+              </div>
+            </div>
+            <div class="ptv-risk-pill">{{ analysisResult?.riskLevel || 'Unknown' }} Risk</div>
+          </div>
+
+          <div class="ptv-main-row">
+            <div class="ptv-big-num-wrap">
+              <div [class]="'ptv-big-num ' + getRiskPercentClassValue()">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</div>
+              <div class="ptv-big-num-label">Parkinson's risk score</div>
+            </div>
+
+            <div class="ptv-right-col">
+              <div class="ptv-bar-section">
+                <div class="ptv-bar-header">
+                  <span>Risk level</span>
+                  <span class="ptv-em">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</span>
+                </div>
+                <div class="ptv-bar-track">
+                  <div class="ptv-bar-fill" [style.width.%]="getRiskPercentDisplay()"></div>
+                </div>
+                <div class="ptv-bar-legend">
+                  <span>0% Low</span>
+                  <span>50% Mod</span>
+                  <span>100% High</span>
+                </div>
+              </div>
+
+              <div class="ptv-mini-stats">
+                <div class="ptv-mini-stat">
+                  <div class="ptv-mini-val">{{ (getConfidenceScoreDisplay() / 100) | number:'1.3-3' }}</div>
+                  <div class="ptv-mini-label">Probability</div>
+                </div>
+                <div class="ptv-mini-stat">
+                  <div class="ptv-mini-val">{{ analysisResult?.riskLevel || 'Unknown' }}</div>
+                  <div class="ptv-mini-label">Risk level</div>
+                </div>
+                <div class="ptv-mini-stat">
+                  <div class="ptv-mini-val ptv-modality">Voice</div>
+                  <div class="ptv-mini-label">Modality</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ptv-divider"></div>
+
+          <div class="ptv-interpret">
+            <div class="ptv-interpret-title">What this means</div>
+            <div class="ptv-interpret-text">
+              This voice-based result indicates potential neurological speech markers. This is a screening result and
+              not a diagnosis. Please consult a qualified clinician for complete evaluation.
+            </div>
+          </div>
+
+          <div class="ptv-rec-row">
+            <div class="ptv-rec-card">
+              <div class="ptv-rec-title">Next step</div>
+              <div class="ptv-rec-text">Discuss these findings with a neurologist and compare with clinical history.</div>
+            </div>
+            <div class="ptv-rec-card ptv-rec-blue">
+              <div class="ptv-rec-title">Combine signals</div>
+              <div class="ptv-rec-text">Take gait and finger-tapping tests for complete multi-signal assessment.</div>
+            </div>
+          </div>
+
+          <div class="ptv-breakdown">
+            <div class="ptv-breakdown-label">Signal breakdown</div>
+            <div class="ptv-breakdown-row">
+              <span class="ptv-sig-name">Voice</span>
+              <div class="ptv-sig-track"><div class="ptv-sig-fill" [style.width.%]="getRiskPercentDisplay()"></div></div>
+              <span class="ptv-sig-val">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</span>
+            </div>
+            <div class="ptv-breakdown-row">
+              <span class="ptv-sig-name ptv-sig-muted">Finger tapping</span>
+              <div class="ptv-sig-track"></div>
+              <span class="ptv-sig-val ptv-sig-muted">-</span>
+            </div>
+            <div class="ptv-breakdown-row">
+              <span class="ptv-sig-name ptv-sig-muted">Gait</span>
+              <div class="ptv-sig-track"></div>
+              <span class="ptv-sig-val ptv-sig-muted">-</span>
+            </div>
+          </div>
+
+          <div class="ptv-result-actions">
+            <button (click)="startNewTest()" class="ptv-btn-secondary">Take Another Test</button>
+            <button (click)="viewMyTests()" class="ptv-btn-primary">View My Tests</button>
+          </div>
         </div>
       </div>
 
@@ -641,7 +614,7 @@
       </div>
 
       <!-- Feature Explanation -->
-      <div *ngIf="featureExplanation" class="patient-test-card app-card bg-app-surface rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
+      <!-- <div *ngIf="featureExplanation" class="patient-test-card app-card bg-app-surface rounded-2xl shadow-app border border-app-border/60 overflow-hidden">
         <div class="patient-test-card-accent h-1 w-full bg-gradient-to-r from-app-primary to-app-primary-hover"></div>
         <div class="p-8">
         <h3 class="text-xl font-bold text-app-primary mb-4">Feature Analysis</h3>
@@ -659,7 +632,7 @@
           </div>
         </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </section>

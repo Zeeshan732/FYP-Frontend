@@ -49,15 +49,15 @@ export class LoginModalComponent implements OnInit, OnDestroy {
   ) {}
 
   private toastOk(summary: string, detail: string): void {
-    this.messageService.add({ severity: 'success', summary, detail, life: 4800 });
+    this.messageService.add({ severity: 'success', summary, detail, life: 2000 });
   }
 
   private toastErr(summary: string, detail: string): void {
-    this.messageService.add({ severity: 'error', summary, detail, life: 8000 });
+    this.messageService.add({ severity: 'error', summary, detail, life: 2000 });
   }
 
   private toastWarn(summary: string, detail: string): void {
-    this.messageService.add({ severity: 'warn', summary, detail, life: 6500 });
+    this.messageService.add({ severity: 'warn', summary, detail, life: 2000 });
   }
 
   ngOnInit() {

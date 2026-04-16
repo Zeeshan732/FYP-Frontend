@@ -200,12 +200,25 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   // startTest moved into startVoiceTest to support test type selector
 
   async startRecording() {
-    if (!this.audioStream) {
-      await this.startTest();
-      return;
+    const hasActiveStream = !!this.audioStream?.getTracks().some(track => track.readyState === 'live');
+    if (!hasActiveStream) {
+      try {
+        this.audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (error: any) {
+        console.error('Error accessing microphone:', error);
+        this.error = 'Unable to access microphone. Please check permissions and try again.';
+        this.isRecording = false;
+        return;
+      }
     }
 
     try {
+      const stream = this.audioStream;
+      if (!stream) {
+        this.error = 'Unable to access microphone. Please try again.';
+        this.isRecording = false;
+        return;
+      }
       this.isRecording = true;
       this.recordingTime = 0;
       this.audioBlob = null;
@@ -213,7 +226,7 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
 
       // Create MediaRecorder
       const options = { mimeType: 'audio/webm' };
-      this.mediaRecorder = new MediaRecorder(this.audioStream, options);
+      this.mediaRecorder = new MediaRecorder(stream, options);
       
       const chunks: BlobPart[] = [];
 
@@ -225,6 +238,9 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.mediaRecorder.onstop = () => {
         this.audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        if (this.audioUrl) {
+          URL.revokeObjectURL(this.audioUrl);
+        }
         this.audioUrl = URL.createObjectURL(this.audioBlob);
         this.isRecording = false;
         this.recordingTimer = null;
@@ -258,7 +274,20 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.recordingTimer) {
         clearInterval(this.recordingTimer);
       }
+      this.mediaRecorder = null;
+      this.audioStream = null;
     }
+  }
+
+  async restartRecording(): Promise<void> {
+    if (this.audioUrl) {
+      URL.revokeObjectURL(this.audioUrl);
+      this.audioUrl = null;
+    }
+    this.audioBlob = null;
+    this.recordingTime = 0;
+    this.error = '';
+    await this.startRecording();
   }
 
   private startWaveformVisualization(): void {

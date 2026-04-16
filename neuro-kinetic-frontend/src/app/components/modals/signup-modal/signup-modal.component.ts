@@ -205,14 +205,14 @@ export class SignupModalComponent implements OnInit, OnDestroy {
             severity: 'success',
             summary: 'Welcome to NeuroSync',
             detail: this.info,
-            life: 5500
+            life: 2000
           });
         } else {
           this.messageService.add({
             severity: 'success',
             summary: 'Registration received',
             detail: this.info,
-            life: 6500
+            life: 2000
           });
         }
 
@@ -245,7 +245,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
           severity: 'error',
           summary: 'Registration failed',
           detail: this.error,
-          life: 9000
+          life: 2000
         });
         console.error('Registration error:', error);
       }

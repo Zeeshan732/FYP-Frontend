@@ -51,6 +51,7 @@ import { BlogComponent } from './pages/blog/blog.component';
 import { ChatHistoryComponent } from './pages/chat-history/chat-history.component';
 import { ProfileSettingsComponent } from './pages/profile-settings/profile-settings.component';
 import { ContactMessagesComponent } from './pages/contact-messages/contact-messages.component';
+import { AdminBlogsComponent } from './pages/admin-blogs/admin-blogs.component';
 import { ContactFormComponent } from './components/contact-form/contact-form.component';
 import { ArticleCardComponent } from './components/blog/article-card/article-card.component';
 import { SectionRowComponent } from './components/blog/section-row/section-row.component';
@@ -91,6 +92,7 @@ import { SharedModule } from './shared/shared.module';
     ChatHistoryComponent,
     ProfileSettingsComponent,
     ContactMessagesComponent,
+    AdminBlogsComponent,
     ContactFormComponent,
     ArticleCardComponent,
     SectionRowComponent
