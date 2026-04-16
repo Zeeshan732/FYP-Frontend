@@ -18,15 +18,15 @@ export interface TeamMember {
 })
 export class AboutComponent {
   team: TeamMember[] = [
-    {
-      initials: 'AR',
-      name: 'Dr. Ayesha Raza',
-      role: 'Neurologist & Co-founder',
-      bio: '15+ years in movement disorders. Leads clinical validation and assessment protocol design.',
-      accentColor: '#2E86DE',
-      accentBg: 'rgba(46,134,222,0.15)',
-      tagLabel: 'Clinical Lead'
-    },
+    // {
+    //   initials: 'AR',
+    //   name: 'Dr. Ayesha Raza',
+    //   role: 'Neurologist & Co-founder',
+    //   bio: '15+ years in movement disorders. Leads clinical validation and assessment protocol design.',
+    //   accentColor: '#2E86DE',
+    //   accentBg: 'rgba(46,134,222,0.15)',
+    //   tagLabel: 'Clinical Lead'
+    // },
     {
       initials: 'UA',
       name: 'Umair Azam',

@@ -20,6 +20,7 @@ import { FingerTapComponent } from './pages/finger-tap/finger-tap.component';
 import { ChatHistoryComponent } from './pages/chat-history/chat-history.component';
 import { ProfileSettingsComponent } from './pages/profile-settings/profile-settings.component';
 import { ContactMessagesComponent } from './pages/contact-messages/contact-messages.component';
+import { AdminBlogsComponent } from './pages/admin-blogs/admin-blogs.component';
 import { AboutComponent } from './pages/about/about.component';
 import { BlogComponent } from './pages/blog/blog.component';
 import { AuthGuard } from './guards/auth.guard';
@@ -47,6 +48,7 @@ const routes: Routes = [
   { path: 'account-requests', component: AccountRequestsComponent, canActivate: [AdminGuard] },
   { path: 'admin-users', component: AdminUsersComponent, canActivate: [AdminGuard] },
   { path: 'contact-messages', component: ContactMessagesComponent, canActivate: [AdminGuard] },
+  { path: 'admin-blogs', component: AdminBlogsComponent, canActivate: [AdminGuard] },
   { path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
   { path: 'about', component: AboutComponent },
   { path: 'blog', component: BlogComponent },

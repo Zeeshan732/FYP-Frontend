@@ -44,6 +44,9 @@ module.exports = {
       },
       fontFamily: {
         base: ['Inter', 'sans-serif'],
+        heading: ['Syne', 'sans-serif'],
+        body: ['DM Sans', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       fontSize: {
         'app-body': ['1rem', { lineHeight: '1.6' }],

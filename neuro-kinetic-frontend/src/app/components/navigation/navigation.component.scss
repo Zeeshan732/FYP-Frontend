@@ -1,3 +1,61 @@
+@use "../../../styles/mixins" as m;
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(9, 14, 26, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logo-wrapper {
+  transition: var(--transition-base);
+}
+
+.logo-wrapper:hover {
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.5));
+}
+
+.nav-link {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 2px;
+  transition: var(--transition-base);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--color-accent);
+  transition: width 0.3s ease-out;
+}
+
+.nav-link:hover {
+  color: var(--color-text-primary);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.btn-ghost {
+  @include m.ghost-button;
+  padding: 8px 16px;
+}
+
+.btn-gradient {
+  @include m.gradient-button;
+  padding: 8px 20px;
+}
 /* ═══ Landing Navbar — NeuroSync Dark Theme ═══ */
 .navbar {
   position: fixed;

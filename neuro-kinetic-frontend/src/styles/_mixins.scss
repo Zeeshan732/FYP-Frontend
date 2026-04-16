@@ -1,0 +1,46 @@
+@mixin glass-card {
+  background: var(--color-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-cyan);
+  border-radius: var(--radius-card);
+}
+
+@mixin gradient-button {
+  background: linear-gradient(135deg, #00d4ff, #0066cc);
+  color: #fff;
+  font-family: "Syne", sans-serif;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.35);
+  transition: var(--transition-base);
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 0 32px rgba(0, 212, 255, 0.55);
+  }
+}
+
+@mixin ghost-button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary);
+  border-radius: 8px;
+  font-family: "DM Sans", sans-serif;
+  transition: var(--transition-base);
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+@mixin section-label {
+  font-family: "Syne", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+}

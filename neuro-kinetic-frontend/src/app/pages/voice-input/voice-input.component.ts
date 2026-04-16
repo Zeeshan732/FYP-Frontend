@@ -51,6 +51,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
   
   // Error handling
   error: string = '';
+  private errorAutoCloseTimer: any = null;
 
   // Test record tracking
   existingTestRecordId: number | null = null;
@@ -87,6 +88,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       this.voiceFeaturesChart.destroy();
       this.voiceFeaturesChart = null;
     }
+    this.clearErrorTimer();
   }
 
   ngAfterViewInit(): void {
@@ -109,25 +111,25 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
       
       if (!allowedExtensions.includes(fileExtension)) {
-        this.error = 'Invalid file type. Please select an audio file (.wav, .mp3, .m4a, etc.)';
+        this.setError('Invalid file type. Please select an audio file (.wav, .mp3, .m4a, etc.)');
         return;
       }
       
       // Validate file size (100 MB max)
       if (file.size > 100 * 1024 * 1024) {
-        this.error = 'File size exceeds 100 MB limit.';
+        this.setError('File size exceeds 100 MB limit.');
         return;
       }
       
       this.selectedFile = file;
-      this.error = '';
+      this.setError('');
     }
   }
 
   // Remove selected file
   removeFile(): void {
     this.selectedFile = null;
-    this.error = '';
+    this.setError('');
     const input = document.getElementById('voiceFileInput') as HTMLInputElement;
     if (input) input.value = '';
   }
@@ -140,21 +142,21 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
   // Upload and process file
   async uploadAndProcess(): Promise<void> {
     if (!this.selectedFile) {
-      this.error = 'Please select a voice file first.';
+      this.setError('Please select a voice file first.');
       return;
     }
 
     // Validate file using service
     const validation = this.fileUploadService.validateFile(this.selectedFile, 'voice');
     if (!validation.valid) {
-      this.error = validation.error || 'Invalid file.';
+      this.setError(validation.error || 'Invalid file.');
       return;
     }
 
     try {
       this.isUploading = true;
       this.isProcessing = true;
-      this.error = '';
+      this.setError('');
 
       // ⭐ Convert WebM files to WAV before uploading
       let fileToUpload = this.selectedFile;
@@ -199,7 +201,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       
       // Step 3: Verify analysis was successful
       if (!analysisResponse) {
-        this.error = 'Analysis completed but no results were returned.';
+        this.setError('Analysis completed but no results were returned.');
         return;
       }
 
@@ -210,7 +212,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
 
       if (analysisResponse.riskPercent == null && analysisResponse.riskPercent !== 0) {
         console.error('❌ Analysis failed - riskPercent is null');
-        this.error = 'Analysis processing failed. Please try again.';
+        this.setError('Analysis processing failed. Please try again.');
         return;
       }
 
@@ -223,13 +225,13 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       } catch (recordError: any) {
         console.error('❌ Error creating/updating test record:', recordError);
         // Still show analysis results even if test record save fails
-        this.error = 'Analysis completed, but failed to save test record. Results are displayed below.';
+        this.setError('Analysis completed, but failed to save test record. Results are displayed below.');
       }
 
     } catch (error: any) {
       console.error('Error:', error);
       const msg = error.error?.message || error.message || 'Failed to process voice file. Please try again.';
-      this.error = msg;
+      this.setError(msg);
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -250,7 +252,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       return true;
     } catch (error) {
       console.error('Microphone permission denied:', error);
-      this.error = 'Microphone access is required to record voice. Please enable microphone permissions.';
+      this.setError('Microphone access is required to record voice. Please enable microphone permissions.');
       return false;
     }
   }
@@ -264,6 +266,9 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     try {
+      // Allow a clean second recording attempt without manual reset.
+      this.deleteRecording();
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -279,7 +284,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.audioChunks = [];
       this.recordingTime = 0;
-      this.error = '';
+      this.setError('');
 
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -316,7 +321,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
 
     } catch (error: any) {
       console.error('Error starting recording:', error);
-      this.error = error.message || 'Failed to start recording. Please check microphone permissions.';
+      this.setError(error.message || 'Failed to start recording. Please check microphone permissions.');
       this.isRecording = false;
     }
   }
@@ -343,7 +348,12 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.audioChunks = [];
     this.recordingTime = 0;
-    this.error = '';
+    this.setError('');
+  }
+
+  async restartRecording(): Promise<void> {
+    this.deleteRecording();
+    await this.startRecording();
   }
 
   // Play recording preview
@@ -352,7 +362,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       const audio = new Audio(this.recordedAudioUrl);
       audio.play().catch(error => {
         console.error('Error playing audio:', error);
-        this.error = 'Failed to play recording preview.';
+        this.setError('Failed to play recording preview.');
       });
     }
   }
@@ -478,14 +488,14 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
   // Upload recorded audio
   async uploadRecordedAudio(): Promise<void> {
     if (!this.recordedAudio) {
-      this.error = 'No recording available. Please record first.';
+      this.setError('No recording available. Please record first.');
       return;
     }
 
     try {
       this.isUploading = true;
       this.isProcessing = true;
-      this.error = '';
+      this.setError('');
 
       // ⭐ Convert WebM to WAV before uploading
       console.log('🔄 Converting WebM to WAV format...');
@@ -524,7 +534,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       
       // Step 3: Verify analysis was successful
       if (!analysisResponse) {
-        this.error = 'Analysis completed but no results were returned.';
+        this.setError('Analysis completed but no results were returned.');
         return;
       }
 
@@ -535,7 +545,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
 
       if (analysisResponse.riskPercent == null && analysisResponse.riskPercent !== 0) {
         console.error('❌ Analysis failed - riskPercent is null');
-        this.error = 'Analysis processing failed. Please try again.';
+        this.setError('Analysis processing failed. Please try again.');
         return;
       }
 
@@ -548,13 +558,13 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       } catch (recordError: any) {
         console.error('❌ Error creating/updating test record:', recordError);
         // Still show analysis results even if test record save fails
-        this.error = 'Analysis completed, but failed to save test record. Results are displayed below.';
+        this.setError('Analysis completed, but failed to save test record. Results are displayed below.');
       }
 
     } catch (error: any) {
       console.error('Error:', error);
       const msg = error.error?.message || error.message || 'Failed to process recording. Please try again.';
-      this.error = msg;
+      this.setError(msg);
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -597,7 +607,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
     if (response.riskPercent !== null && response.riskPercent !== undefined) {
       // Only clear error if it's not a test record save error
       if (!this.error.includes('failed to save test record')) {
-        this.error = '';
+        this.setError('');
       }
     }
   }
@@ -660,7 +670,7 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
     this.modelVersion = undefined;
     this.isSimulation = undefined;
     this.voiceFeatures = null;
-    this.error = '';
+    this.setError('');
     this.existingTestRecordId = null;  // Reset test record ID for new analysis
     this.generateSessionId();
   }
@@ -798,6 +808,24 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
       'Negative': 'Negative'
     };
     return mapping[predictedClass || ''] || 'Uncertain';
+  }
+
+  private clearErrorTimer(): void {
+    if (this.errorAutoCloseTimer) {
+      clearTimeout(this.errorAutoCloseTimer);
+      this.errorAutoCloseTimer = null;
+    }
+  }
+
+  private setError(message: string, autoCloseMs = 5000): void {
+    this.clearErrorTimer();
+    this.error = message;
+    if (message) {
+      this.errorAutoCloseTimer = setTimeout(() => {
+        this.error = '';
+        this.errorAutoCloseTimer = null;
+      }, autoCloseMs);
+    }
   }
 }
 

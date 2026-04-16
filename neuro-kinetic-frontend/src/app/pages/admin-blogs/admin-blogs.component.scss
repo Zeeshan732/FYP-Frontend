@@ -1,0 +1,142 @@
+.admin-blogs-page {
+  background: #0a1628;
+  min-height: 100vh;
+  padding: 32px 0 56px;
+}
+
+.admin-blogs-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.admin-blogs-header h1 {
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: 32px;
+}
+
+.admin-blogs-header p {
+  margin: 0 0 24px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.admin-blogs-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 18px;
+}
+
+.admin-blogs-card {
+  background: #112240;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.admin-blogs-card h2 {
+  margin: 0 0 14px;
+  color: #fff;
+  font-size: 18px;
+}
+
+label {
+  display: block;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+input,
+textarea,
+select {
+  margin-top: 6px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0a1628;
+  color: #fff;
+  padding: 10px 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary,
+.btn-ghost,
+.btn-mini {
+  border-radius: 8px;
+  border: 0;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary {
+  // background: #2e86de;
+  color: #fff;
+}
+
+.btn-ghost {
+  // background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 10px 12px;
+}
+
+.post-title {
+  color: #fff;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.post-meta {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.post-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-mini {
+  padding: 6px 10px;
+  // background: rgba(46, 134, 222, 0.15);
+  color: #9acaff;
+}
+
+.btn-danger {
+  // background: rgba(224, 82, 82, 0.15);
+  color: #ffadad;
+}
+
+@media (max-width: 960px) {
+  .admin-blogs-grid {
+    grid-template-columns: 1fr;
+  }
+}
