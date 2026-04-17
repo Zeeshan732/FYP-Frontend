@@ -5,9 +5,19 @@
     <div class="header-row">
       <div>
         <h1 class="text-3xl font-bold text-app-text-primary">Account Requests</h1>
-        <p class="text-app-text-muted text-sm">Review pending registrations and manage statuses.</p>
+        <p class="text-app-text-muted text-sm">
+          Pending clinician registrations (default): review, approve, or reject. Use filters to see all roles or statuses.
+        </p>
       </div>
       <div class="filters">
+        <select
+          [(ngModel)]="roleFilter"
+          (change)="onFilterChange()"
+          class="select"
+          title="Role filter"
+        >
+          <option *ngFor="let option of roleOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
         <select
           [(ngModel)]="statusFilter"
           (change)="onFilterChange()"
@@ -50,8 +60,9 @@
         <div class="table-header">
           <div class="col-user">User</div>
           <div class="col-email">Email</div>
+          <div class="col-role">Role</div>
           <div class="col-status">Status</div>
-          <div class="col-reason">Reason</div>
+          <!-- <div class="col-reason">Reason</div> -->
           <div class="col-actions actions-col">Actions</div>
         </div>
 
@@ -63,6 +74,9 @@
             <div class="meta">ID: {{ req.id }}</div>
           </div>
           <div class="cell email col-email">{{ req.email }}</div>
+          <div class="cell col-role">
+            <span class="pill">{{ getRoleLabel(req.role) }}</span>
+          </div>
           <div class="cell col-status">
             <span
               class="badge"
@@ -75,9 +89,9 @@
               {{ req.status }}
             </span>
           </div>
-          <div class="cell reason col-reason">
+          <!-- <div class="cell reason col-reason">
             <div class="pill">{{ req.comment ? req.comment : '-' }}</div>
-          </div>
+          </div> -->
           <div class="cell actions col-actions">
             <button
               class="table-action-btn"
@@ -161,7 +175,7 @@
         </div>
         <div *ngIf="selectedUser.role">
           <label>Role</label>
-          <div class="value">{{ selectedUser.role }}</div>
+          <div class="value">{{ getRoleLabel(selectedUser.role) }}</div>
         </div>
         <div *ngIf="selectedUser.clinicName">
           <label>Clinic / Hospital</label>

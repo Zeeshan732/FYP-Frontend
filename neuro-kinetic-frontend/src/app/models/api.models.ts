@@ -17,11 +17,10 @@ export interface User {
   createdAt?: string;
 }
 
-// Auth Response
+// Auth Response (backend: token, message, user — approval is user.status only)
 export interface AuthResponse {
   token?: string;
   user?: User;
-  status?: 'Pending' | 'Approved' | 'Rejected' | 'Activated';
   message?: string;
 }
 
@@ -32,6 +31,7 @@ export interface AccountRequest {
   firstName: string;
   lastName: string;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
+  /** Account role (e.g. MedicalProfessional for clinician requests). */
   role?: 'Public' | 'Researcher' | 'MedicalProfessional' | 'Admin';
   institution?: string;
   clinicName?: string;

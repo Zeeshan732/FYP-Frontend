@@ -1,6 +1,8 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+import { filter, take } from 'rxjs/operators';
+import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { ModalService } from '../../services/modal.service';
 
@@ -14,7 +16,8 @@ export class LandingComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -24,6 +27,38 @@ export class LandingComponent implements OnInit {
       this.authService.navigateForAuthenticatedUser(user);
       return;
     }
+
+    this.route.queryParams
+      .pipe(
+        filter((p) => !!p['reason']),
+        take(1)
+      )
+      .subscribe((params) => {
+        const reason = params['reason'];
+        if (reason === 'clinician_pending') {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Account under review',
+            detail:
+              'Your clinician account is awaiting admin approval. You will be able to sign in once it is approved.',
+            life: 6000
+          });
+        } else if (reason === 'clinician_rejected') {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Account not approved',
+            detail:
+              'Your clinician account request has been rejected. Please contact support if you need help.',
+            life: 8000
+          });
+        }
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { reason: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+      });
 
     if (this.route.snapshot.data['openLoginModal']) {
       this.modalService.openLoginModal();

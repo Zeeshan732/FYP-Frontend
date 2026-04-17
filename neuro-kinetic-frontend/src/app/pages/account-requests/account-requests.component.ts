@@ -15,6 +15,8 @@ export class AccountRequestsComponent implements OnInit, OnDestroy {
   loading = false;
   error = '';
   statusFilter: 'Pending' | 'Approved' | 'Rejected' | 'Inactive' | '' = 'Pending';
+  /** API value; use "Clinicians only" in UI. */
+  roleFilter: '' | 'MedicalProfessional' = 'MedicalProfessional';
   searchTerm = '';
   pageNumber = 1;
   pageSize = 10;
@@ -30,6 +32,11 @@ export class AccountRequestsComponent implements OnInit, OnDestroy {
     { label: 'Approved', value: 'Approved' },
     { label: 'Rejected', value: 'Rejected' },
     { label: 'Inactive', value: 'Inactive' }
+  ];
+
+  roleOptions = [
+    { label: 'Clinicians only', value: 'MedicalProfessional' },
+    { label: 'All roles', value: '' }
   ];
   Math = Math;
   private search$ = new Subject<string>();
@@ -66,6 +73,7 @@ export class AccountRequestsComponent implements OnInit, OnDestroy {
     this.error = '';
     this.apiService.getAccountRequests({
       status: (this.statusFilter || undefined) as any,
+      role: this.roleFilter || undefined,
       pageNumber: this.pageNumber,
       pageSize: this.pageSize,
       search: this.searchTerm || undefined
@@ -125,6 +133,20 @@ export class AccountRequestsComponent implements OnInit, OnDestroy {
 
   onSearchChange(term: string) {
     this.search$.next(term);
+  }
+
+  /** Display label for API role values (e.g. MedicalProfessional → Clinician). */
+  getRoleLabel(role?: string): string {
+    switch (role) {
+      case 'MedicalProfessional':
+        return 'Clinician';
+      case 'Public':
+        return 'Patient';
+      case 'Admin':
+        return 'Admin';
+      default:
+        return role || '—';
+    }
   }
 
   openModal(req: AccountRequest) {

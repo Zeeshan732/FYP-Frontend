@@ -5,7 +5,7 @@
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1320px;
 }
 
 .header-row {
@@ -80,7 +80,13 @@
 }
 
 .table-card {
-  --ar-cols: minmax(220px, 1fr) minmax(220px, 1.1fr) 116px minmax(180px, 1fr) 108px;
+  /* User | Email | Role | Status | Actions (5 columns — must match template) */
+  --ar-cols:
+    minmax(200px, 1.1fr)
+    minmax(240px, 1.6fr)
+    minmax(140px, 0.7fr)
+    minmax(132px, 0.7fr)
+    minmax(108px, 120px);
 
   background: #112240;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -93,7 +99,8 @@
   display: grid;
   grid-template-columns: var(--ar-cols);
   align-items: center;
-  gap: 12px 14px;
+  gap: 14px 28px;
+  column-gap: 28px;
 }
 
 .table-header {
@@ -101,7 +108,7 @@
   color: rgba(255, 255, 255, 0.3);
   font-size: 11px;
   font-weight: 600;
-  padding: 10px 16px;
+  padding: 12px 22px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -112,7 +119,7 @@
 }
 
 .row {
-  padding: 12px 16px;
+  padding: 14px 22px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   color: #e8ebf0;
   min-height: 56px;
@@ -152,8 +159,22 @@
 
 .cell.email {
   word-break: break-word;
+  overflow-wrap: anywhere;
   color: rgba(255, 255, 255, 0.75);
   font-size: 13px;
+  padding-right: 4px;
+}
+
+.cell.col-role .pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.cell.col-status {
+  padding-left: 2px;
+  padding-right: 8px;
 }
 
 .cell.reason .pill {
@@ -455,10 +476,12 @@
 
 .col-user,
 .col-email,
+.col-role,
 .col-status,
 .col-reason {
   justify-self: start;
   text-align: left;
+  min-width: 0;
 }
 
 .col-actions,
@@ -494,7 +517,7 @@
   .table-header,
   .row,
   .table-footer {
-    min-width: 860px;
+    min-width: 1000px;
   }
 }
 
@@ -526,12 +549,13 @@
   .table-header,
   .row,
   .table-footer {
-    min-width: 860px;
+    min-width: 1000px;
   }
 
   .row {
-    padding: 12px;
-    gap: 10px;
+    padding: 12px 18px;
+    gap: 12px 22px;
+    column-gap: 22px;
   }
 
   .table-footer {

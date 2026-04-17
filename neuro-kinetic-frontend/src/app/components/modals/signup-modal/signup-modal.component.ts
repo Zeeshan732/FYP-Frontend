@@ -37,7 +37,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   // Available roles for signup
   roleOptions = [
     { label: 'Public User', value: 'Public' },
-    { label: 'Medical Professional', value: 'MedicalProfessional' }
+    { label: 'Clinician', value: 'MedicalProfessional' }
   ];
 
   constructor(
@@ -191,16 +191,21 @@ export class SignupModalComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.loading = false;
 
-        const isApproved = response.status === 'Approved' || response.status === 'Activated';
-        const isLoggedIn = !!response.token && !!response.user;
+        const u = response.user;
+        const registeredAndCanSignIn =
+          !!response.token &&
+          !!u &&
+          u.status === 'Approved';
 
-        if (isApproved) {
+        if (registeredAndCanSignIn) {
           this.info = response.message || 'Account created successfully.';
         } else {
-          this.info = response.message || 'Registration submitted. Your account is under review.';
+          this.info =
+            response.message ||
+            'Registration submitted. Your account is under review.';
         }
 
-        if (isLoggedIn) {
+        if (registeredAndCanSignIn) {
           this.messageService.add({
             severity: 'success',
             summary: 'Welcome to NeuroSync',
@@ -219,7 +224,7 @@ export class SignupModalComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           this.modalService.closeSignupModal();
 
-          if (isLoggedIn) {
+          if (registeredAndCanSignIn) {
             const createdRole = response.user?.role;
             if (createdRole === 'MedicalProfessional') {
               this.router.navigate(['/clinician']);
