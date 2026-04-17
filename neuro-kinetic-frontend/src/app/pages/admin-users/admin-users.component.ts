@@ -30,7 +30,7 @@ export class AdminUsersComponent implements OnInit {
   roleOptions = [
     { label: 'All Roles', value: '' },
     { label: 'Public', value: 'Public' },
-    { label: 'Medical Professional', value: 'MedicalProfessional' },
+    { label: 'Clinician', value: 'MedicalProfessional' },
     { label: 'Admin', value: 'Admin' }
   ];
 
@@ -177,7 +177,7 @@ export class AdminUsersComponent implements OnInit {
   getRoleLabel(role: string): string {
     switch (role) {
       case 'MedicalProfessional':
-        return 'Medical Professional';
+        return 'Clinician';
       default:
         return role;
     }

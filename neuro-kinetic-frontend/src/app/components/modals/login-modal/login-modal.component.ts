@@ -347,17 +347,20 @@ export class LoginModalComponent implements OnInit, OnDestroy {
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.loading = false;
-        if (response.status && response.status !== 'Approved' && response.status !== 'Activated') {
-          this.error = response.message || (response.status === 'Pending'
-            ? 'Your account is under review.'
-            : 'Your account request was rejected.');
-          this.toastWarn('Cannot sign in yet', this.error);
-          return;
-        }
 
         if (!response.token || !response.user) {
           this.error = response.message || 'Login could not be completed. Please try again.';
           this.toastErr('Sign in incomplete', this.error);
+          return;
+        }
+
+        if (!this.authService.isSessionUserAllowed(response.user)) {
+          const st = response.user.status;
+          this.error =
+            st === 'Rejected'
+              ? 'Your clinician account request has been rejected. Please contact support.'
+              : 'Your account is under review and awaiting admin approval.';
+          this.toastWarn('Cannot sign in yet', this.error);
           return;
         }
 
@@ -386,28 +389,18 @@ export class LoginModalComponent implements OnInit, OnDestroy {
         if (error.status === 0) {
           this.error = 'Unable to connect to the server. Please ensure the backend is running.';
         } else if (error.status === 401) {
-          this.error = error.error?.message || 'Invalid email or password. Please try again.';
-          if (this.error?.toLowerCase().includes('inactive')) {
-            this.error = 'Your account is inactive. Please contact admin.';
+          this.error =
+            (error.error?.message || '').toString() || 'Invalid email or password. Please try again.';
+          if (this.error.toLowerCase().includes('inactive')) {
             this.showContactAdmin = true;
-          } else if (this.error?.toLowerCase().includes('pending')) {
-            this.error = 'Your account is under review.';
-          } else if (this.error?.toLowerCase().includes('rejected')) {
-            this.error = 'Your account request was rejected.';
           }
         } else if (error.status === 404) {
           this.error = 'API endpoint not found. Please check the API configuration.';
         } else if (error.error?.message) {
           const message = error.error.message as string;
+          this.error = message;
           if (message.toLowerCase().includes('inactive')) {
-            this.error = 'Your account is inactive. Please contact admin.';
             this.showContactAdmin = true;
-          } else if (message.toLowerCase().includes('pending')) {
-            this.error = 'Your account is under review.';
-          } else if (message.toLowerCase().includes('rejected')) {
-            this.error = 'Your account request was rejected.';
-          } else {
-            this.error = message;
           }
         } else if (error.error?.errors) {
           const errors = Object.values(error.error.errors).flat();

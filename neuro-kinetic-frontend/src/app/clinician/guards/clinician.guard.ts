@@ -10,13 +10,26 @@ export class ClinicianGuard implements CanActivate, CanActivateChild {
   ) {}
 
   canActivate(): boolean {
-    const roleRaw = this.authService.getCurrentUser()?.role ?? '';
+    const user = this.authService.getCurrentUser();
+    const roleRaw = user?.role ?? '';
     const role = String(roleRaw).toLowerCase();
-    if (role === 'clinician' || role === 'medicalprofessional') {
-      return true;
+    const isClinician = role === 'clinician' || role === 'medicalprofessional';
+
+    if (!user || !isClinician) {
+      this.router.navigate(['/dashboard']);
+      return false;
     }
-    this.router.navigate(['/dashboard']);
-    return false;
+
+    if (!this.authService.isSessionUserAllowed(user)) {
+      const qp =
+        user.status === 'Rejected'
+          ? { reason: 'clinician_rejected' }
+          : { reason: 'clinician_pending' };
+      this.authService.clearAuthAndGoToLogin(qp);
+      return false;
+    }
+
+    return true;
   }
 
   canActivateChild(): boolean {

@@ -505,6 +505,8 @@ export class ApiService {
   // ========== ACCOUNT REQUESTS (ADMIN) ==========
   getAccountRequests(params: {
     status?: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
+    /** Filter by role, e.g. MedicalProfessional for pending clinician queue */
+    role?: string;
     pageNumber?: number;
     pageSize?: number;
     search?: string;
@@ -513,6 +515,9 @@ export class ApiService {
 
     if (params.status) {
       httpParams = httpParams.set('status', params.status);
+    }
+    if (params.role) {
+      httpParams = httpParams.set('role', params.role);
     }
     if (params.pageNumber) {
       httpParams = httpParams.set('pageNumber', params.pageNumber.toString());

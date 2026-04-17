@@ -35,12 +35,11 @@ export class AuthService {
       .pipe(
         tap((response: AuthResponse) => {
           console.log('Login response:', response);
-          if (response.token && response.user && (response.status === 'Approved' || response.status === 'Activated' || !response.status)) {
-            // Set auth data synchronously before any redirects
+          // AuthResponse has no top-level status in the API; approval is on user.status. Never persist
+          // a session for unapproved clinicians or rejected accounts.
+          if (this.shouldPersistAuthFromResponse(response)) {
             console.log('About to call setAuthData with token length:', response.token?.length);
-            this.setAuthData(response.token, response.user);
-            
-            // Wait a tick to ensure localStorage operations complete
+            this.setAuthData(response.token!, response.user!);
             setTimeout(() => {
               console.log('After setAuthData - Token stored:', !!localStorage.getItem('token'));
               console.log('After setAuthData - User stored:', !!localStorage.getItem('user'));
@@ -48,7 +47,6 @@ export class AuthService {
               console.log('After setAuthData - Current user subject value:', this.currentUserSubject.value);
             }, 0);
           } else {
-            // Ensure we do not persist tokens for pending/rejected users
             this.clearAuthData();
           }
         })
@@ -70,18 +68,13 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data)
       .pipe(
         tap((response: AuthResponse) => {
-          // Admin accounts are approved but NOT automatically logged in
-          // They need to manually log in after signup
           const isAdminAccount = response.user?.role === 'Admin';
-          
+
           if (isAdminAccount) {
-            // Clear auth data for admin accounts - they must log in manually
             this.clearAuthData();
-          } else if (response.token && response.user && (response.status === 'Approved' || response.status === 'Activated' || !response.status)) {
-            // Other approved accounts can be auto-logged in
-            this.setAuthData(response.token, response.user);
+          } else if (this.shouldPersistAuthFromResponse(response)) {
+            this.setAuthData(response.token!, response.user!);
           } else {
-            // Pending accounts - no auto-login
             this.clearAuthData();
           }
         })
@@ -234,13 +227,21 @@ export class AuthService {
       
       // Extract user info from token claims
       // Adjust these based on your JWT token structure
+      const roleRaw =
+        payload.role ??
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??
+        'Public';
+      const statusRaw =
+        payload.status ??
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/status'];
+
       const user: User = {
-        id: payload.sub || payload.userId || payload.id || 0,
-        email: payload.email || '',
-        firstName: payload.firstName || payload.given_name || '',
-        lastName: payload.lastName || payload.family_name || '',
-        role: payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'Public',
-        status: payload.status || 'Approved',
+        id: Number(payload.sub ?? payload.userId ?? payload.id ?? 0) || 0,
+        email: payload.email ?? '',
+        firstName: payload.firstName ?? payload.given_name ?? '',
+        lastName: payload.lastName ?? payload.family_name ?? '',
+        role: roleRaw,
+        status: (statusRaw as User['status']) ?? 'Approved',
         provider: payload.provider,
         providerId: payload.providerId
       };
@@ -284,6 +285,10 @@ export class AuthService {
     if (!this.currentUserSubject.value) {
       try {
         const user = JSON.parse(userStr) as User;
+        if (!this.isSessionUserAllowed(user)) {
+          this.clearAuthData();
+          return false;
+        }
         this.currentUserSubject.next(user);
         return true;
       } catch (error) {
@@ -291,6 +296,12 @@ export class AuthService {
         this.clearAuthData();
         return false;
       }
+    }
+
+    const current = this.currentUserSubject.value;
+    if (current && !this.isSessionUserAllowed(current)) {
+      this.clearAuthData();
+      return false;
     }
     
     // User data exists in both places, authenticated
@@ -324,14 +335,56 @@ export class AuthService {
       this.router.navigate(['/admin-dashboard']);
       return;
     }
-    if (user.role === 'MedicalProfessional') {
+    if (this.isMedicalProfessionalRole(user.role)) {
+      if (user.status !== 'Approved') {
+        this.clearAuthAndGoToLogin(
+          user.status === 'Rejected' ? { reason: 'clinician_rejected' } : { reason: 'clinician_pending' }
+        );
+        return;
+      }
       this.router.navigate(['/clinician']);
       return;
     }
     this.router.navigate(['/home']);
   }
 
+  /** Clears tokens and navigates to login with optional query params (e.g. clinician approval state). */
+  clearAuthAndGoToLogin(queryParams?: Record<string, string>): void {
+    this.clearAuthData();
+    this.router.navigate(['/login'], { queryParams: queryParams ?? {} });
+  }
+
+  /** True if the account is allowed an app session (defense-in-depth vs API). */
+  isSessionUserAllowed(user: User | null | undefined): boolean {
+    if (!user) {
+      return false;
+    }
+    if (user.isActive === false || user.status === 'Inactive') {
+      return false;
+    }
+    if (user.status === 'Rejected') {
+      return false;
+    }
+    if (this.isMedicalProfessionalRole(user.role)) {
+      return user.status === 'Approved';
+    }
+    return true;
+  }
+
   // ========== PRIVATE METHODS ==========
+
+  /** Backend AuthResponse uses user.status only (no top-level status). */
+  private shouldPersistAuthFromResponse(response: AuthResponse): boolean {
+    if (!response.token || !response.user) {
+      return false;
+    }
+    return this.isSessionUserAllowed(response.user);
+  }
+
+  private isMedicalProfessionalRole(role: string | undefined): boolean {
+    const r = String(role ?? '').toLowerCase();
+    return r === 'medicalprofessional' || r === 'clinician';
+  }
 
   private setAuthData(token: string, user: User): void {
     try {
@@ -394,6 +447,10 @@ export class AuthService {
       
       try {
         const user = JSON.parse(userStr) as User;
+        if (!this.isSessionUserAllowed(user)) {
+          this.clearAuthData();
+          return;
+        }
         this.currentUserSubject.next(user);
         
         // Validate token with backend on app startup (but don't block)
@@ -494,6 +551,7 @@ export class AuthService {
 
   private clearAuthData(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);
   }
