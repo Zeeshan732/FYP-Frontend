@@ -1,10 +1,19 @@
-import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  OnDestroy,
+  ViewChild
+} from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { SidebarService } from '../../services/sidebar.service';
 import { NotificationsService } from '../../services/notifications.service';
+import { ApiService } from '../../services/api.service';
+import { NotificationItem, PatientClinicianTestRequestItem } from '../../models/api.models';
 
 @Component({
   selector: 'app-header',
@@ -19,11 +28,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isCompactViewport = false;
   isLandingPage: boolean = false;
   unreadCount = 0;
-  
+  notificationsDropdownOpen = false;
+  notificationPreview: NotificationItem[] = [];
+
+  @ViewChild('notifDropdownHost') notifDropdownHost?: ElementRef<HTMLElement>;
+
   private routerSubscription?: Subscription;
   private userSubscription?: Subscription;
   private sidebarSubscription?: Subscription;
   private unreadSubscription?: Subscription;
+  private notificationsListSubscription?: Subscription;
 
   // Route to label mapping
   routeLabels: { [key: string]: string } = {
@@ -49,7 +63,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private authService: AuthService,
     private sidebarService: SidebarService,
-    private notificationsService: NotificationsService
+    public notificationsService: NotificationsService,
+    private apiService: ApiService
   ) {}
 
   ngOnInit() {
@@ -94,6 +109,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.unreadCount = count;
     });
 
+    this.notificationsListSubscription = this.notificationsService.notifications$.subscribe(
+      (items) => {
+        this.notificationPreview = [...(items ?? [])].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ).slice(0, 8);
+      }
+    );
+
     // Subscribe to sidebar state
     this.sidebarSubscription = this.sidebarService.sidebarCollapsed$.subscribe(collapsed => {
       this.sidebarCollapsed = collapsed;
@@ -113,7 +136,110 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.unreadSubscription) {
       this.unreadSubscription.unsubscribe();
     }
+    if (this.notificationsListSubscription) {
+      this.notificationsListSubscription.unsubscribe();
+    }
     this.notificationsService.stopRealtime();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(ev: MouseEvent): void {
+    const el = this.notifDropdownHost?.nativeElement;
+    if (el && ev.target instanceof Node && el.contains(ev.target)) {
+      return;
+    }
+    this.notificationsDropdownOpen = false;
+  }
+
+  toggleNotificationsDropdown(event: MouseEvent): void {
+    event.stopPropagation();
+    this.notificationsDropdownOpen = !this.notificationsDropdownOpen;
+    if (this.notificationsDropdownOpen && this.currentUser && this.authService.isAuthenticated()) {
+      this.notificationsService.loadNotifications().subscribe({ error: () => {} });
+    }
+  }
+
+  formatRelativeTime(iso: string): string {
+    const d = new Date(iso);
+    const diff = Date.now() - d.getTime();
+    const sec = Math.floor(diff / 1000);
+    if (sec < 60) return 'Just now';
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min}m ago`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr}h ago`;
+    const day = Math.floor(hr / 24);
+    if (day === 1) return 'Yesterday';
+    if (day < 7) return `${day}d ago`;
+    return d.toLocaleDateString();
+  }
+
+  onPreviewItemClick(note: NotificationItem, event: Event): void {
+    event.stopPropagation();
+    this.notificationsDropdownOpen = false;
+    this.openNotification(note);
+  }
+
+  private openNotification(note: NotificationItem): void {
+    if (note.relatedEntity === 'ClinicianTestRequest' && note.relatedEntityId != null) {
+      this.notificationsService.markAsRead(note.id).subscribe({ error: () => {} });
+      this.apiService
+        .getPatientClinicianTestRequests()
+        .pipe(take(1))
+        .subscribe({
+          next: (list) => {
+            const req = list.find((r) => r.id === note.relatedEntityId);
+            if (req) {
+              this.navigateToPatientRequest(req);
+            } else {
+              this.router.navigate(['/home']);
+            }
+          },
+          error: () => this.router.navigate(['/home'])
+        });
+      return;
+    }
+
+    if (note.relatedEntity === 'User' && note.relatedEntityId != null) {
+      this.notificationsService.markAsRead(note.id).subscribe({ error: () => {} });
+      this.router.navigate(['/account-requests'], {
+        queryParams: { userId: note.relatedEntityId }
+      });
+      return;
+    }
+
+    if (this.notificationsService.isUnread(note)) {
+      this.notificationsService.markAsRead(note.id).subscribe();
+    }
+    this.router.navigate(['/notifications']);
+  }
+
+  private navigateToPatientRequest(item: PatientClinicianTestRequestItem): void {
+    const t = (item.testType || 'voice').toLowerCase();
+    if (t === 'gait') {
+      this.router.navigate(['/gait-analysis'], { queryParams: { fromRequest: item.id } });
+      return;
+    }
+    if (t === 'fingertap') {
+      this.router.navigate(['/finger-tap'], { queryParams: { fromRequest: item.id } });
+      return;
+    }
+    this.router.navigate(['/patient-test'], {
+      queryParams: { requested: 'voice', fromRequest: item.id }
+    });
+  }
+
+  markAllPreviewRead(): void {
+    const ids = this.notificationPreview
+      .filter((n) => this.notificationsService.isUnread(n))
+      .map((n) => n.id);
+    if (!ids.length) return;
+    this.notificationsService.markManyRead(ids).subscribe({ error: () => {} });
+  }
+
+  goToNotificationsPage(): void {
+    this.notificationsDropdownOpen = false;
+    this.router.navigate(['/notifications']);
   }
 
   @HostListener('window:resize')
@@ -216,7 +342,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/profile-settings']);
   }
 
-  goToNotifications() {
-    this.router.navigate(['/notifications']);
+  /** Fallback when list shows unread but server count is stale */
+  get hasPreviewUnreadFallback(): boolean {
+    return (
+      this.unreadCount === 0 &&
+      this.notificationPreview.some((n) => this.notificationsService.isUnread(n))
+    );
   }
 }

@@ -51,11 +51,23 @@ export interface NotificationItem {
   id: number;
   userId?: number;
   message: string;
-  status: number; // 0 = Unread, 1 = Read (backend format)
+  /** 0 = Unread, 1 = Read — backend NotificationResponse uses numeric status */
+  status: number;
   relatedEntity?: string;
   relatedEntityId?: number;
   createdAt: string;
   updatedAt?: string | null;
+}
+
+/** Clinician-initiated test request rows for patient dashboard */
+export interface PatientClinicianTestRequestItem {
+  id: number;
+  testType: string;
+  message?: string | null;
+  clinicianName: string;
+  status: string;
+  createdAt: string;
+  notificationId?: number | null;
 }
 
 // Helper type for frontend display

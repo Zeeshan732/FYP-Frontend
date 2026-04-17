@@ -35,7 +35,8 @@ import {
   ContactMessageResponse,
   VoicePredictRequest,
   VoicePredictResponse,
-  GaitModelInfo
+  GaitModelInfo,
+  PatientClinicianTestRequestItem
 } from '../models/api.models';
 
 @Injectable({
@@ -611,8 +612,23 @@ export class ApiService {
     return this.http.get<NotificationItem[]>(`${this.apiUrl}/notifications`, { params });
   }
 
-  markNotificationRead(id: number): Observable<NotificationItem> {
-    return this.http.patch<NotificationItem>(`${this.apiUrl}/notifications/${id}/read`, {});
+  markNotificationRead(id: number): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/notifications/${id}/read`, {});
+  }
+
+  getNotificationUnreadCount(): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/notifications/unread-count`);
+  }
+
+  markNotificationsRead(ids: number[]): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/notifications/mark-read`, { ids });
+  }
+
+  /** Pending/completed clinician test requests for the logged-in patient */
+  getPatientClinicianTestRequests(): Observable<PatientClinicianTestRequestItem[]> {
+    return this.http.get<PatientClinicianTestRequestItem[]>(
+      `${this.apiUrl}/patient/clinician-test-requests`
+    );
   }
 
   // ========== NEW ENDPOINTS - SPRINT 1-5 ==========

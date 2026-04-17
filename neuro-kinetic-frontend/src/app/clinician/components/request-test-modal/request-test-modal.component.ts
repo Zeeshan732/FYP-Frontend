@@ -14,12 +14,14 @@ export class RequestTestModalComponent {
   selectedTest: 'voice' | 'gait' | 'fingertap' | null = null;
   message = '';
   isSubmitting = false;
+  errorMessage = '';
 
   constructor(private clinicianService: ClinicianService) {}
 
   submit(): void {
     if (!this.selectedTest) return;
     this.isSubmitting = true;
+    this.errorMessage = '';
     this.clinicianService.requestTest({
       patientId: this.patient.id,
       testType: this.selectedTest,
@@ -29,7 +31,12 @@ export class RequestTestModalComponent {
         this.testRequested.emit();
         this.close.emit();
       },
-      error: () => {
+      error: (err) => {
+        this.errorMessage =
+          err.error?.message ??
+          (err.status === 404
+            ? 'Patient not found or no longer linked to your account.'
+            : 'Could not send the test request. Please try again.');
         this.isSubmitting = false;
       }
     });

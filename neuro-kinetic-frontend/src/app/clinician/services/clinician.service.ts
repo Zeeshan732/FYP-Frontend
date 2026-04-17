@@ -77,11 +77,39 @@ export class ClinicianService {
     return this.http.get<PatientResult[]>(`${this.base}/patients/${id}/results`);
   }
 
-  requestTest(payload: RequestTestPayload): Observable<void> {
-    return this.http.post<void>(`${this.base}/patients/${payload.patientId}/request-test`, payload);
+  requestTest(payload: RequestTestPayload): Observable<{ testRequestId?: number }> {
+    return this.http.post<{ testRequestId?: number }>(
+      `${this.base}/patients/${payload.patientId}/request-test`,
+      payload
+    );
   }
 
   removePatient(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/patients/${id}`);
+  }
+
+  /** Whether an email already has a NeuroSync account */
+  lookupPatientEmail(email: string): Observable<{
+    registered: boolean;
+    userId?: number;
+    linkedToThisClinician?: boolean;
+    role?: string;
+  }> {
+    const params = { email: email.trim() };
+    return this.http.get<{
+      registered: boolean;
+      userId?: number;
+      linkedToThisClinician?: boolean;
+      role?: string;
+    }>(`${this.base}/patients/email-lookup`, { params });
+  }
+
+  /** Invite a non-registered email to sign up (no patient row created) */
+  sendTestInvitationEmail(payload: {
+    email: string;
+    testType: string;
+    message?: string;
+  }): Observable<{ message?: string }> {
+    return this.http.post<{ message?: string }>(`${this.base}/test-request/send-invitation`, payload);
   }
 }

@@ -19,21 +19,59 @@
 
     <!-- Actions + User Badge -->
     <div class="flex items-center gap-2 sm:gap-3 ml-2 sm:ml-4 shrink-0">
-      <!-- Notifications -->
-      <button
-        type="button"
-        class="neuro-header-icon relative rounded-lg transition-colors"
-        [class.neuro-header-icon--compact]="isCompactViewport"
-        (click)="goToNotifications()"
-        title="Notifications"
-      >
-        <svg class="header-action-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-        <span *ngIf="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] flex items-center justify-center">
-          {{ unreadCount > 99 ? '99+' : unreadCount }}
-        </span>
-      </button>
+      <!-- Notifications dropdown -->
+      <div class="notif-dropdown-host relative" #notifDropdownHost>
+        <button
+          type="button"
+          class="neuro-header-icon relative rounded-lg transition-colors"
+          [class.neuro-header-icon--compact]="isCompactViewport"
+          (click)="toggleNotificationsDropdown($event)"
+          [attr.aria-expanded]="notificationsDropdownOpen"
+          aria-haspopup="true"
+          title="Notifications"
+        >
+          <svg class="header-action-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <span *ngIf="unreadCount > 0" class="notif-badge-num">
+            {{ unreadCount > 99 ? '99+' : unreadCount }}
+          </span>
+          <span *ngIf="hasPreviewUnreadFallback" class="notif-badge-dot" aria-hidden="true"></span>
+        </button>
+
+        <div
+          *ngIf="notificationsDropdownOpen"
+          class="notif-dropdown-panel"
+          role="menu"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="notif-dropdown-head">
+            <span>Notifications</span>
+            <button type="button" class="notif-link-btn" (click)="markAllPreviewRead()">Mark read</button>
+          </div>
+          <div class="notif-dropdown-empty" *ngIf="notificationPreview.length === 0">
+            No notifications yet.
+          </div>
+          <ul class="notif-dropdown-list" *ngIf="notificationPreview.length > 0">
+            <li *ngFor="let note of notificationPreview">
+              <button
+                type="button"
+                class="notif-dropdown-item"
+                [class.unread]="notificationsService.isUnread(note)"
+                (click)="onPreviewItemClick(note, $event)"
+              >
+                <span class="notif-item-msg">{{ note.message }}</span>
+                <span class="notif-item-time">{{ formatRelativeTime(note.createdAt) }}</span>
+              </button>
+            </li>
+          </ul>
+          <div class="notif-dropdown-foot">
+            <button type="button" class="notif-foot-btn" (click)="goToNotificationsPage()">
+              View all
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- User Info + Avatar -->
       <div class="flex items-center space-x-3">

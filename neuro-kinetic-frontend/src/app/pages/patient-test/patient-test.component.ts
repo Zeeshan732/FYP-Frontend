@@ -4,7 +4,7 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { FileUploadService } from '../../services/file-upload.service';
 import { ModalService } from '../../services/modal.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { 
   UserTestRecordRequest, 
   UserTestRecord, 
@@ -88,6 +88,7 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     private modalService: ModalService,
     private messageService: MessageService,
     private router: Router,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -95,6 +96,12 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
+
+    const q = this.route.snapshot.queryParamMap;
+    const requested = q.get('requested');
+    if (requested === 'voice' || requested === 'gait' || requested === 'fingertap') {
+      this.selectTest(requested);
+    }
     
     // Load disclaimer on component init
     this.loadDisclaimer();

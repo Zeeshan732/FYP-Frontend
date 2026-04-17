@@ -36,26 +36,28 @@
         class="item"
         [class.unread]="notificationsService.isUnread(note)"
       >
-        <div class="item-main">
-          <div class="icon-pill" [class.unread]="notificationsService.isUnread(note)">
-            <svg *ngIf="notificationsService.isUnread(note)" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M5.07 19h13.86A2.07 2.07 0 0021 16.93V7.07A2.07 2.07 0 0018.93 5H5.07A2.07 2.07 0 003 7.07v9.86A2.07 2.07 0 005.07 19z"/>
-            </svg>
-            <svg *ngIf="!notificationsService.isUnread(note)" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
+        <button type="button" class="item-open" (click)="openNotification(note)" [attr.aria-label]="'Open notification'">
+          <div class="item-main">
+            <div class="icon-pill" [class.unread]="notificationsService.isUnread(note)">
+              <svg *ngIf="notificationsService.isUnread(note)" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M5.07 19h13.86A2.07 2.07 0 0021 16.93V7.07A2.07 2.07 0 0018.93 5H5.07A2.07 2.07 0 003 7.07v9.86A2.07 2.07 0 005.07 19z"/>
+              </svg>
+              <svg *ngIf="!notificationsService.isUnread(note)" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="item-text">
+              <div class="item-title">{{ note.message }}</div>
+              <div class="item-meta">{{ formatRelativeTime(note.createdAt) }}</div>
+            </div>
           </div>
-          <div class="item-text">
-            <div class="item-title">{{ note.message }}</div>
-            <div class="item-meta">{{ note.createdAt | date:'medium' }}</div>
-          </div>
-        </div>
+        </button>
         <div class="item-actions">
           <button
             *ngIf="isAccountRequest(note)"
             type="button"
             class="icon-btn view"
-            (click)="viewUserDetails(note)"
+            (click)="viewUserDetails(note); $event.stopPropagation()"
             title="Open in Account Requests"
             aria-label="Open account request"
           >
@@ -68,7 +70,7 @@
             *ngIf="notificationsService.isUnread(note)"
             type="button"
             class="icon-btn mark"
-            (click)="markRead(note)"
+            (click)="markRead(note); $event.stopPropagation()"
             title="Mark as read"
             aria-label="Mark as read"
           >
