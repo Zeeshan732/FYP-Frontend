@@ -90,3 +90,55 @@ input, select, textarea {
   color: #E05252;
   font-size: 12px;
 }
+
+.cm-body-warn {
+  .warn-title {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fecaca;
+  }
+
+  .warn-text {
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .warn-label {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+  }
+}
+
+.cm-test-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.cm-test-grid--invite {
+  margin-bottom: 4px;
+}
+
+.cm-test-btn {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0a1628;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cm-test-btn.active {
+  border-color: #2e86de;
+  background: rgba(46, 134, 222, 0.2);
+  color: #fff;
+}

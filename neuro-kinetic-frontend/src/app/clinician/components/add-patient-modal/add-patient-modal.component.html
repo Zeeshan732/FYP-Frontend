@@ -5,12 +5,12 @@
       <button type="button" (click)="close.emit()">×</button>
     </div>
 
-    <div class="cm-body">
+    <div class="cm-body" *ngIf="phase === 'form'">
       <div class="cm-row">
         <input [(ngModel)]="form.firstName" placeholder="First name">
         <input [(ngModel)]="form.lastName" placeholder="Last name">
       </div>
-      <input [(ngModel)]="form.email" placeholder="Email">
+      <input [(ngModel)]="form.email" placeholder="Email" type="email" autocomplete="email">
       <div class="cm-row">
         <input type="date" [(ngModel)]="form.dateOfBirth">
         <select [(ngModel)]="form.gender">
@@ -25,11 +25,35 @@
       <div class="cm-error" *ngIf="errorMessage">{{ errorMessage }}</div>
     </div>
 
-    <div class="cm-footer">
+    <div class="cm-body cm-body-warn" *ngIf="phase === 'noAccount'">
+      <p class="warn-title">No account for this email</p>
+      <p class="warn-text">
+        This patient does not currently have an account. You can send them an invitation to register,
+        or go back and use a different email.
+      </p>
+      <p class="warn-label">Recommended test (included in invitation)</p>
+      <div class="cm-test-grid cm-test-grid--invite">
+        <button class="cm-test-btn" [class.active]="inviteTestType==='voice'" (click)="inviteTestType='voice'" type="button">Voice</button>
+        <button class="cm-test-btn" [class.active]="inviteTestType==='gait'" (click)="inviteTestType='gait'" type="button">Gait</button>
+        <button class="cm-test-btn" [class.active]="inviteTestType==='fingertap'" (click)="inviteTestType='fingertap'" type="button">Finger tap</button>
+      </div>
+      <div class="cm-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    </div>
+
+    <div class="cm-footer" *ngIf="phase === 'form'">
       <button class="cm-btn cm-btn-ghost" type="button" (click)="close.emit()">Cancel</button>
       <button class="cm-btn cm-btn-primary" type="button" [disabled]="isSubmitting" (click)="submit()">
-        <app-loader *ngIf="isSubmitting" variant="button" title="Saving..."></app-loader>
+        <app-loader *ngIf="isSubmitting" variant="button" title="Checking..."></app-loader>
         <ng-container *ngIf="!isSubmitting">Add patient</ng-container>
+      </button>
+    </div>
+
+    <div class="cm-footer" *ngIf="phase === 'noAccount'">
+      <button class="cm-btn cm-btn-ghost" type="button" [disabled]="isSubmitting" (click)="backToForm()">Back</button>
+      <button class="cm-btn cm-btn-ghost" type="button" [disabled]="isSubmitting" (click)="close.emit()">Cancel</button>
+      <button class="cm-btn cm-btn-primary" type="button" [disabled]="isSubmitting" (click)="sendInvitation()">
+        <app-loader *ngIf="isSubmitting" variant="button" title="Sending..."></app-loader>
+        <ng-container *ngIf="!isSubmitting">Send invitation email</ng-container>
       </button>
     </div>
   </div>

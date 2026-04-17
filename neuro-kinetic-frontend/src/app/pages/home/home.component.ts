@@ -2,7 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
-import { ChatConversation, PagedResult, UserTestRecord } from '../../models/api.models';
+import {
+  ChatConversation,
+  PagedResult,
+  PatientClinicianTestRequestItem,
+  UserTestRecord
+} from '../../models/api.models';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
@@ -34,6 +39,7 @@ export class HomeComponent implements OnInit {
 
   recentTests: UserTestRecord[] = [];
   recentConversations: ChatConversation[] = [];
+  clinicianTestRequests: PatientClinicianTestRequestItem[] = [];
 
   constructor(
     private authService: AuthService,
@@ -111,7 +117,10 @@ export class HomeComponent implements OnInit {
         sortOrder: 'desc',
         userId: this.currentUser?.id
       }),
-      chatSummary: this.loadChatSummary()
+      chatSummary: this.loadChatSummary(),
+      clinicianRequests: this.apiService.getPatientClinicianTestRequests().pipe(
+        catchError(() => of([] as PatientClinicianTestRequestItem[]))
+      )
     }).pipe(
       catchError(() => {
         this.error = 'Unable to load dashboard data right now.';
@@ -148,6 +157,62 @@ export class HomeComponent implements OnInit {
 
       this.recentTests = recentTests;
       this.recentConversations = result.chatSummary.recentConversations;
+      this.clinicianTestRequests = result.clinicianRequests || [];
+    });
+  }
+
+  formatRelativeTime(iso: string): string {
+    const d = new Date(iso);
+    const now = Date.now();
+    const diff = now - d.getTime();
+    const sec = Math.floor(diff / 1000);
+    if (sec < 60) return 'Just now';
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min} minute${min === 1 ? '' : 's'} ago`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr} hour${hr === 1 ? '' : 's'} ago`;
+    const day = Math.floor(hr / 24);
+    if (day === 1) return 'Yesterday';
+    if (day < 7) return `${day} days ago`;
+    return d.toLocaleDateString();
+  }
+
+  testLabel(t: string): string {
+    const x = (t || '').toLowerCase();
+    if (x === 'voice') return 'Voice';
+    if (x === 'gait') return 'Gait';
+    if (x === 'fingertap') return 'Finger tap';
+    return t;
+  }
+
+  requestStatusLabel(status: string): string {
+    const s = (status || '').toLowerCase();
+    if (s === 'pending') return 'Pending';
+    if (s === 'completed') return 'Completed';
+    if (s === 'expired') return 'Expired';
+    if (s === 'cancelled') return 'Cancelled';
+    return status || 'Pending';
+  }
+
+  requestStatusClass(status: string): string {
+    const s = (status || '').toLowerCase();
+    if (s === 'completed') return 'req-status--done';
+    if (s === 'expired' || s === 'cancelled') return 'req-status--inactive';
+    return 'req-status--pending';
+  }
+
+  startRequestedTest(item: PatientClinicianTestRequestItem): void {
+    const t = (item.testType || 'voice').toLowerCase();
+    if (t === 'gait') {
+      this.router.navigate(['/gait-analysis'], { queryParams: { fromRequest: item.id } });
+      return;
+    }
+    if (t === 'fingertap') {
+      this.router.navigate(['/finger-tap'], { queryParams: { fromRequest: item.id } });
+      return;
+    }
+    this.router.navigate(['/patient-test'], {
+      queryParams: { requested: 'voice', fromRequest: item.id }
     });
   }
 

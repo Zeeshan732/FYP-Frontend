@@ -111,6 +111,43 @@
         </article>
       </div>
 
+      <section class="panel-card req-panel" aria-labelledby="dash-req-heading">
+        <div class="panel-head">
+          <h2 id="dash-req-heading">Test requests from your clinician</h2>
+          <button type="button" class="link-btn" routerLink="/notifications">Notifications</button>
+        </div>
+
+        <div class="empty" *ngIf="clinicianTestRequests.length === 0">
+          No active requests right now. When your clinician sends a test request, it will appear here.
+        </div>
+
+        <div class="req-list" *ngIf="clinicianTestRequests.length > 0">
+          <div class="req-card" *ngFor="let r of clinicianTestRequests">
+            <div class="req-main">
+              <p class="req-clinician">{{ r.clinicianName }}</p>
+              <p class="req-test">{{ testLabel(r.testType) }} assessment</p>
+              <p class="req-meta">
+                Requested {{ formatRelativeTime(r.createdAt) }}
+                <span *ngIf="r.message"> · {{ r.message }}</span>
+              </p>
+            </div>
+            <div class="req-aside">
+              <span class="req-status-pill" [ngClass]="requestStatusClass(r.status)">
+                {{ requestStatusLabel(r.status) }}
+              </span>
+              <button
+                type="button"
+                class="req-cta"
+                *ngIf="(r.status || '').toLowerCase() === 'pending'"
+                (click)="startRequestedTest(r)"
+              >
+                Start test
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div class="content-grid">
         <section class="panel-card">
           <div class="panel-head">

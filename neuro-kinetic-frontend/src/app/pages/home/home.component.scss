@@ -242,6 +242,106 @@
   color: #3a6080;
 }
 
+.req-panel {
+  margin-bottom: 14px;
+}
+
+.req-list {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0 8px;
+  gap: 0;
+}
+
+.req-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+  &:first-of-type {
+    border-top: none;
+  }
+}
+
+.req-main {
+  min-width: 0;
+  flex: 1 1 220px;
+}
+
+.req-clinician {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.req-test {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.req-meta {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.48);
+  line-height: 1.4;
+}
+
+.req-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.req-status-pill {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.req-status--pending {
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.req-status--done {
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.req-status--inactive {
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.req-cta {
+  border-radius: 10px;
+  border: 1px solid #2e86de;
+  background: rgba(46, 134, 222, 0.25);
+  color: #e8f2ff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.req-cta:hover {
+  background: rgba(46, 134, 222, 0.4);
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
