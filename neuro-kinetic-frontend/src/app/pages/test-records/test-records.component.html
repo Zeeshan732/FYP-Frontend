@@ -65,6 +65,7 @@
             </button>
 
             <button
+              *ngIf="canTakeTest"
               (click)="takeNewTest()"
               class="test-records-primary-btn inline-flex items-center justify-center bg-app-primary hover:bg-app-primary-hover text-white px-5 py-2.5 rounded-app-lg transition-colors font-semibold text-sm whitespace-nowrap"
             >
@@ -453,6 +454,7 @@
         </ng-container>
       </p>
       <button 
+        *ngIf="canTakeTest"
         (click)="takeNewTest()"
         class="bg-app-primary hover:bg-app-primary-hover text-white px-6 py-3 rounded-app-lg transition-colors font-semibold"
       >

@@ -303,6 +303,10 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
     return !!this.currentUser;
   }
 
+  get canTakeTest(): boolean {
+    return !this.isAdmin && !this.isMedicalProfessional;
+  }
+
   get hasAnySelection(): boolean {
     return this.selectedIds.size > 0;
   }
@@ -467,6 +471,14 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
   }
 
   takeNewTest() {
+    if (!this.canTakeTest) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Not available',
+        detail: 'Only patients can start a new test from this page.'
+      });
+      return;
+    }
     this.router.navigate(['/patient-test']);
   }
 
