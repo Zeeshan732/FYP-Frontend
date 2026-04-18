@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../services/api.service';
 import { ContactMessageItem, PagedResult } from '../../models/api.models';
+import { shouldIgnoreDataCardClick, shouldIgnoreDataRowClick } from '../../shared/utils/table-row-click';
 
 @Component({
   selector: 'app-contact-messages',
@@ -32,6 +33,9 @@ export class ContactMessagesComponent implements OnInit, OnDestroy {
   /** NeuroSync confirmation modal (ns-modal) */
   showDeleteMessageDialog = false;
   messagePendingDelete: ContactMessageItem | null = null;
+
+  showMessageDetailDialog = false;
+  messageDetail: ContactMessageItem | null = null;
 
   readonly subjectOptions = [
     { label: 'All Subjects', value: '' },
@@ -161,6 +165,30 @@ export class ContactMessagesComponent implements OnInit, OnDestroy {
     if (!this.hasNext) return;
     this.currentPage += 1;
     this.load();
+  }
+
+  openMessageDetail(item: ContactMessageItem): void {
+    this.messageDetail = item;
+    this.showMessageDetailDialog = true;
+  }
+
+  closeMessageDetail(): void {
+    this.showMessageDetailDialog = false;
+    this.messageDetail = null;
+  }
+
+  onContactRowClick(item: ContactMessageItem, ev: MouseEvent): void {
+    if (shouldIgnoreDataRowClick(ev, { actionsCellSelector: '.contact-messages-col-actions' })) {
+      return;
+    }
+    this.openMessageDetail(item);
+  }
+
+  onContactCardClick(item: ContactMessageItem, ev: MouseEvent): void {
+    if (shouldIgnoreDataCardClick(ev)) {
+      return;
+    }
+    this.openMessageDetail(item);
   }
 
   openDeleteMessageDialog(item: ContactMessageItem): void {

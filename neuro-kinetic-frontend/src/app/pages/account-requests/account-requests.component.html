@@ -68,7 +68,7 @@
 
         <div class="row state-row text-center" *ngIf="requests.length === 0">No account requests found.</div>
 
-        <div class="row" *ngFor="let req of requests">
+        <div class="row row--interactive" *ngFor="let req of requests" (click)="openModal(req)">
           <div class="cell user col-user">
             <div class="name">{{ req.firstName }} {{ req.lastName }}</div>
             <div class="meta">ID: {{ req.id }}</div>
@@ -92,7 +92,7 @@
           <!-- <div class="cell reason col-reason">
             <div class="pill">{{ req.comment ? req.comment : '-' }}</div>
           </div> -->
-          <div class="cell actions col-actions">
+          <div class="cell actions col-actions" (click)="$event.stopPropagation()">
             <button
               class="table-action-btn"
               [disabled]="loading"

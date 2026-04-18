@@ -2,6 +2,10 @@
   position: fixed;
   inset: 0;
   z-index: 10800;
+
+  &--elevated {
+    z-index: 10920;
+  }
   background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
@@ -49,6 +53,42 @@
   border-bottom: 0.5px solid #1a3050;
   box-sizing: border-box;
   flex-shrink: 0;
+}
+
+.ns-modal__header--with-close {
+  justify-content: space-between;
+}
+
+.ns-modal__header-close {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: -4px -6px -4px 8px;
+  padding: 0;
+  border: 0.5px solid rgba(168, 196, 220, 0.35);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.15);
+  color: #c5d8ec;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+
+  .pi {
+    font-size: 0.95rem;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(224, 82, 82, 0.12);
+    border-color: rgba(224, 82, 82, 0.45);
+    color: #ffb4b4;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
 }
 
 .ns-modal__header--danger {
@@ -154,6 +194,114 @@
   border-top: 0.5px solid #1a3050;
   background: #112240;
   box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.ns-modal__footer--text {
+  gap: 12px;
+  flex-wrap: nowrap;
+  justify-content: center;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  .ns-modal__text-btn {
+    flex: 0 0 auto;
+    width: 7.75rem;
+    min-width: 7.75rem;
+    max-width: 7.75rem;
+    box-sizing: border-box;
+  }
+}
+
+.ns-modal__text-btn {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s, opacity 0.12s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0.5px solid transparent;
+  box-sizing: border-box;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.ns-modal__text-btn--secondary {
+  background: rgba(224, 82, 82, 0.08);
+  border-color: rgba(224, 82, 82, 0.45);
+  color: #e88383;
+
+  &:hover:not(:disabled) {
+    background: rgba(224, 82, 82, 0.15);
+    border-color: rgba(224, 82, 82, 0.65);
+    color: #ffb4b4;
+  }
+}
+
+.ns-modal__text-btn--primary {
+  border-color: rgba(110, 176, 255, 0.45);
+  background: rgba(46, 134, 222, 0.12);
+  color: #7eb8ff;
+
+  &:hover:not(:disabled) {
+    background: rgba(46, 134, 222, 0.2);
+    border-color: rgba(110, 176, 255, 0.6);
+  }
+}
+
+.ns-modal__text-btn--danger {
+  border-color: rgba(29, 158, 117, 0.45);
+  background: rgba(29, 158, 117, 0.12);
+  color: #5ed4a8;
+
+  &:hover:not(:disabled) {
+    background: rgba(29, 158, 117, 0.2);
+    border-color: rgba(77, 212, 160, 0.55);
+  }
+}
+
+.ns-modal__text-btn--success {
+  border-color: rgba(77, 212, 160, 0.5);
+  background: rgba(29, 158, 117, 0.14);
+  color: #4cd4a0;
+
+  &:hover:not(:disabled) {
+    background: rgba(29, 158, 117, 0.22);
+  }
+}
+
+.ns-modal__text-btn--warning {
+  border-color: rgba(240, 181, 64, 0.5);
+  background: rgba(240, 165, 0, 0.14);
+  color: #f5c15c;
+
+  &:hover:not(:disabled) {
+    background: rgba(240, 165, 0, 0.24);
+  }
+}
+
+.ns-modal__text-btn--info {
+  border-color: rgba(110, 176, 255, 0.45);
+  background: rgba(46, 134, 222, 0.12);
+  color: #7eb8ff;
+
+  &:hover:not(:disabled) {
+    background: rgba(46, 134, 222, 0.2);
+  }
+}
+
+.ns-modal__spinner--inline {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
   flex-shrink: 0;
 }
 

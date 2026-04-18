@@ -7,7 +7,6 @@
 .chat-history-controls-row {
   display: flex;
   gap: 1rem;
-  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   min-width: 0;
@@ -32,39 +31,26 @@
   flex: 1 1 200px;
 }
 
-.chat-history-actions {
-  display: grid;
-  gap: 0.5rem 0.55rem;
+/** Search + bulk delete grouped at the right; tight gap (input fills field — no inner dead space). */
+.chat-history-controls-right {
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  margin-left: auto;
   min-width: 0;
-  flex: 1 1 280px;
-  justify-content: end;
-  grid-template-columns: auto minmax(160px, 1fr);
-  grid-template-rows: auto;
-  grid-template-areas: 'trash q';
-  justify-items: stretch;
-}
-
-.chat-history-actions--no-bulk {
-  grid-template-columns: 1fr;
-  grid-template-areas: 'q';
-}
-
-.ch-tool--trash {
-  grid-area: trash;
-}
-
-.ch-tool--query {
-  grid-area: q;
-  min-width: 0;
+  max-width: 100%;
 }
 
 .chat-search-field {
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 0;
-  width: 100%;
+  flex: 0 1 auto;
+  box-sizing: border-box;
+  min-width: 12rem;
+  width: clamp(12.5rem, 34vw, 24rem);
+  max-width: min(24rem, calc(100vw - 5.5rem));
 }
 
 .chat-search-field__icon {
@@ -89,9 +75,9 @@
 }
 
 .chat-search-input {
+  box-sizing: border-box;
   min-width: 0;
   width: 100%;
-  max-width: none;
   padding: 0.55rem 0.75rem;
   border: 1px solid var(--app-border);
   border-radius: 0.6rem;
@@ -116,6 +102,7 @@
   justify-content: center;
   gap: 0.35rem;
   flex: 0 0 auto;
+  flex-shrink: 0;
   min-width: 2.5rem;
 }
 
@@ -149,25 +136,28 @@
 }
 
 .select-col {
-  width: 54px;
+  width: 6%;
+  min-width: 2.75rem;
+  max-width: 3.25rem;
 }
 
-/* Keep numeric / action columns narrow so centered content sits under the header label */
-.col-messages {
-  width: 6.5rem;
-  min-width: 6.5rem;
-  text-align: center;
+/* Equal column widths: checkbox + four equal content columns (colgroup). */
+.chat-history-table {
+  table-layout: fixed;
+  width: 100%;
 }
 
-.col-updated {
-  width: 10.5rem;
-  min-width: 10.5rem;
-  text-align: center;
+.chat-history-col-select {
+  width: 6%;
 }
 
+.chat-history-col-eq {
+  width: 23.5%;
+}
+
+.col-messages,
+.col-updated,
 .col-actions {
-  width: 7.5rem;
-  min-width: 7.5rem;
   text-align: center;
 }
 
@@ -182,14 +172,6 @@
   font-weight: 600;
   overflow-wrap: anywhere;
   word-break: break-word;
-}
-
-.preview-cell {
-  color: var(--app-text-muted);
-  max-width: 520px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .actions-cell {
@@ -227,14 +209,34 @@
     flex: none;
   }
 
-  .chat-history-actions {
-    flex: none;
+  .chat-history-controls-right {
+    margin-left: 0;
     width: 100%;
     max-width: 100%;
+    flex: none;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+
+  .chat-search-field {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    max-width: none;
   }
 }
 
-/* View-detail modal: transcript (ns-modal wide panel) */
+@media (max-width: 380px) {
+  .chat-history-controls-right {
+    flex-wrap: nowrap;
+  }
+
+  .chat-search-field {
+    min-width: 0;
+  }
+}
+
+/* Transcript modal (wide ns-modal) */
 .chat-detail-modal {
   min-height: 120px;
 }
@@ -350,4 +352,3 @@
   font-size: 0.7rem;
   color: rgba(168, 196, 220, 0.65);
 }
-

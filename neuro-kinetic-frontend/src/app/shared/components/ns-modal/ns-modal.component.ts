@@ -11,7 +11,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { NsModalIntent } from './ns-modal.models';
+import { NsModalFooterVariant, NsModalIntent } from './ns-modal.models';
 
 @Component({
   selector: 'ns-modal',
@@ -59,8 +59,14 @@ export class NsModalComponent {
   /** Accessible labels for icon-only footer controls */
   @Input() cancelLabel = 'Cancel';
   @Input() confirmLabel = 'Confirm';
+  /** `singleAction` header close control (replaces footer tick). */
+  @Input() closeButtonLabel = 'Close';
+  /** `text` shows labeled buttons (same global modal chrome); `icons` keeps the compact icon footer. */
+  @Input() footerVariant: NsModalFooterVariant = 'icons';
   /** Wider panel for read-only content (e.g. conversation transcript). */
   @Input() panelSize: 'default' | 'wide' = 'default';
+  /** Raise backdrop above another open `ns-modal` (stacked dialogs). */
+  @Input() elevated = false;
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() cancel = new EventEmitter<void>();
@@ -94,6 +100,13 @@ export class NsModalComponent {
       return;
     }
     this.confirm.emit();
+  }
+
+  onHeaderCloseClick(): void {
+    if (this.confirmLoading) {
+      return;
+    }
+    this.emitDismiss();
   }
 
   headerModifierClass(): string {

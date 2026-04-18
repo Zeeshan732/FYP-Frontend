@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../services/api.service';
 import { ChatConversation, ChatMessage, PagedResult } from '../../models/api.models';
+import { shouldIgnoreDataCardClick, shouldIgnoreDataRowClick } from '../../shared/utils/table-row-click';
 
 @Component({
   selector: 'app-chat-history',
@@ -22,11 +23,21 @@ export class ChatHistoryComponent implements OnInit, OnDestroy {
 
   showBulkDeleteDialog = false;
 
+  /** Continue previous conversation (global ns-modal, then navigate to consultation). */
+  showContinueChatDialog = false;
+  chatPendingContinue: ChatConversation | null = null;
+
+  /** View icon: transcript modal, then delayed continue prompt. */
   showChatDetailModal = false;
   chatDetail: ChatConversation | null = null;
   chatDetailMessages: ChatMessage[] = [];
   chatDetailLoading = false;
   chatDetailError = '';
+  /** Conversation waiting for delayed continue after preview (cleared if user closes preview early). */
+  private chatAwaitingContinueAfterPreview: ChatConversation | null = null;
+  private continueAfterPreviewTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Delay after messages are shown before opening the continue dialog (2–3 s). */
+  private readonly continuePromptDelayMs = 2600;
 
   searchTerm = '';
   sortOrder: 'asc' | 'desc' = 'desc';
@@ -52,6 +63,7 @@ export class ChatHistoryComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearSearchDebounce();
+    this.clearContinueAfterPreviewTimer();
   }
 
   private clearSearchDebounce(): void {
@@ -133,41 +145,100 @@ export class ChatHistoryComponent implements OnInit, OnDestroy {
     this.load();
   }
 
-  openConversation(item: ChatConversation): void {
+  requestContinueChat(item: ChatConversation): void {
+    this.chatPendingContinue = item;
+    this.showContinueChatDialog = true;
+  }
+
+  cancelContinueChat(): void {
+    this.showContinueChatDialog = false;
+    this.chatPendingContinue = null;
+  }
+
+  confirmContinueChat(): void {
+    const item = this.chatPendingContinue;
+    if (!item) {
+      return;
+    }
+    this.showContinueChatDialog = false;
+    this.chatPendingContinue = null;
+    this.resetChatDetailModalState();
+    this.showChatDetailModal = false;
+    this.router.navigate(['/consultation'], { queryParams: { cid: item.id } });
+  }
+
+  /**
+   * Eye icon: open transcript in a modal; after messages load, wait ~2–3 s then show continue confirmation.
+   */
+  openChatFromViewIcon(item: ChatConversation): void {
+    this.clearContinueAfterPreviewTimer();
+    this.chatAwaitingContinueAfterPreview = item;
     const conversationId = item.id;
     this.chatDetail = item;
     this.chatDetailMessages = [];
     this.chatDetailError = '';
     this.chatDetailLoading = true;
     this.showChatDetailModal = true;
+
     this.apiService.getChatMessages(conversationId).subscribe({
       next: (messages) => {
-        if (this.chatDetail?.id !== conversationId) {
+        if (this.chatDetail?.id !== conversationId || this.chatAwaitingContinueAfterPreview?.id !== item.id) {
           return;
         }
         this.chatDetailMessages = messages;
         this.chatDetailLoading = false;
+        this.scheduleContinuePromptAfterPreview();
       },
       error: () => {
-        if (this.chatDetail?.id !== conversationId) {
+        if (this.chatDetail?.id !== conversationId || this.chatAwaitingContinueAfterPreview?.id !== item.id) {
           return;
         }
         this.chatDetailLoading = false;
         this.chatDetailError = 'Could not load messages for this conversation.';
+        this.chatAwaitingContinueAfterPreview = null;
+        this.clearContinueAfterPreviewTimer();
       }
     });
   }
 
-  closeChatDetailModal(): void {
-    this.showChatDetailModal = false;
+  private scheduleContinuePromptAfterPreview(): void {
+    this.clearContinueAfterPreviewTimer();
+    this.continueAfterPreviewTimer = setTimeout(() => {
+      this.continueAfterPreviewTimer = null;
+      const target = this.chatAwaitingContinueAfterPreview;
+      this.chatAwaitingContinueAfterPreview = null;
+      if (!target || !this.showChatDetailModal) {
+        return;
+      }
+      // Keep transcript modal open; continue dialog stacks on top (see `elevated` on ns-modal).
+      this.chatPendingContinue = target;
+      this.showContinueChatDialog = true;
+    }, this.continuePromptDelayMs);
+  }
+
+  private clearContinueAfterPreviewTimer(): void {
+    if (this.continueAfterPreviewTimer) {
+      clearTimeout(this.continueAfterPreviewTimer);
+      this.continueAfterPreviewTimer = null;
+    }
+  }
+
+  private resetChatDetailModalState(): void {
     this.chatDetail = null;
     this.chatDetailMessages = [];
     this.chatDetailError = '';
     this.chatDetailLoading = false;
   }
 
-  openConsultation(): void {
-    this.router.navigate(['/consultation']);
+  closeChatDetailModal(): void {
+    this.clearContinueAfterPreviewTimer();
+    this.chatAwaitingContinueAfterPreview = null;
+    if (this.showContinueChatDialog) {
+      this.showContinueChatDialog = false;
+      this.chatPendingContinue = null;
+    }
+    this.resetChatDetailModalState();
+    this.showChatDetailModal = false;
   }
 
   get chatDetailSubtext(): string | null {
@@ -178,6 +249,24 @@ export class ChatHistoryComponent implements OnInit, OnDestroy {
     const n = c.messageCount;
     const when = new Date(c.updatedAt).toLocaleString();
     return `${n} message${n === 1 ? '' : 's'} · Last activity ${when}`;
+  }
+
+  onChatRowClick(item: ChatConversation, ev: MouseEvent): void {
+    if (shouldIgnoreDataRowClick(ev, { actionsCellSelector: '.col-actions' })) {
+      return;
+    }
+    this.requestContinueChat(item);
+  }
+
+  onChatCardClick(item: ChatConversation, ev: MouseEvent): void {
+    if (shouldIgnoreDataCardClick(ev)) {
+      return;
+    }
+    this.requestContinueChat(item);
+  }
+
+  openConsultation(): void {
+    this.router.navigate(['/consultation']);
   }
 
   get hasAnySelection(): boolean {

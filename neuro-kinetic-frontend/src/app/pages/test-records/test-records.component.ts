@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { shouldIgnoreDataCardClick, shouldIgnoreDataRowClick } from '../../shared/utils/table-row-click';
 import { 
   UserTestRecord, 
   PagedResult, 
@@ -405,6 +406,20 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
     const n = Number(value);
     const rounded = Math.round(n * 100) / 100;
     return `${rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(2)}%`;
+  }
+
+  onTestRecordRowClick(record: UserTestRecord, ev: MouseEvent): void {
+    if (shouldIgnoreDataRowClick(ev, { actionsCellSelector: '.test-records-actions-col' })) {
+      return;
+    }
+    this.viewRecord(record.id);
+  }
+
+  onTestRecordCardClick(record: UserTestRecord, ev: MouseEvent): void {
+    if (shouldIgnoreDataCardClick(ev)) {
+      return;
+    }
+    this.viewRecord(record.id);
   }
 
   viewRecord(id: number) {

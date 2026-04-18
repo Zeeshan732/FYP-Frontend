@@ -264,11 +264,14 @@
                     </span>
                   </div>
                 </th>
-                <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary">Actions</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-app-primary test-records-actions-col">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let record of records" class="transition-colors">
+              <tr
+                *ngFor="let record of records"
+                class="transition-colors neuro-table__row--clickable"
+                (click)="onTestRecordRowClick(record, $event)">
                 <td *ngIf="canManageRecords" class="px-4 py-4 text-center test-records-select-col">
                   <input
                     type="checkbox"
@@ -299,7 +302,7 @@
                     {{ record.status }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-center">
+                <td class="px-6 py-4 text-center test-records-actions-col">
                   <div class="actions-cell inline-flex items-center justify-center gap-0.5">
                     <p-button 
                       icon="pi pi-eye"
@@ -352,8 +355,9 @@
       >
         <article
           *ngFor="let record of records"
-          class="ns-data-card"
+          class="ns-data-card ns-data-card--row-click"
           role="listitem"
+          (click)="onTestRecordCardClick(record, $event)"
         >
           <div class="ns-data-card__head">
             <div class="ns-data-card__title-block">

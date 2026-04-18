@@ -146,6 +146,14 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
+.row--interactive {
+  cursor: pointer;
+}
+
+.row--interactive:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .cell.user .name {
   font-weight: 500;
   color: #ffffff;

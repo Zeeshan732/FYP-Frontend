@@ -86,11 +86,14 @@
                   <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">Admin Email</th>
                   <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">User Ack</th>
                   <th class="px-4 py-3 text-left text-sm font-semibold text-app-primary">Received</th>
-                  <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary">Action</th>
+                  <th class="px-4 py-3 text-center text-sm font-semibold text-app-primary contact-messages-col-actions">Action</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of items">
+                <tr
+                  *ngFor="let item of items"
+                  class="neuro-table__row--clickable"
+                  (click)="onContactRowClick(item, $event)">
                   <td class="px-3 sm:px-4 py-3 text-sm text-app-text-primary contact-messages-col-name">{{ item.firstName }} {{ item.lastName }}</td>
                   <td class="px-3 sm:px-4 py-3 text-sm text-app-text-primary contact-messages-col-email">{{ item.email }}</td>
                   <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.subject }}</td>
@@ -105,7 +108,7 @@
                     </span>
                   </td>
                   <td class="px-4 py-3 text-sm text-app-text-primary">{{ item.createdAt | date:'medium' }}</td>
-                  <td class="px-4 py-3 text-center">
+                  <td class="px-4 py-3 text-center contact-messages-col-actions">
                     <p-button
                       icon="pi pi-trash"
                       severity="danger"
@@ -122,7 +125,7 @@
       </div>
 
       <div class="ns-data-shell__cards" role="list" aria-label="Contact messages">
-        <article *ngFor="let item of items" class="ns-data-card" role="listitem">
+        <article *ngFor="let item of items" class="ns-data-card ns-data-card--row-click" role="listitem" (click)="onContactCardClick(item, $event)">
           <div class="ns-data-card__head">
             <div class="ns-data-card__title-block">
               <div class="ns-data-card__title">{{ item.firstName }} {{ item.lastName }}</div>
@@ -207,6 +210,27 @@
     </div>
   </div>
 </section>
+
+<ns-modal
+  [(visible)]="showMessageDetailDialog"
+  intent="info"
+  panelSize="wide"
+  [title]="messageDetail?.subject || 'Contact message'"
+  [subtext]="messageDetail ? messageDetail.email : null"
+  [singleAction]="true"
+  closeButtonLabel="Close"
+  confirmLabel="Close"
+  [dismissible]="true"
+  (cancel)="closeMessageDetail()">
+  <div *ngIf="messageDetail as d" class="contact-msg-detail">
+    <p class="contact-msg-detail__from">
+      <strong>{{ d.firstName }} {{ d.lastName }}</strong>
+      <span *ngIf="d.organization" class="contact-msg-detail__org"> · {{ d.organization }}</span>
+    </p>
+    <p class="contact-msg-detail__received text-app-text-muted text-sm">Received {{ d.createdAt | date:'medium' }}</p>
+    <div class="contact-msg-detail__body">{{ d.message }}</div>
+  </div>
+</ns-modal>
 
 <ns-modal
   [(visible)]="showDeleteMessageDialog"

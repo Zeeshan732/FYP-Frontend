@@ -724,6 +724,10 @@ a.text-app-primary,
   background: var(--color-sky);
 }
 
+.neuro-table tbody tr.neuro-table__row--clickable {
+  cursor: pointer;
+}
+
 .neuro-table td {
   color: var(--color-ink);
 }
@@ -833,6 +837,21 @@ a.text-app-primary,
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-card);
+}
+
+.ns-data-card.ns-data-card--row-click {
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.ns-data-card.ns-data-card--row-click:hover {
+  background: var(--color-sky);
+}
+
+@media (hover: none) {
+  .ns-data-card.ns-data-card--row-click:active {
+    background: var(--color-sky);
+  }
 }
 
 .ns-data-card__head {
