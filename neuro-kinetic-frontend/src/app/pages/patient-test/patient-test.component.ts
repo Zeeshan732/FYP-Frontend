@@ -81,6 +81,9 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedMode: 'record' | 'upload' | 'live' = 'record';
   showFingerTapModal = false;
 
+  /** Query param from clinician dashboard — completes ClinicianTestRequest when voice test is saved */
+  private clinicianTestRequestId?: number;
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
@@ -101,6 +104,14 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     const requested = q.get('requested');
     if (requested === 'voice' || requested === 'gait' || requested === 'fingertap') {
       this.selectTest(requested);
+    }
+
+    const fromReq = q.get('fromRequest');
+    if (fromReq) {
+      const id = parseInt(fromReq, 10);
+      if (Number.isFinite(id)) {
+        this.clinicianTestRequestId = id;
+      }
     }
     
     // Load disclaimer on component init
@@ -537,7 +548,10 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   accuracy: (analysisResponse.confidenceScore ?? 0) * 100,
                   riskPercent: analysisResponse.riskPercent != null ? Math.round(analysisResponse.riskPercent) : undefined,
                   voiceRecordingUrl: uploadResponse?.fileUrl || uploadResponse?.filePath,
-                  analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`
+                  analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`,
+                  ...(this.clinicianTestRequestId != null
+                    ? { clinicianTestRequestId: this.clinicianTestRequestId }
+                    : {})
                 };
 
                 this.apiService.createUserTestRecord(testRecord).subscribe({
@@ -963,7 +977,10 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   accuracy: (analysisResponse.confidenceScore ?? 0) * 100,
                   riskPercent: analysisResponse.riskPercent != null ? Math.round(analysisResponse.riskPercent) : undefined,
                   voiceRecordingUrl: uploadResponse?.fileUrl || uploadResponse?.filePath,
-                  analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`
+                  analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`,
+                  ...(this.clinicianTestRequestId != null
+                    ? { clinicianTestRequestId: this.clinicianTestRequestId }
+                    : {})
                 };
 
                 this.apiService.createUserTestRecord(testRecord).subscribe({

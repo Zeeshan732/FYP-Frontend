@@ -26,11 +26,13 @@
     </div>
 
     <div class="cm-body cm-body-warn" *ngIf="phase === 'noAccount'">
-      <p class="warn-title">No account for this email</p>
+      <p class="warn-title">No patient account was found for this email address.</p>
       <p class="warn-text">
-        This patient does not currently have an account. You can send them an invitation to register,
-        or go back and use a different email.
+        No user account exists for this email yet. Send an invitation so they can register; no profile or login will be created until they sign up.
       </p>
+      <div class="cm-success" *ngIf="inviteSentSuccess">
+        Invitation email sent. This window will close shortly.
+      </div>
       <p class="warn-label">Recommended test (included in invitation)</p>
       <div class="cm-test-grid cm-test-grid--invite">
         <button class="cm-test-btn" [class.active]="inviteTestType==='voice'" (click)="inviteTestType='voice'" type="button">Voice</button>
@@ -49,9 +51,9 @@
     </div>
 
     <div class="cm-footer" *ngIf="phase === 'noAccount'">
-      <button class="cm-btn cm-btn-ghost" type="button" [disabled]="isSubmitting" (click)="backToForm()">Back</button>
-      <button class="cm-btn cm-btn-ghost" type="button" [disabled]="isSubmitting" (click)="close.emit()">Cancel</button>
-      <button class="cm-btn cm-btn-primary" type="button" [disabled]="isSubmitting" (click)="sendInvitation()">
+      <button class="cm-btn cm-btn-ghost" type="button" [disabled]="isSubmitting || inviteSentSuccess" (click)="backToForm()">Back</button>
+      <button class="cm-btn cm-btn-ghost" type="button" [disabled]="isSubmitting || inviteSentSuccess" (click)="close.emit()">Cancel</button>
+      <button class="cm-btn cm-btn-primary" type="button" [disabled]="isSubmitting || inviteSentSuccess" (click)="sendInvitation()">
         <app-loader *ngIf="isSubmitting" variant="button" title="Sending..."></app-loader>
         <ng-container *ngIf="!isSubmitting">Send invitation email</ng-container>
       </button>

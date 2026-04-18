@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AddPatientPayload, ClinicianService, Patient } from '../../services/clinician.service';
 
 @Component({
@@ -25,6 +26,7 @@ export class AddPatientModalComponent {
 
   isSubmitting = false;
   errorMessage = '';
+  inviteSentSuccess = false;
 
   constructor(private clinicianService: ClinicianService) {}
 
@@ -69,8 +71,23 @@ export class AddPatientModalComponent {
         this.patientAdded.emit(patient);
         this.close.emit();
       },
-      error: (err) => {
-        this.errorMessage = err.error?.message ?? 'Failed to add patient. Please try again.';
+      error: (err: HttpErrorResponse) => {
+        const code = err.error?.code as string | undefined;
+        if (err.status === 404 && code === 'NO_PATIENT_ACCOUNT') {
+          this.phase = 'noAccount';
+          this.errorMessage = '';
+          this.isSubmitting = false;
+          return;
+        }
+        if (err.status === 409 && code === 'NON_PATIENT_ACCOUNT') {
+          this.errorMessage =
+            err.error?.message ??
+            'This email cannot be added as a patient.';
+          this.isSubmitting = false;
+          return;
+        }
+        this.errorMessage =
+          err.error?.message ?? 'Failed to add patient. Please try again.';
         this.isSubmitting = false;
       }
     });
@@ -85,6 +102,7 @@ export class AddPatientModalComponent {
 
     this.isSubmitting = true;
     this.errorMessage = '';
+    this.inviteSentSuccess = false;
 
     this.clinicianService
       .sendTestInvitationEmail({
@@ -95,9 +113,12 @@ export class AddPatientModalComponent {
       .subscribe({
         next: () => {
           this.isSubmitting = false;
-          this.close.emit();
+          this.inviteSentSuccess = true;
+          window.setTimeout(() => {
+            this.close.emit();
+          }, 1600);
         },
-        error: (err) => {
+        error: (err: HttpErrorResponse) => {
           this.errorMessage =
             err.error?.message ??
             (err.status === 409
@@ -111,5 +132,6 @@ export class AddPatientModalComponent {
   backToForm(): void {
     this.phase = 'form';
     this.errorMessage = '';
+    this.inviteSentSuccess = false;
   }
 }

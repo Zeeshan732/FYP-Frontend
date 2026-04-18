@@ -342,11 +342,4 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/profile-settings']);
   }
 
-  /** Fallback when list shows unread but server count is stale */
-  get hasPreviewUnreadFallback(): boolean {
-    return (
-      this.unreadCount === 0 &&
-      this.notificationPreview.some((n) => this.notificationsService.isUnread(n))
-    );
-  }
 }
