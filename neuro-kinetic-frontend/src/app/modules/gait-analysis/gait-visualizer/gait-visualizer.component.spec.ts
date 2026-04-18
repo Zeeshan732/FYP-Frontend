@@ -3,6 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
+import { ActivatedRoute } from '@angular/router';
 import { GaitVisualizerComponent } from './gait-visualizer.component';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
@@ -27,6 +28,10 @@ describe('GaitVisualizerComponent', () => {
         {
           provide: AuthService,
           useValue: { currentUser$: of(null) }
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { queryParamMap: { get: () => null } } }
         }
       ]
     });

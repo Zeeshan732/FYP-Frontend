@@ -299,6 +299,10 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
     return this.isAdmin || this.isMedicalProfessional;
   }
 
+  get canDeleteRecords(): boolean {
+    return !!this.currentUser;
+  }
+
   get hasAnySelection(): boolean {
     return this.selectedIds.size > 0;
   }
@@ -654,4 +658,3 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
     return risk != null ? `${Math.round(risk)}%` : '—';
   }
 }
-

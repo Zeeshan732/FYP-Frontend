@@ -1,10 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
 import { AnalysisResult, UserTestRecordRequest } from '../../../models/api.models';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { ClinicalGaitForm } from './gait-clinical-form.types';
+import {
+  parseGaitCsvText,
+  validateGaitCsvFile,
+  GAIT_CSV_REQUIRED_COLUMNS
+} from './gait-csv-import.util';
+
+export type { ClinicalGaitForm } from './gait-clinical-form.types';
 
 /** Maps UI clinical inputs → 17-vector order in ml_service/gait_features.txt (internal only). */
 function buildModelFeatureVector(form: ClinicalGaitForm): number[] {
@@ -47,17 +55,6 @@ function buildModelFeatureVector(form: ClinicalGaitForm): number[] {
     swing,
     stance
   ];
-}
-
-export interface ClinicalGaitForm {
-  gaitVelocity: number;
-  strideLength: number;
-  cadence: number;
-  stepTimeVariability: number;
-  forceAsymmetry: number;
-  balanceScore: number;
-  walkingSpeed: number;
-  stepLengthDifference: number;
 }
 
 @Component({
@@ -121,6 +118,16 @@ export class GaitVisualizerComponent {
   /** From ?fromRequest= — server marks clinician test request completed when gait record is saved */
   private readonly clinicianTestRequestId?: number;
 
+  /** Last CSV import (audit / test record notes only; file is not stored) */
+  gaitValueSource: 'manual' | 'csv' = 'manual';
+  csvFileName: string | null = null;
+  csvImportErrors: string[] = [];
+  csvPreview: { key: string; value: string }[] = [];
+
+  @ViewChild('csvFileInput') csvFileInput?: ElementRef<HTMLInputElement>;
+
+  readonly csvRequiredColumns = GAIT_CSV_REQUIRED_COLUMNS;
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
@@ -134,16 +141,95 @@ export class GaitVisualizerComponent {
 
   loadHealthyExample(): void {
     this.form = { ...this.healthyExample };
+    this.clearCsvState();
     this.resetOutcomePanel();
   }
 
   loadParkinsonExample(): void {
     this.form = { ...this.parkinsonExample };
+    this.clearCsvState();
     this.resetOutcomePanel();
+  }
+
+  openCsvPicker(): void {
+    this.csvFileInput?.nativeElement?.click();
+  }
+
+  onCsvFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    input.value = '';
+
+    this.csvImportErrors = [];
+
+    const pre = validateGaitCsvFile(file);
+    if (pre) {
+      this.csvImportErrors = [pre];
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = typeof reader.result === 'string' ? reader.result : '';
+      const parsed = parseGaitCsvText(text);
+      if (!parsed.ok) {
+        this.csvImportErrors = parsed.errors;
+        this.csvFileName = file!.name;
+        return;
+      }
+
+      const rangeCheck = this.validateForm(parsed.values);
+      if (!rangeCheck.ok) {
+        this.csvImportErrors = [
+          rangeCheck.message,
+          'Adjust values manually or fix the CSV and upload again.'
+        ];
+        this.csvFileName = file!.name;
+        return;
+      }
+
+      this.form = { ...parsed.values };
+      this.gaitValueSource = 'csv';
+      this.csvFileName = file!.name;
+      this.csvImportErrors = [];
+      this.csvPreview = [
+        { key: 'gait_velocity', value: String(parsed.values.gaitVelocity) },
+        { key: 'stride_length', value: String(parsed.values.strideLength) },
+        { key: 'cadence', value: String(parsed.values.cadence) },
+        { key: 'step_time_variability', value: String(parsed.values.stepTimeVariability) },
+        { key: 'force_asymmetry', value: String(parsed.values.forceAsymmetry) },
+        { key: 'balance_score', value: String(parsed.values.balanceScore) },
+        { key: 'walking_speed', value: String(parsed.values.walkingSpeed) },
+        { key: 'step_length_difference', value: String(parsed.values.stepLengthDifference) }
+      ];
+      this.resetOutcomePanel();
+    };
+    reader.onerror = () => {
+      this.csvImportErrors = ['Could not read the file. Try again.'];
+    };
+    reader.readAsText(file!);
+  }
+
+  clearCsvImport(): void {
+    this.clearCsvState();
+    this.resetOutcomePanel();
+  }
+
+  private clearCsvState(): void {
+    this.gaitValueSource = 'manual';
+    this.csvFileName = null;
+    this.csvImportErrors = [];
+    this.csvPreview = [];
   }
 
   /** Clears the result panel when the clinician adjusts inputs after a run. */
   onFieldEdited(): void {
+    if (this.gaitValueSource === 'csv') {
+      this.gaitValueSource = 'manual';
+      this.csvFileName = null;
+      this.csvPreview = [];
+    }
+    this.csvImportErrors = [];
     this.resetOutcomePanel();
   }
 
@@ -170,7 +256,7 @@ export class GaitVisualizerComponent {
 
   analyzeGaitPattern(): void {
     this.error = '';
-    const v = this.validateForm();
+    const v = this.validateForm(this.form);
     if (!v.ok) {
       this.error = v.message;
       return;
@@ -211,8 +297,7 @@ export class GaitVisualizerComponent {
     });
   }
 
-  private validateForm(): { ok: boolean; message: string } {
-    const f = this.form;
+  private validateForm(f: ClinicalGaitForm = this.form): { ok: boolean; message: string } {
     if (Number.isNaN(f.gaitVelocity) || f.gaitVelocity < 0 || f.gaitVelocity > 4) {
       return { ok: false, message: 'Gait velocity must be between 0 and 4 m/s.' };
     }
@@ -350,6 +435,10 @@ export class GaitVisualizerComponent {
     const notesExtra = this.clinicalNotes.trim()
       ? ` Clinical notes: ${this.clinicalNotes.trim()}`
       : '';
+    const sourceExtra =
+      this.gaitValueSource === 'csv' && this.csvFileName
+        ? ` Source: CSV upload (${this.csvFileName}).`
+        : ' Source: Manual entry.';
     const req: UserTestRecordRequest = {
       userName: user?.email || 'Anonymous',
       userId: user?.id,
@@ -358,7 +447,7 @@ export class GaitVisualizerComponent {
       accuracy: (res.confidenceScore ?? 0) * 100,
       riskPercent: res.riskPercent != null ? Math.round(res.riskPercent) : undefined,
       analysisNotes:
-        `Gait clinical assessment. Session: ${sessionId}. Model: ${res.modelVersion || '—'}.${notesExtra}`,
+        `Gait clinical assessment. Session: ${sessionId}. Model: ${res.modelVersion || '—'}.${sourceExtra}${notesExtra}`,
       modality: 'gait',
       predictionScore0To1: p != null ? Math.min(1, Math.max(0, p)) : undefined,
       ...(this.clinicianTestRequestId != null

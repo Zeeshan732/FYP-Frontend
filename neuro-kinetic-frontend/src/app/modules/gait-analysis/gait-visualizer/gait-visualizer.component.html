@@ -21,7 +21,7 @@
           <h2 class="text-lg font-semibold text-app-text-primary mb-2">About this assessment</h2>
           <p class="text-app-text-muted leading-relaxed">
             Gait analysis helps identify movement abnormalities commonly associated with Parkinson's disease.
-            Doctors can manually enter clinically observed gait values below to estimate neurological risk.
+            Enter clinically observed gait values manually, or import a standard-format CSV — then review, adjust if needed, and run analysis.
             Results support clinical discussion only and are not a substitute for formal diagnosis.
           </p>
         </div>
@@ -47,6 +47,67 @@
                   Load Parkinson Example
                 </button>
               </div>
+            </div>
+
+            <input
+              #csvFileInput
+              type="file"
+              accept=".csv,text/csv"
+              class="ga-csv-file-input"
+              aria-label="Upload gait parameters CSV file"
+              (change)="onCsvFileSelected($event)"
+            />
+
+            <div class="ga-csv-panel rounded-xl border border-app-border/80 bg-app-primary/5 p-4 sm:p-5 mb-8">
+              <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div class="min-w-0">
+                  <h3 class="text-sm font-semibold text-app-text-primary">Import from CSV</h3>
+                  <p class="text-xs sm:text-sm text-app-text-muted mt-1 max-w-xl leading-relaxed">
+                    Optional: upload a <strong>.csv</strong> file with a header row and one data row.
+                    Values load into the fields below so you can review or edit before analysis.
+                  </p>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0">
+                  <button type="button" class="ga-chip-btn" (click)="openCsvPicker()" [disabled]="isProcessing">
+                    Choose CSV file
+                  </button>
+                  <button
+                    type="button"
+                    class="ga-chip-btn ga-chip-btn-secondary"
+                    *ngIf="gaitValueSource === 'csv'"
+                    (click)="clearCsvImport()"
+                    [disabled]="isProcessing"
+                  >
+                    Clear import
+                  </button>
+                </div>
+              </div>
+
+              <p class="text-xs text-app-text-muted mt-3 break-all" *ngIf="csvFileName">
+                <span class="font-medium text-app-text-primary">Selected:</span> {{ csvFileName }}
+                <span class="text-emerald-400 ml-2" *ngIf="csvPreview.length && !csvImportErrors.length">— fields updated below.</span>
+              </p>
+
+              <ul class="ga-csv-errors mt-3 space-y-1 list-none p-0 m-0" *ngIf="csvImportErrors.length">
+                <li *ngFor="let er of csvImportErrors" class="text-sm text-red-400 pl-0">{{ er }}</li>
+              </ul>
+
+              <div class="ga-csv-preview mt-4 overflow-x-auto" *ngIf="csvPreview.length && !csvImportErrors.length">
+                <p class="text-xs uppercase tracking-wide text-app-text-muted font-semibold mb-2">Imported values preview</p>
+                <table class="ga-csv-preview-table text-sm w-full min-w-[280px]">
+                  <tbody>
+                    <tr *ngFor="let row of csvPreview">
+                      <td class="py-1.5 pr-4 font-mono text-app-text-muted align-top">{{ row.key }}</td>
+                      <td class="py-1.5 text-app-text-primary align-top">{{ row.value }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <details class="mt-4 text-xs text-app-text-muted">
+                <summary class="cursor-pointer select-none text-app-primary hover:underline">Required CSV columns</summary>
+                <p class="mt-2 font-mono break-all leading-relaxed">{{ csvRequiredColumns.join(', ') }}</p>
+              </details>
             </div>
 
             <div class="ga-fields-grid">
