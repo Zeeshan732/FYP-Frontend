@@ -326,7 +326,7 @@
                       tooltipPosition="top">
                     </p-button>
                     <p-button 
-                      *ngIf="canManageRecords"
+                      *ngIf="canDeleteRecords"
                       icon="pi pi-trash"
                       (onClick)="openDeleteDialog(record.id)"
                       severity="danger"
@@ -428,7 +428,7 @@
               tooltipPosition="top">
             </p-button>
             <p-button
-              *ngIf="canManageRecords"
+              *ngIf="canDeleteRecords"
               icon="pi pi-trash"
               (onClick)="openDeleteDialog(record.id)"
               severity="danger"
@@ -518,7 +518,7 @@
     [(visible)]="showDeleteDialog"
     intent="danger"
     title="Delete test record"
-    subtext="This removes the record from the system. Assigned clinicians and admins can delete patient tests they are allowed to manage."
+    subtext="This removes the record from the system. Patients can delete their own records; clinicians/admins can delete records they are authorized to manage."
     [confirmLoading]="deleting"
     [dismissible]="!deleting"
     cancelLabel="Cancel"
