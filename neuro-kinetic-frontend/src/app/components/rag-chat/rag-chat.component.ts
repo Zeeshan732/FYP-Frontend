@@ -54,6 +54,7 @@ export class RagChatComponent implements OnInit, OnChanges {
   loading = false;
   error = '';
   inputMessage = '';
+  private pendingConversationCreate: Promise<number | null> | null = null;
 
   constructor(
     private apiService: ApiService,
@@ -179,25 +180,8 @@ export class RagChatComponent implements OnInit, OnChanges {
       { type: 'text', text: q, reply: true, sender: 'You', date: new Date() }
     ];
     this.messageSent.emit(q);
-    if (!this.conversationId) {
-      this.apiService.createChatConversation().subscribe({
-        next: (conversation) => {
-          this.conversationId = conversation.id;
-          this.conversationCreated.emit(conversation.id);
-          this.apiService.appendChatMessage(conversation.id, 'user', q).subscribe({ error: () => void 0 });
-        },
-        error: () => void 0
-      });
-    }
+    this.ensureConversationAndPersistUser(q);
     this.saveChatToStorage();
-    if (this.conversationId) {
-      this.apiService.appendChatMessage(this.conversationId, 'user', q).subscribe({
-        error: () => {
-          this.conversationId = null;
-          this.conversationUnavailable.emit();
-        }
-      });
-    }
     this.cdr.detectChanges();
 
     const setReply = (text: string) => {
@@ -207,9 +191,7 @@ export class RagChatComponent implements OnInit, OnChanges {
         { type: 'text', text, reply: false, sender: 'NeuroSync', date: new Date() }
       ];
       this.saveChatToStorage();
-      if (this.conversationId) {
-        this.apiService.appendChatMessage(this.conversationId, 'assistant', text).subscribe({ error: () => void 0 });
-      }
+      this.persistAssistantMessage(text);
       this.cdr.detectChanges();
     };
     const setError = (err: any) => {
@@ -228,6 +210,7 @@ export class RagChatComponent implements OnInit, OnChanges {
         { type: 'text', text: errMsg, reply: false, sender: 'NeuroSync', date: new Date() }
       ];
       this.saveChatToStorage();
+      this.persistAssistantMessage(errMsg);
       this.cdr.detectChanges();
     };
 
@@ -249,6 +232,61 @@ export class RagChatComponent implements OnInit, OnChanges {
       next: (res) => setReply(this.formatResponseAsText(res)),
       error: setError
     });
+  }
+
+  private ensureConversationAndPersistUser(content: string): void {
+    // Existing conversation: persist immediately.
+    if (this.conversationId) {
+      this.apiService.appendChatMessage(this.conversationId, 'user', content).subscribe({
+        error: () => {
+          this.conversationId = null;
+          this.conversationUnavailable.emit();
+        }
+      });
+      return;
+    }
+
+    // New conversation already being created: queue this user message on completion.
+    if (this.pendingConversationCreate) {
+      this.pendingConversationCreate.then((id) => {
+        if (!id) return;
+        this.apiService.appendChatMessage(id, 'user', content).subscribe({ error: () => void 0 });
+      });
+      return;
+    }
+
+    // Start conversation creation and persist first user message once ID exists.
+    this.pendingConversationCreate = new Promise<number | null>((resolve) => {
+      this.apiService.createChatConversation().subscribe({
+        next: (conversation) => {
+          this.conversationId = conversation.id;
+          this.conversationCreated.emit(conversation.id);
+          this.apiService.appendChatMessage(conversation.id, 'user', content).subscribe({ error: () => void 0 });
+          resolve(conversation.id);
+        },
+        error: () => {
+          resolve(null);
+        }
+      });
+    }).finally(() => {
+      this.pendingConversationCreate = null;
+    });
+  }
+
+  private persistAssistantMessage(content: string): void {
+    // Existing conversation: persist immediately.
+    if (this.conversationId) {
+      this.apiService.appendChatMessage(this.conversationId, 'assistant', content).subscribe({ error: () => void 0 });
+      return;
+    }
+
+    // Conversation still being created: persist once ID is available.
+    if (this.pendingConversationCreate) {
+      this.pendingConversationCreate.then((id) => {
+        if (!id) return;
+        this.apiService.appendChatMessage(id, 'assistant', content).subscribe({ error: () => void 0 });
+      });
+    }
   }
 
   private formatResponseAsText(res: RagTestResponse): string {
