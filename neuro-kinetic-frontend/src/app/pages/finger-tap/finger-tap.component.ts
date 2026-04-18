@@ -24,7 +24,7 @@ import { environment } from '../../../environments/environment';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserTestRecord, UserTestRecordRequest } from '../../models/api.models';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FingerTapVideoPrepService } from '../../services/finger-tap-video-prep.service';
 import { jsPDF } from 'jspdf';
 
@@ -176,11 +176,15 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   private apiUrl = environment.apiUrl;
 
+  /** From ?fromRequest= — server marks clinician test request completed when finger-tap record is saved */
+  private clinicianTestRequestId?: number;
+
   constructor(
     private http: HttpClient,
     private apiService: ApiService,
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private fingerTapVideoPrep: FingerTapVideoPrepService
   ) {}
@@ -204,6 +208,14 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const fr = this.route.snapshot.queryParamMap.get('fromRequest');
+    if (fr) {
+      const id = parseInt(fr, 10);
+      if (Number.isFinite(id)) {
+        this.clinicianTestRequestId = id;
+      }
+    }
+
     // If navigated here from embedded popup flow with a completed result, show it directly.
     const navState = (history.state ?? {}) as { fingerTapResult?: FingerTapResult };
     if (!this.embedded && navState.fingerTapResult) {
@@ -1114,7 +1126,10 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       accuracy: result.riskPercent,
       analysisNotes: `Finger tap screening. ${result.label}`,
       modality: 'fingertapping',
-      predictionScore0To1: result.probability
+      predictionScore0To1: result.probability,
+      ...(this.clinicianTestRequestId != null
+        ? { clinicianTestRequestId: this.clinicianTestRequestId }
+        : {})
     };
 
     this.apiService.createUserTestRecord(req).subscribe({

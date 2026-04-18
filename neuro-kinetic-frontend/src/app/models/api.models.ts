@@ -283,6 +283,8 @@ export interface UserTestRecordRequest {
   modality?: 'fingertapping' | 'gait';
   /** Model probability / risk 0–1; required with modality for correct test type in list. */
   predictionScore0To1?: number;
+  /** Completes matching clinician-initiated request on the server when test is saved. */
+  clinicianTestRequestId?: number;
 }
 
 // Admin Dashboard Analytics

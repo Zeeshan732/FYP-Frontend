@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
@@ -117,11 +118,18 @@ export class GaitVisualizerComponent {
   contributingFactors: string[] = [];
   clinicalInterpretation = '';
 
+  /** From ?fromRequest= — server marks clinician test request completed when gait record is saved */
+  private readonly clinicianTestRequestId?: number;
+
   constructor(
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private route: ActivatedRoute
   ) {
     this.authService.currentUser$.subscribe(u => { this.currentUser = u; });
+    const fr = this.route.snapshot.queryParamMap.get('fromRequest');
+    const id = fr ? parseInt(fr, 10) : NaN;
+    this.clinicianTestRequestId = Number.isFinite(id) ? id : undefined;
   }
 
   loadHealthyExample(): void {
@@ -352,7 +360,10 @@ export class GaitVisualizerComponent {
       analysisNotes:
         `Gait clinical assessment. Session: ${sessionId}. Model: ${res.modelVersion || '—'}.${notesExtra}`,
       modality: 'gait',
-      predictionScore0To1: p != null ? Math.min(1, Math.max(0, p)) : undefined
+      predictionScore0To1: p != null ? Math.min(1, Math.max(0, p)) : undefined,
+      ...(this.clinicianTestRequestId != null
+        ? { clinicianTestRequestId: this.clinicianTestRequestId }
+        : {})
     };
     this.apiService.createUserTestRecord(req).subscribe({
       next: (record) => {
