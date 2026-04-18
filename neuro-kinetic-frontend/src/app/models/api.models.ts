@@ -502,6 +502,10 @@ export interface ChatConversation {
   id: number;
   title: string;
   lastMessagePreview?: string;
+  /** Latest user turn preview (conversation flow in list). */
+  lastUserPreview?: string | null;
+  /** Latest assistant turn preview. */
+  lastAssistantPreview?: string | null;
   messageCount: number;
   createdAt: string;
   updatedAt: string;

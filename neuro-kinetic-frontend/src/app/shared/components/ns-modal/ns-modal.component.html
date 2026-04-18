@@ -1,5 +1,6 @@
 <div
   class="ns-modal-backdrop"
+  [class.ns-modal-backdrop--elevated]="elevated"
   *ngIf="visible"
   @nsBackdrop
   (click)="onBackdropClick()"
@@ -14,7 +15,10 @@
     aria-modal="true"
     [attr.aria-labelledby]="title ? 'ns-modal-title' : null"
   >
-    <header class="ns-modal__header" [ngClass]="headerModifierClass()">
+    <header
+      class="ns-modal__header"
+      [class.ns-modal__header--with-close]="singleAction"
+      [ngClass]="headerModifierClass()">
       <div class="ns-modal__header-left">
         <i *ngIf="intent === 'danger'" class="pi pi-exclamation-triangle ns-modal__header-icon" aria-hidden="true"></i>
         <span
@@ -31,6 +35,17 @@
           aria-hidden="true"></span>
         <h2 id="ns-modal-title" class="ns-modal__title">{{ title }}</h2>
       </div>
+      <button
+        *ngIf="singleAction"
+        type="button"
+        class="ns-modal__header-close"
+        (click)="onHeaderCloseClick()"
+        [disabled]="confirmLoading"
+        [attr.aria-label]="closeButtonLabel"
+        [attr.title]="closeButtonLabel"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
     </header>
 
     <div class="ns-modal__body">
@@ -40,34 +55,57 @@
       <p class="ns-modal__subtext" *ngIf="subtext">{{ subtext }}</p>
     </div>
 
-    <footer class="ns-modal__footer">
-      <button
-        *ngIf="!singleAction"
-        type="button"
-        class="ns-modal__icon-btn ns-modal__footer-cancel"
-        (click)="onCancelClick()"
-        [disabled]="confirmLoading"
-        [attr.aria-label]="cancelLabel"
-        [attr.title]="cancelLabel"
-      >
-        <i class="pi pi-times" aria-hidden="true"></i>
-      </button>
-      <button
-        type="button"
-        class="ns-modal__icon-btn ns-modal__footer-confirm"
-        [ngClass]="confirmModifierClass()"
-        (click)="onConfirmClick()"
-        [disabled]="confirmLoading"
-        [attr.aria-label]="confirmLabel"
-        [attr.title]="confirmLabel"
-      >
-        <i
-          *ngIf="!confirmLoading"
-          class="pi pi-check"
-          aria-hidden="true"
-        ></i>
-        <span *ngIf="confirmLoading" class="ns-modal__spinner" aria-hidden="true"></span>
-      </button>
+    <footer *ngIf="!singleAction" class="ns-modal__footer" [class.ns-modal__footer--text]="footerVariant === 'text'">
+      <ng-container *ngIf="footerVariant === 'icons'; else nsModalTextFooter">
+        <button
+          *ngIf="!singleAction"
+          type="button"
+          class="ns-modal__icon-btn ns-modal__footer-cancel"
+          (click)="onCancelClick()"
+          [disabled]="confirmLoading"
+          [attr.aria-label]="cancelLabel"
+          [attr.title]="cancelLabel"
+        >
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+        <button
+          type="button"
+          class="ns-modal__icon-btn ns-modal__footer-confirm"
+          [ngClass]="confirmModifierClass()"
+          (click)="onConfirmClick()"
+          [disabled]="confirmLoading"
+          [attr.aria-label]="confirmLabel"
+          [attr.title]="confirmLabel"
+        >
+          <i
+            *ngIf="!confirmLoading"
+            class="pi pi-check"
+            aria-hidden="true"
+          ></i>
+          <span *ngIf="confirmLoading" class="ns-modal__spinner" aria-hidden="true"></span>
+        </button>
+      </ng-container>
+      <ng-template #nsModalTextFooter>
+        <button
+          *ngIf="!singleAction"
+          type="button"
+          class="ns-modal__text-btn ns-modal__text-btn--secondary"
+          (click)="onCancelClick()"
+          [disabled]="confirmLoading"
+        >
+          {{ cancelLabel }}
+        </button>
+        <button
+          type="button"
+          class="ns-modal__text-btn ns-modal__text-btn--primary"
+          [ngClass]="'ns-modal__text-btn--' + intent"
+          (click)="onConfirmClick()"
+          [disabled]="confirmLoading"
+        >
+          <span *ngIf="confirmLoading" class="ns-modal__spinner ns-modal__spinner--inline" aria-hidden="true"></span>
+          {{ confirmLabel }}
+        </button>
+      </ng-template>
     </footer>
   </div>
 </div>

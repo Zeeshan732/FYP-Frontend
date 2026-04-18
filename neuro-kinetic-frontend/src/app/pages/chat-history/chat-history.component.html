@@ -9,18 +9,7 @@
           <span class="chat-history-sub">View, filter and manage previous conversations</span>
         </div>
 
-        <div
-          class="chat-history-actions"
-          [class.chat-history-actions--no-bulk]="items.length === 0">
-          <button
-            *ngIf="items.length > 0"
-            type="button"
-            class="chat-action-btn chat-action-btn--danger ch-tool ch-tool--trash"
-            [disabled]="!hasAnySelection || bulkDeleting"
-            (click)="openBulkDeleteDialog()">
-            <i class="pi pi-trash"></i>
-          </button>
-
+        <div class="chat-history-controls-right">
           <div class="chat-search-field ch-tool ch-tool--query">
             <i class="pi pi-search chat-search-field__icon" aria-hidden="true"></i>
             <input
@@ -34,6 +23,14 @@
               autocomplete="off"
               enterkeyhint="search" />
           </div>
+          <button
+            *ngIf="items.length > 0"
+            type="button"
+            class="chat-action-btn chat-action-btn--danger ch-tool ch-tool--trash"
+            [disabled]="!hasAnySelection || bulkDeleting"
+            (click)="openBulkDeleteDialog()">
+            <i class="pi pi-trash"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -48,7 +45,14 @@
       <div class="ns-data-shell__desktop">
         <div class="ns-data-shell__surface">
           <div class="ns-data-shell__scroll ns-data-shell__scroll--chats overflow-x-auto">
-            <table class="w-full neuro-table">
+            <table class="w-full neuro-table chat-history-table">
+              <colgroup>
+                <col class="chat-history-col-select" />
+                <col class="chat-history-col-eq" />
+                <col class="chat-history-col-eq" />
+                <col class="chat-history-col-eq" />
+                <col class="chat-history-col-eq" />
+              </colgroup>
               <thead>
                 <tr>
                   <th class="text-center select-col">
@@ -65,7 +69,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of items">
+                <tr
+                  *ngFor="let item of items"
+                  class="neuro-table__row--clickable"
+                  (click)="onChatRowClick(item, $event)">
                   <td class="text-center select-col">
                     <input
                       type="checkbox"
@@ -78,7 +85,7 @@
                   <td class="text-center col-updated">{{ item.updatedAt | date:'short' }}</td>
                   <td class="text-center col-actions">
                     <div class="actions-cell">
-                      <p-button icon="pi pi-eye" (onClick)="openConversation(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View messages" tooltipPosition="top"></p-button>
+                      <p-button icon="pi pi-eye" (onClick)="openChatFromViewIcon(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View conversation" tooltipPosition="top"></p-button>
                       <p-button icon="pi pi-trash" [loading]="deletingId === item.id" (onClick)="openDeleteChatDialog(item)" severity="danger" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="Delete chat" tooltipPosition="top"></p-button>
                     </div>
                   </td>
@@ -90,7 +97,7 @@
       </div>
 
       <div class="ns-data-shell__cards" role="list" aria-label="Chat history">
-        <article *ngFor="let item of items" class="ns-data-card" role="listitem">
+        <article *ngFor="let item of items" class="ns-data-card ns-data-card--row-click" role="listitem" (click)="onChatCardClick(item, $event)">
           <div class="ns-data-card__head">
             <div class="ns-data-card__title-block">
               <div class="ns-data-card__title">{{ item.title }}</div>
@@ -114,7 +121,7 @@
             </div>
           </div>
           <div class="ns-data-card__actions">
-            <p-button icon="pi pi-eye" (onClick)="openConversation(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View messages" tooltipPosition="top"></p-button>
+            <p-button icon="pi pi-eye" (onClick)="openChatFromViewIcon(item)" severity="secondary" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="View conversation" tooltipPosition="top"></p-button>
             <p-button icon="pi pi-trash" [loading]="deletingId === item.id" (onClick)="openDeleteChatDialog(item)" severity="danger" styleClass="p-button-rounded p-button-text p-button-plain p-button-sm" pTooltip="Delete chat" tooltipPosition="top"></p-button>
           </div>
         </article>
@@ -209,10 +216,10 @@
   [title]="chatDetail?.title || 'Conversation'"
   [subtext]="chatDetailSubtext"
   [singleAction]="true"
+  closeButtonLabel="Close"
   confirmLabel="Close"
-  [dismissible]="!chatDetailLoading"
-  (cancel)="closeChatDetailModal()"
-  (confirm)="closeChatDetailModal()">
+  [dismissible]="!chatDetailLoading && !showContinueChatDialog"
+  (cancel)="closeChatDetailModal()">
   <div class="chat-detail-modal">
     <div *ngIf="chatDetailLoading" class="chat-detail-state chat-detail-state--loading" aria-live="polite">
       <span class="chat-detail-spinner" aria-hidden="true"></span>
@@ -234,4 +241,20 @@
       </div>
     </div>
   </div>
+</ns-modal>
+
+<ns-modal
+  [(visible)]="showContinueChatDialog"
+  intent="danger"
+  title="Continue chat"
+  subtext="You will open the consultation page with this conversation loaded so you can keep chatting."
+  cancelLabel="No"
+  confirmLabel="Yes"
+  [elevated]="true"
+  [dismissible]="true"
+  (cancel)="cancelContinueChat()"
+  (confirm)="confirmContinueChat()">
+  <p *ngIf="chatPendingContinue as c">
+    Do you want to continue <strong>{{ c.title || 'this conversation' }}</strong>?
+  </p>
 </ns-modal>

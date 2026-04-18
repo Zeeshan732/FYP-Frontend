@@ -143,3 +143,29 @@
   background: rgba(248, 113, 113, 0.12);
   border-color: rgba(248, 113, 113, 0.4);
 }
+
+.contact-msg-detail__from {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: #e2ecf7;
+}
+
+.contact-msg-detail__org {
+  font-weight: 400;
+  color: #a8c4dc;
+}
+
+.contact-msg-detail__received {
+  margin: 0 0 1rem;
+}
+
+.contact-msg-detail__body {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #a8c4dc;
+  max-height: min(50vh, 360px);
+  overflow-y: auto;
+}
