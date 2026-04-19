@@ -89,9 +89,11 @@
               {{ req.status }}
             </span>
           </div>
+          
           <!-- <div class="cell reason col-reason">
             <div class="pill">{{ req.comment ? req.comment : '-' }}</div>
           </div> -->
+
           <div class="cell actions col-actions" (click)="$event.stopPropagation()">
             <button
               class="table-action-btn"
