@@ -58,6 +58,10 @@ export class RagChatComponent implements OnInit, OnChanges {
   private readonly messagePersistRetryDelayMs = 700;
   /** Server thread id for POST /messages; survives brief @Input() resets while parent merges `cid` into the URL. */
   private persistedThreadId: number | null = null;
+  /** Set when POST /messages for the current user turn succeeds (assistant must wait for this). */
+  private userMessageSavedThisTurn = false;
+  /** Assistant text for the active turn; flushed after user message is persisted. */
+  private pendingAssistantText: string | null = null;
 
   constructor(
     private apiService: ApiService,
@@ -177,10 +181,15 @@ export class RagChatComponent implements OnInit, OnChanges {
   sendMessage(): void {
     const q = this.inputMessage.trim();
     if (!q) return;
+    if (this.loading) {
+      return;
+    }
     this.inputMessage = '';
     const riskValue = this.riskPercent != null && !isNaN(Number(this.riskPercent)) ? Number(this.riskPercent) : 0;
     this.error = '';
     this.loading = true;
+    this.userMessageSavedThisTurn = false;
+    this.pendingAssistantText = null;
 
     this.messages = [
       ...this.messages,
@@ -198,7 +207,7 @@ export class RagChatComponent implements OnInit, OnChanges {
         { type: 'text', text, reply: false, sender: 'NeuroSync', date: new Date() }
       ];
       this.saveChatToStorage();
-      this.persistAssistantMessage(text);
+      this.queueAssistantForHistory(text);
       this.cdr.detectChanges();
     };
     const setError = (err: any) => {
@@ -217,7 +226,7 @@ export class RagChatComponent implements OnInit, OnChanges {
         { type: 'text', text: errMsg, reply: false, sender: 'NeuroSync', date: new Date() }
       ];
       this.saveChatToStorage();
-      this.persistAssistantMessage(errMsg);
+      this.queueAssistantForHistory(errMsg);
       this.cdr.detectChanges();
     };
 
@@ -280,49 +289,43 @@ export class RagChatComponent implements OnInit, OnChanges {
     });
   }
 
-  private persistAssistantMessage(content: string): void {
-    const cid = this.persistedThreadId ?? this.conversationId;
-    if (cid) {
-      this.persistMessageWithRetry(cid, 'assistant', content, 0, false);
-      return;
-    }
-
-    // Conversation still being created: persist once ID is available.
-    if (this.pendingConversationCreate) {
-      this.pendingConversationCreate.then((id) => {
-        if (!id) return;
-        this.persistedThreadId = id;
-        this.persistMessageWithRetry(id, 'assistant', content, 0, false);
-      });
-      return;
-    }
-
-    // Rare: RAG settled before thread id is visible; retry briefly instead of dropping the reply.
-    this.scheduleAssistantPersistWhenThreadReady(content, 0);
+  /**
+   * Buffer assistant/error text until the user message for this turn is stored, then POST assistant.
+   * Avoids racing RAG (fast) against createChat + append user (slower), which dropped assistant saves.
+   */
+  private queueAssistantForHistory(content: string): void {
+    this.pendingAssistantText = content;
+    this.tryPersistAssistantAfterUser(0);
   }
 
-  private scheduleAssistantPersistWhenThreadReady(content: string, attempt: number): void {
+  private tryPersistAssistantAfterUser(attempt: number): void {
+    const text = this.pendingAssistantText;
+    if (!text || !this.userMessageSavedThisTurn) {
+      return;
+    }
     const cid = this.persistedThreadId ?? this.conversationId;
-    if (cid) {
-      this.persistMessageWithRetry(cid, 'assistant', content, 0, false);
+    if (!cid) {
+      if (this.pendingConversationCreate) {
+        this.pendingConversationCreate.then((id) => {
+          if (id) {
+            this.persistedThreadId = id;
+            this.tryPersistAssistantAfterUser(0);
+          }
+        });
+        return;
+      }
+      if (attempt >= 40) {
+        this.error = 'Some replies could not be saved to your chat history.';
+        // eslint-disable-next-line no-console
+        console.warn('Assistant message not persisted: no conversation id after user message saved.', { attempt });
+        this.cdr.detectChanges();
+        return;
+      }
+      setTimeout(() => this.tryPersistAssistantAfterUser(attempt + 1), 100);
       return;
     }
-    if (this.pendingConversationCreate) {
-      this.pendingConversationCreate.then((id) => {
-        if (!id) return;
-        this.persistedThreadId = id;
-        this.persistMessageWithRetry(id, 'assistant', content, 0, false);
-      });
-      return;
-    }
-    if (attempt >= 40) {
-      this.error = 'Some replies could not be saved to your chat history.';
-      // eslint-disable-next-line no-console
-      console.warn('Assistant message not persisted: conversation id never became available.', { attempt });
-      this.cdr.detectChanges();
-      return;
-    }
-    setTimeout(() => this.scheduleAssistantPersistWhenThreadReady(content, attempt + 1), 100);
+    this.pendingAssistantText = null;
+    this.persistMessageWithRetry(cid, 'assistant', text, 0, false);
   }
 
   /**
@@ -338,6 +341,10 @@ export class RagChatComponent implements OnInit, OnChanges {
   ): void {
     this.apiService.appendChatMessage(conversationId, role, content).subscribe({
       next: () => {
+        if (role === 'user') {
+          this.userMessageSavedThisTurn = true;
+          this.tryPersistAssistantAfterUser(0);
+        }
         // Saved successfully; clear any stale warning.
         if (role === 'assistant' && this.error === 'Some replies could not be saved to your chat history.') {
           this.error = '';
