@@ -242,10 +242,11 @@ export class RagChatComponent implements OnInit, OnChanges {
   }
 
   private ensureConversationAndPersistUser(content: string): void {
-    // Existing conversation: persist immediately.
-    if (this.conversationId) {
-      this.persistedThreadId = this.conversationId;
-      this.persistMessageWithRetry(this.conversationId, 'user', content, 0, true);
+    // Prefer persisted id so we never start a second conversation if @Input() lags or clears briefly.
+    const activeThreadId = this.persistedThreadId ?? this.conversationId;
+    if (activeThreadId) {
+      this.persistedThreadId = activeThreadId;
+      this.persistMessageWithRetry(activeThreadId, 'user', content, 0, true);
       return;
     }
 
@@ -362,7 +363,10 @@ export class RagChatComponent implements OnInit, OnChanges {
           this.cdr.detectChanges();
         }
 
-        if (markUnavailableOnFailure && this.conversationId === conversationId) {
+        if (
+          markUnavailableOnFailure &&
+          (this.conversationId === conversationId || this.persistedThreadId === conversationId)
+        ) {
           this.conversationId = null;
           this.persistedThreadId = null;
           this.conversationUnavailable.emit();

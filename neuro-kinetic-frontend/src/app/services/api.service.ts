@@ -289,7 +289,9 @@ export class ApiService {
   }
 
   getChatMessages(conversationId: number): Observable<ChatMessage[]> {
-    return this.http.get<ChatMessage[]>(`${this.apiUrl}/chat-history/${conversationId}/messages`);
+    return this.http
+      .get<ChatMessage[]>(`${this.apiUrl}/chat-history/${conversationId}/messages`)
+      .pipe(map((items) => items.map((m) => ({ ...m, role: normalizeChatRole(m.role) }))));
   }
 
   appendChatMessage(conversationId: number, role: 'user' | 'assistant', content: string): Observable<ChatMessage> {
@@ -742,4 +744,9 @@ export class ApiService {
     );
   }
 
+}
+
+/** Ensures history UI treats server role strings consistently (camelCase / casing drift). */
+function normalizeChatRole(role: string | undefined): 'user' | 'assistant' {
+  return (role ?? '').toLowerCase().trim() === 'assistant' ? 'assistant' : 'user';
 }
