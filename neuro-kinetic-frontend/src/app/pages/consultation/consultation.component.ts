@@ -24,8 +24,16 @@ export class ConsultationComponent implements OnInit {
       this.riskPercent = value != null && !isNaN(value) ? value : null;
       this.mode = (params['mode'] === 'gait' || params['mode'] === 'multimodal') ? params['mode'] : 'voice';
       const cidRaw = params['cid'];
-      const cid = cidRaw !== undefined && cidRaw !== null && cidRaw !== '' ? Number(cidRaw) : null;
-      this.conversationId = cid != null && !isNaN(cid) ? cid : null;
+      const cidParsed = cidRaw !== undefined && cidRaw !== null && cidRaw !== '' ? Number(cidRaw) : null;
+      const cidFromUrl = cidParsed != null && !isNaN(cidParsed) ? cidParsed : null;
+      if (cidFromUrl != null) {
+        this.conversationId = cidFromUrl;
+      } else if (cidRaw !== undefined) {
+        // `cid` present but empty/invalid — treat as cleared (e.g. explicit reset).
+        this.conversationId = null;
+      }
+      // When `cid` is absent from the query string, keep `conversationId` as-is so a brief
+      // subscription tick before `router.navigate` merges `cid` does not wipe a new thread id.
       this.hasParams = true;
     });
   }

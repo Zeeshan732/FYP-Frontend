@@ -55,6 +55,9 @@ export class RagChatComponent implements OnInit, OnChanges {
   error = '';
   inputMessage = '';
   private pendingConversationCreate: Promise<number | null> | null = null;
+  private readonly messagePersistRetryDelayMs = 700;
+  /** Server thread id for POST /messages; survives brief @Input() resets while parent merges `cid` into the URL. */
+  private persistedThreadId: number | null = null;
 
   constructor(
     private apiService: ApiService,
@@ -63,6 +66,7 @@ export class RagChatComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     if (this.conversationId) {
+      this.persistedThreadId = this.conversationId;
       this.loadChatFromServer();
       return;
     }
@@ -77,12 +81,14 @@ export class RagChatComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['conversationId'] && !changes['conversationId'].firstChange) {
       if (this.conversationId) {
+        this.persistedThreadId = this.conversationId;
         // When a new conversation is created from first send, keep optimistic messages.
         // Reload only if there is no in-memory chat to avoid wiping the first message.
         if (this.messages.length === 0) {
           this.loadChatFromServer();
         }
       } else {
+        this.persistedThreadId = null;
         this.messages = [];
         this.error = '';
         this.loading = false;
@@ -123,6 +129,7 @@ export class RagChatComponent implements OnInit, OnChanges {
         this.messages = [];
         this.error = 'Unable to load this chat. Please try again.';
         this.conversationId = null;
+        this.persistedThreadId = null;
         this.conversationUnavailable.emit();
         this.cdr.detectChanges();
       }
@@ -237,12 +244,8 @@ export class RagChatComponent implements OnInit, OnChanges {
   private ensureConversationAndPersistUser(content: string): void {
     // Existing conversation: persist immediately.
     if (this.conversationId) {
-      this.apiService.appendChatMessage(this.conversationId, 'user', content).subscribe({
-        error: () => {
-          this.conversationId = null;
-          this.conversationUnavailable.emit();
-        }
-      });
+      this.persistedThreadId = this.conversationId;
+      this.persistMessageWithRetry(this.conversationId, 'user', content, 0, true);
       return;
     }
 
@@ -250,7 +253,8 @@ export class RagChatComponent implements OnInit, OnChanges {
     if (this.pendingConversationCreate) {
       this.pendingConversationCreate.then((id) => {
         if (!id) return;
-        this.apiService.appendChatMessage(id, 'user', content).subscribe({ error: () => void 0 });
+        this.persistedThreadId = id;
+        this.persistMessageWithRetry(id, 'user', content, 0, false);
       });
       return;
     }
@@ -259,9 +263,11 @@ export class RagChatComponent implements OnInit, OnChanges {
     this.pendingConversationCreate = new Promise<number | null>((resolve) => {
       this.apiService.createChatConversation().subscribe({
         next: (conversation) => {
+          // Set before emit so assistant persistence never loses the id if @Input() lags the route.
+          this.persistedThreadId = conversation.id;
           this.conversationId = conversation.id;
           this.conversationCreated.emit(conversation.id);
-          this.apiService.appendChatMessage(conversation.id, 'user', content).subscribe({ error: () => void 0 });
+          this.persistMessageWithRetry(conversation.id, 'user', content, 0, false);
           resolve(conversation.id);
         },
         error: () => {
@@ -274,9 +280,9 @@ export class RagChatComponent implements OnInit, OnChanges {
   }
 
   private persistAssistantMessage(content: string): void {
-    // Existing conversation: persist immediately.
-    if (this.conversationId) {
-      this.apiService.appendChatMessage(this.conversationId, 'assistant', content).subscribe({ error: () => void 0 });
+    const cid = this.persistedThreadId ?? this.conversationId;
+    if (cid) {
+      this.persistMessageWithRetry(cid, 'assistant', content, 0, false);
       return;
     }
 
@@ -284,9 +290,86 @@ export class RagChatComponent implements OnInit, OnChanges {
     if (this.pendingConversationCreate) {
       this.pendingConversationCreate.then((id) => {
         if (!id) return;
-        this.apiService.appendChatMessage(id, 'assistant', content).subscribe({ error: () => void 0 });
+        this.persistedThreadId = id;
+        this.persistMessageWithRetry(id, 'assistant', content, 0, false);
       });
+      return;
     }
+
+    // Rare: RAG settled before thread id is visible; retry briefly instead of dropping the reply.
+    this.scheduleAssistantPersistWhenThreadReady(content, 0);
+  }
+
+  private scheduleAssistantPersistWhenThreadReady(content: string, attempt: number): void {
+    const cid = this.persistedThreadId ?? this.conversationId;
+    if (cid) {
+      this.persistMessageWithRetry(cid, 'assistant', content, 0, false);
+      return;
+    }
+    if (this.pendingConversationCreate) {
+      this.pendingConversationCreate.then((id) => {
+        if (!id) return;
+        this.persistedThreadId = id;
+        this.persistMessageWithRetry(id, 'assistant', content, 0, false);
+      });
+      return;
+    }
+    if (attempt >= 40) {
+      this.error = 'Some replies could not be saved to your chat history.';
+      // eslint-disable-next-line no-console
+      console.warn('Assistant message not persisted: conversation id never became available.', { attempt });
+      this.cdr.detectChanges();
+      return;
+    }
+    setTimeout(() => this.scheduleAssistantPersistWhenThreadReady(content, attempt + 1), 100);
+  }
+
+  /**
+   * Persist message to chat-history with retries to avoid silently losing assistant replies.
+   * For user messages in active threads, hard failures mark conversation unavailable.
+   */
+  private persistMessageWithRetry(
+    conversationId: number,
+    role: 'user' | 'assistant',
+    content: string,
+    attempt: number,
+    markUnavailableOnFailure: boolean
+  ): void {
+    this.apiService.appendChatMessage(conversationId, role, content).subscribe({
+      next: () => {
+        // Saved successfully; clear any stale warning.
+        if (role === 'assistant' && this.error === 'Some replies could not be saved to your chat history.') {
+          this.error = '';
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        if (attempt < 3) {
+          const delay = this.messagePersistRetryDelayMs * (attempt + 1);
+          setTimeout(() => {
+            this.persistMessageWithRetry(conversationId, role, content, attempt + 1, markUnavailableOnFailure);
+          }, delay);
+          return;
+        }
+
+        // Surface assistant-save failures so they don't go unnoticed.
+        if (role === 'assistant') {
+          // Keep UX subtle: one-line warning under chat (existing UI).
+          this.error = 'Some replies could not be saved to your chat history.';
+          // Helpful for debugging in devtools.
+          // eslint-disable-next-line no-console
+          console.warn('Failed to persist assistant message to chat history.', { conversationId, err });
+          this.cdr.detectChanges();
+        }
+
+        if (markUnavailableOnFailure && this.conversationId === conversationId) {
+          this.conversationId = null;
+          this.persistedThreadId = null;
+          this.conversationUnavailable.emit();
+          this.cdr.detectChanges();
+        }
+      },
+    });
   }
 
   private formatResponseAsText(res: RagTestResponse): string {
