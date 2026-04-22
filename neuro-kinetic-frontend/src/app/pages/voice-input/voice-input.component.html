@@ -207,8 +207,12 @@
 
               <div class="ftr-mini-stats">
                 <div class="ftr-mini-stat">
+                  <div class="ftr-mini-val">{{ riskPercent !== undefined ? (riskPercent / 100).toFixed(3) : '0.000' }}</div>
+                  <div class="ftr-mini-label">PD risk (model)</div>
+                </div>
+                <div class="ftr-mini-stat">
                   <div class="ftr-mini-val">{{ confidence !== undefined ? (confidence / 100).toFixed(3) : '0.000' }}</div>
-                  <div class="ftr-mini-label">Probability</div>
+                  <div class="ftr-mini-label">Model certainty</div>
                 </div>
                 <div class="ftr-mini-stat">
                   <div class="ftr-mini-val">{{ riskLevel || 'Unknown' }}</div>

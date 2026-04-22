@@ -143,12 +143,15 @@ export class GaitVisualizerComponent {
     this.form = { ...this.healthyExample };
     this.clearCsvState();
     this.resetOutcomePanel();
+    // Presets are for demos: run analysis immediately so outcomes differ without an extra click.
+    this.analyzeGaitPattern();
   }
 
   loadParkinsonExample(): void {
     this.form = { ...this.parkinsonExample };
     this.clearCsvState();
     this.resetOutcomePanel();
+    this.analyzeGaitPattern();
   }
 
   openCsvPicker(): void {
@@ -361,7 +364,7 @@ export class GaitVisualizerComponent {
     if (f.balanceScore < 65) abnormal.push('Lower balance score on clinical observation');
     if (Math.abs(f.stepLengthDifference) > 0.08) abnormal.push('Inter-limb step length difference');
 
-    // Align explanation with the *final* predicted category to avoid “Healthy + severe abnormalities”.
+    // When the model says Healthy, still describe clearly abnormal *entered* values (no fake “all normal”).
     if (outcome === 'Healthy') {
       const minor: string[] = [];
       if ((f.gaitVelocity >= 0.9 && f.gaitVelocity < 1.0) || (f.walkingSpeed >= 0.9 && f.walkingSpeed < 1.0)) {
@@ -374,6 +377,12 @@ export class GaitVisualizerComponent {
         minor.push('Mildly elevated step timing variability');
       }
       if (minor.length) return minor.slice(0, 2);
+      if (abnormal.length > 0) {
+        return [
+          'Several entered parameters fall outside typical reference ranges, while the screening estimate remains in a lower-risk band.',
+          ...abnormal.slice(0, 3)
+        ];
+      }
       return ['Gait parameters fall within commonly reported non-pathological ranges'];
     }
 
