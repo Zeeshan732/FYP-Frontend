@@ -167,12 +167,24 @@
 
 .ft-compress-panel {
   width: 100%;
-  max-width: 420px;
+  max-width: min(100%, 520px);
   margin: 0 auto;
   padding: 1.25rem 1.35rem;
   border-radius: 14px;
   border: 1px solid rgba(148, 163, 184, 0.25);
   background: rgba(15, 23, 42, 0.85);
+}
+
+@media (min-width: 768px) {
+  .ft-compress-panel {
+    max-width: min(100%, 580px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .ft-compress-panel {
+    max-width: min(100%, 640px);
+  }
 }
 
 .ft-compress-sizes {
@@ -206,16 +218,17 @@
   color: rgba(148, 163, 184, 0.9);
 }
 
-/* Processing: let shared loader fill width and scroll inside modal on small screens */
+/* Processing: match main content width on laptop/desktop; stay full-bleed on phones */
 .ft-processing {
   width: 100%;
-  max-width: min(100%, 400px);
+  max-width: min(100%, 720px);
   margin-inline: auto;
   flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-start;
 
   app-loader {
@@ -223,6 +236,29 @@
     max-width: 100%;
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 900px) {
+  .ft-processing {
+    max-width: min(100%, 800px);
+  }
+}
+
+@media (min-width: 1280px) {
+  .ft-processing {
+    max-width: min(100%, 880px);
+  }
+}
+
+/* Embedded modal: keep loader comfortable but not wider than the dialog */
+.ft-root--embedded .ft-processing {
+  max-width: 100%;
+  align-items: center;
+
+  app-loader {
+    max-width: min(100%, 540px);
   }
 }
 
