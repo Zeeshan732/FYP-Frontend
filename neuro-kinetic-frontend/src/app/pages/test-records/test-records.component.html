@@ -105,6 +105,8 @@
                 [options]="statusFilterOptions"
                 optionLabel="label"
                 optionValue="value"
+                appendTo="body"
+                panelStyleClass="test-records-filter-dd-panel"
                 styleClass="w-full test-records-filter-dropdown"
                 placeholder="All Status">
               </p-dropdown>
@@ -120,6 +122,8 @@
                 [options]="resultFilterOptions"
                 optionLabel="label"
                 optionValue="value"
+                appendTo="body"
+                panelStyleClass="test-records-filter-dd-panel"
                 styleClass="w-full test-records-filter-dropdown"
                 placeholder="All Results">
               </p-dropdown>
@@ -135,6 +139,8 @@
                 [options]="testTypeFilterOptions"
                 optionLabel="label"
                 optionValue="value"
+                appendTo="body"
+                panelStyleClass="test-records-filter-dd-panel"
                 styleClass="w-full test-records-filter-dropdown"
                 placeholder="All Categories">
               </p-dropdown>
@@ -151,23 +157,25 @@
               [options]="sortOptions"
               optionLabel="label"
               optionValue="value"
+              appendTo="body"
+              panelStyleClass="test-records-filter-dd-panel"
               styleClass="w-full test-records-filter-dropdown"
               placeholder="Sort by Date">
             </p-dropdown>
           </div>
 
-          <div class="flex justify-end gap-2 pt-5 mt-4 border-t border-app-border">
+          <div class="test-records-filter-actions pt-5 mt-4 border-t border-app-border">
             <button
               type="button"
               (click)="toggleFilterMenu()"
-              class="px-4 py-2 border border-app-border text-app-text-primary hover:bg-app-surface-muted text-sm font-medium transition-colors"
+              class="test-records-filter-btn test-records-filter-btn--cancel"
             >
               Cancel
             </button>
             <button
               type="button"
               (click)="applyFilters()"
-              class="px-4 py-2 bg-app-primary hover:bg-app-primary-hover text-white text-sm font-semibold transition-colors"
+              class="test-records-filter-btn test-records-filter-btn--apply"
             >
               Apply
             </button>

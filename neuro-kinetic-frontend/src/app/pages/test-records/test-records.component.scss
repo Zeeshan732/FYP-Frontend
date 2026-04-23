@@ -3,41 +3,127 @@
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
-// Filter panel – align with app (no radius on inputs/buttons)
-::ng-deep .test-records-filter-panel {
-  background: #112240 !important;
-  border: 1px solid rgba(255,255,255,0.09) !important;
-  border-radius: 12px !important;
+// Filter panel — solid surface (override .app-card.bg-app-surface gradient + overflow clip)
+$filter-surface: #112240;
+$filter-border: rgba(255, 255, 255, 0.15);
 
+::ng-deep .test-records-filter-panel.app-card.bg-app-surface {
+  background: $filter-surface !important;
+  border: 1px solid $filter-border !important;
+  border-radius: 12px !important;
+  overflow: visible !important;
+}
+
+::ng-deep .test-records-filter-panel {
   // Fix “FILTERS” heading casing (HTML uses Tailwind `uppercase`)
   .uppercase {
     text-transform: none !important;
     letter-spacing: normal !important;
   }
 
-  .p-dropdown {
-    border-radius: 0 !important;
-  }
-  .p-dropdown-label {
-    border-radius: 0;
+  /* Trigger: solid fill so nothing bleeds through from the card */
+  .p-dropdown.p-component,
+  .p-dropdown.p-inputwrapper {
+    background-color: $filter-surface !important;
+    border: 1px solid $filter-border !important;
+    border-radius: 8px !important;
   }
 
-  // Cancel / Apply buttons row (styling only)
-  .border-t button:first-child {
-    background: transparent !important;
-    border: 1px solid rgba(255,255,255,0.15) !important;
-    color: rgba(255,255,255,0.65) !important;
-    border-radius: 8px !important;
-    height: 38px !important;
+  .p-dropdown .p-dropdown-label,
+  .p-dropdown .p-dropdown-label.p-inputtext {
+    background-color: $filter-surface !important;
+    color: #e8ebf0 !important;
+    border-radius: 8px 0 0 8px !important;
   }
 
-  .border-t button:last-child {
-    background: #2E86DE !important;
-    border: none !important;
-    color: #ffffff !important;
-    border-radius: 8px !important;
-    height: 38px !important;
+  .p-dropdown .p-dropdown-trigger {
+    background-color: $filter-surface !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+    border-radius: 0 8px 8px 0 !important;
   }
+
+  .p-dropdown:not(.p-disabled):hover {
+    border-color: rgba(255, 255, 255, 0.22) !important;
+  }
+
+  .p-dropdown.p-focus,
+  .p-dropdown.p-dropdown-open {
+    border-color: rgba(46, 134, 222, 0.65) !important;
+  }
+}
+
+/* Open list (appendTo body) — same surface as filter panel */
+::ng-deep .test-records-filter-dd-panel.p-dropdown-panel {
+  background-color: $filter-surface !important;
+  border: 1px solid $filter-border !important;
+  border-radius: 8px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .test-records-filter-dd-panel .p-dropdown-items .p-dropdown-item {
+  background-color: $filter-surface !important;
+  color: rgba(232, 235, 240, 0.88) !important;
+}
+
+::ng-deep .test-records-filter-dd-panel .p-dropdown-items .p-dropdown-item:hover {
+  background-color: rgba(46, 134, 222, 0.12) !important;
+  color: #ffffff !important;
+}
+
+::ng-deep .test-records-filter-dd-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+::ng-deep .test-records-filter-dd-panel .p-dropdown-items .p-dropdown-item.p-highlight:hover {
+  background-color: rgba(46, 134, 222, 0.18) !important;
+  color: #ffffff !important;
+}
+
+.test-records-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.test-records-filter-btn {
+  box-sizing: border-box;
+  height: 44px;
+  padding: 0 24px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.test-records-filter-btn--cancel {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  font-weight: 500;
+}
+
+.test-records-filter-btn--cancel:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.test-records-filter-btn--apply {
+  background: #2e86de !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.test-records-filter-btn--apply:hover {
+  background: #2578c7 !important;
 }
 
 .test-records-shell {
