@@ -51,7 +51,7 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
     { label: 'All Results', value: '' },
     { label: 'Positive', value: 'Positive' },
     { label: 'Negative', value: 'Negative' },
-    { label: 'Uncertain', value: 'Uncertain' }
+    { label: 'Early Signs', value: 'Uncertain' }
   ];
 
   testTypeFilterOptions = [
@@ -508,6 +508,15 @@ export class TestRecordsComponent implements OnInit, OnDestroy {
       default:
         return 'risk-badge-warning';
     }
+  }
+
+  getResultDisplay(record: UserTestRecord): string {
+    const result = (record.testResult || '').trim();
+    const type = (record.testType || '').trim().toLowerCase();
+    if (type === 'fingertapping' && result === 'Uncertain') {
+      return 'Early Signs';
+    }
+    return result || '—';
   }
 
   getStatusBadgeColor(status: string): string {

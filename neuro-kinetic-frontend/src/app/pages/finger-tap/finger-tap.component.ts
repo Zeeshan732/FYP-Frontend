@@ -1128,7 +1128,13 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       userId: user.id,
       userName: user.email || `${user.firstName} ${user.lastName}`.trim() || 'User',
       status: 'Completed',
-      testResult: result.riskPercent >= 50 ? 'Positive' : 'Negative',
+      // Keep backend-compatible enum while using clearer UI wording for the middle band.
+      testResult:
+        result.riskPercent >= 60
+          ? 'Positive'
+          : result.riskPercent >= 35
+            ? 'Uncertain'
+            : 'Negative',
       accuracy: result.riskPercent,
       analysisNotes: `Finger tap screening. ${result.label}`,
       modality: 'fingertapping',
