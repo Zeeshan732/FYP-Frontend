@@ -1113,8 +1113,11 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   /** Save to Test Records with correct modality (requires authenticated user). */
   private persistFingerTapTestRecord(result: FingerTapResult): void {
+    // Ensure AuthService hydrates BehaviorSubject from localStorage after refresh/reopen.
+    this.authService.isAuthenticated();
     const user = this.authService.getCurrentUser();
     if (!user?.id) {
+      console.warn('Skipping finger-tap test-record save: no authenticated user context.');
       return;
     }
 
@@ -1136,7 +1139,11 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       next: (record: UserTestRecord) => {
         this.savedTestRecordId = record.id;
       },
-      error: (e) => console.warn('Failed to save finger-tap test record', e)
+      error: (e) => {
+        console.warn('Failed to save finger-tap test record', e);
+        // Keep result visible, but make persistence failure explicit to the user.
+        this.apiError = 'Analysis finished, but saving to Test Records failed. Please try again while signed in.';
+      }
     });
   }
 
