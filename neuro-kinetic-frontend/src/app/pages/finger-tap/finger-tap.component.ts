@@ -525,6 +525,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
           { text: 'Computing movement regularity', done: true, active: false }
         ];
         if (this.embedded) {
+          // Save test-records even when this component is opened in embedded/modal mode.
+          // Previously we returned early here, so latest finger-tap runs were not persisted.
+          this.persistFingerTapTestRecord(result);
           this.requestClose.emit();
           this.router.navigate(['/finger-tap'], { state: { fingerTapResult: result } });
           return;
