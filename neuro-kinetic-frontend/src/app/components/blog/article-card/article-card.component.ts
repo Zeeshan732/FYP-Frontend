@@ -13,6 +13,8 @@ export interface ArticleAuthor {
   styleUrls: ['./article-card.component.scss']
 })
 export class ArticleCardComponent {
+  @Input() link: string | null = null;
+  @Input() featuredImage = '';
   @Input() thumbBg = '#0D1B2E';
   @Input() thumbLabel = '';
   @Input() tag = '';

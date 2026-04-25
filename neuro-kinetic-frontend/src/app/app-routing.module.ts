@@ -23,6 +23,8 @@ import { ContactMessagesComponent } from './pages/contact-messages/contact-messa
 import { AdminBlogsComponent } from './pages/admin-blogs/admin-blogs.component';
 import { AboutComponent } from './pages/about/about.component';
 import { BlogComponent } from './pages/blog/blog.component';
+import { BlogDetailComponent } from './pages/blog-detail/blog-detail.component';
+import { BlogAllComponent } from './pages/blog-all/blog-all.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -52,6 +54,8 @@ const routes: Routes = [
   { path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
   { path: 'about', component: AboutComponent },
   { path: 'blog', component: BlogComponent },
+  { path: 'blog/all', component: BlogAllComponent },
+  { path: 'blog/:id', component: BlogDetailComponent },
   { path: 'clinical-use', component: ClinicalUseComponent },
   { path: 'voice-analysis', loadChildren: () => import('./modules/voice-analysis/voice-analysis.module').then(m => m.VoiceAnalysisModule) },
   { path: 'gait-test', redirectTo: 'gait-analysis', pathMatch: 'full' },

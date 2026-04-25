@@ -1,0 +1,37 @@
+<section class="blog-all-page">
+  <div class="blog-all-wrap">
+    <div class="blog-all-head">
+      <h1>All Blog Posts</h1>
+      <p>Explore all published articles, research updates, and case studies.</p>
+    </div>
+
+    <div *ngIf="loading" class="blog-all-state">Loading blogs...</div>
+
+    <div *ngIf="!loading && allPosts.length === 0" class="blog-all-state">
+      No blog posts available yet.
+    </div>
+
+    <div *ngIf="!loading && allPosts.length > 0" class="blog-all-grid">
+      <app-article-card
+        *ngFor="let post of allPosts"
+        [link]="postLink(post)"
+        [featuredImage]="post.featuredImage || ''"
+        [thumbBg]="post.thumbBg"
+        [thumbLabel]="post.thumbLabel"
+        [tag]="post.tag"
+        [tagColor]="post.tagColor"
+        [title]="post.title"
+        [desc]="post.desc"
+        [author]="post.author"
+        [date]="post.date"
+        [metaOverride]="post.metaOverride"
+        [iconType]="post.iconType ?? 'research'">
+      </app-article-card>
+    </div>
+
+  </div>
+
+  <div class="blog-all-footer-wrap">
+    <app-footer></app-footer>
+  </div>
+</section>
