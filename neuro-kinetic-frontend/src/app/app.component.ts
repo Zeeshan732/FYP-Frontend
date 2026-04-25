@@ -25,6 +25,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private askResultsDialogSubscription?: Subscription;
   private globalNoticeSubscription?: Subscription;
 
+  get hideGlobalChrome(): boolean {
+    return /^\/blog\/\d+(?:[/?#].*)?$/.test(this.currentRoute || this.router.url || '');
+  }
+
+  get useFullWidthPublicShell(): boolean {
+    const route = this.currentRoute || this.router.url || '';
+    return route === '/' || route === '/landing' || route.startsWith('/blog');
+  }
+
   constructor(
     private authService: AuthService,
     private sidebarService: SidebarService,

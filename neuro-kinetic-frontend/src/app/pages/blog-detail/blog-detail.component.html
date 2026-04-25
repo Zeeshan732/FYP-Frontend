@@ -1,0 +1,28 @@
+<div class="blog-detail-page">
+  <div class="blog-detail-wrap">
+    <button type="button" class="back-btn" (click)="backToBlog()">Back to blog</button>
+
+    <div *ngIf="loading" class="state-card">Loading article...</div>
+    <div *ngIf="!loading && error" class="state-card state-card-error">{{ error }}</div>
+
+    <article *ngIf="!loading && post" class="blog-article">
+      <img [src]="post.featuredImage" [alt]="post.title" class="hero-image" />
+
+      <div class="meta-row">
+        <span class="tag" [style.color]="post.tagColor">{{ post.tag }}</span>
+        <span>{{ post.metaOverride || post.date }}</span>
+      </div>
+
+      <h1>{{ post.title }}</h1>
+      <p class="lead">{{ post.desc }}</p>
+
+      <section class="content">
+        <p>{{ post.desc }}</p>
+        <p>
+          This article is part of the NeuroSync knowledge base. Featured images support local upload and external URL
+          fallback to ensure every post has a professional visual presentation.
+        </p>
+      </section>
+    </article>
+  </div>
+</div>

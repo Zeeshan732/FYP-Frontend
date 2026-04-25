@@ -1,14 +1,14 @@
 <!-- Navigation Component (Navbar or Sidebar based on route) -->
-<app-navigation></app-navigation>
+<app-navigation *ngIf="!hideGlobalChrome"></app-navigation>
 
 <!-- Header Component (shown when authenticated) -->
-<app-header></app-header>
+<app-header *ngIf="!hideGlobalChrome"></app-header>
 
-<div [class.ml-56]="isAuthenticated && !sidebarCollapsed && !isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
-     [class.ml-20]="isAuthenticated && sidebarCollapsed && !isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
-     [class.pt-16]="isAuthenticated && currentRoute !== '/landing' && currentRoute !== '/'"
-     [class.app-shell--compact-auth]="isAuthenticated && isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
-     [class.app-shell--fab-safe]="isAuthenticated && isCompactViewport && currentRoute !== '/landing' && currentRoute !== '/'"
+<div [class.ml-56]="isAuthenticated && !sidebarCollapsed && !isCompactViewport && !useFullWidthPublicShell"
+     [class.ml-20]="isAuthenticated && sidebarCollapsed && !isCompactViewport && !useFullWidthPublicShell"
+     [class.pt-16]="isAuthenticated && !useFullWidthPublicShell"
+     [class.app-shell--compact-auth]="isAuthenticated && isCompactViewport && !useFullWidthPublicShell"
+     [class.app-shell--fab-safe]="isAuthenticated && isCompactViewport && !useFullWidthPublicShell"
      class="app-shell transition-all duration-300 ease-in-out">
   <router-outlet></router-outlet>
 </div>

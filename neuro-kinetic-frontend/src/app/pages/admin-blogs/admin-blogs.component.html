@@ -10,67 +10,110 @@
         <h2>{{ isEditing ? 'Edit Blog Post' : 'Add Blog Post' }}</h2>
 
         <div class="form-grid">
-          <label>
+          <label for="blog-category">
             Category
-            <select [(ngModel)]="form.category">
+            <select id="blog-category" [(ngModel)]="form.category">
               <option *ngFor="let c of categories" [ngValue]="c.value">{{ c.label }}</option>
             </select>
           </label>
 
-          <label>
+          <label for="blog-icon-type">
             Icon type
-            <select [(ngModel)]="form.iconType">
-              <option value="voice">Voice</option>
-              <option value="gait">Gait</option>
-              <option value="tap">Tap</option>
-              <option value="research">Research</option>
-              <option value="case-study">Case Study</option>
+            <select id="blog-icon-type" [(ngModel)]="form.iconType">
+              <option *ngFor="let icon of iconTypes" [ngValue]="icon.value">{{ icon.label }}</option>
             </select>
           </label>
 
-          <label>
+          <label for="blog-title">
             Title
-            <input type="text" [(ngModel)]="form.title" />
+            <input id="blog-title" type="text" [(ngModel)]="form.title" />
           </label>
 
-          <label>
+          <label for="blog-tag">
             Tag
-            <input type="text" [(ngModel)]="form.tag" />
+            <input id="blog-tag" type="text" [(ngModel)]="form.tag" />
           </label>
 
-          <label>
+          <label for="blog-tag-color">
             Tag color
-            <input type="text" [(ngModel)]="form.tagColor" placeholder="#2E86DE" />
+            <input id="blog-tag-color" type="text" [(ngModel)]="form.tagColor" placeholder="#2E86DE" />
           </label>
 
-          <label>
+          <label for="blog-card-bg">
             Card background
-            <input type="text" [(ngModel)]="form.thumbBg" placeholder="#0F2340" />
+            <input id="blog-card-bg" type="text" [(ngModel)]="form.thumbBg" placeholder="#0F2340" />
           </label>
 
-          <label>
+          <label for="blog-thumb-label">
             Thumbnail label
-            <input type="text" [(ngModel)]="form.thumbLabel" />
+            <input id="blog-thumb-label" type="text" [(ngModel)]="form.thumbLabel" />
           </label>
 
-          <label>
+          <label for="blog-date">
             Date
-            <input type="text" [(ngModel)]="form.date" placeholder="Mar 10" />
+            <input id="blog-date" type="text" [(ngModel)]="form.date" placeholder="Mar 10" />
+          </label>
+
+          <label class="checkbox-label" for="blog-featured-toggle">
+            <span>Mark as featured</span>
+            <input id="blog-featured-toggle" type="checkbox" [(ngModel)]="form.isFeatured" />
           </label>
         </div>
 
-        <label>
+        <label for="blog-meta-override">
           Meta override (optional)
-          <input type="text" [(ngModel)]="form.metaOverride" placeholder="Anonymised · Mar 2026" />
+          <input id="blog-meta-override" type="text" [(ngModel)]="form.metaOverride" placeholder="Anonymised - Mar 2026" />
         </label>
 
-        <label>
+        <label for="blog-description">
           Description
-          <textarea rows="5" [(ngModel)]="form.desc"></textarea>
+          <textarea id="blog-description" rows="5" [(ngModel)]="form.desc"></textarea>
         </label>
+
+        <div class="featured-image-section">
+          <h3>Featured Image</h3>
+          <p class="featured-image-help">
+            Priority: uploaded image -> external URL -> placeholder fallback.
+          </p>
+
+          <div class="featured-image-grid">
+            <label for="blog-image-upload">
+              Upload image
+              <input
+                id="blog-image-upload"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                (change)="onFeaturedImageSelected($event)"
+              />
+              <small class="field-note">jpg, jpeg, png, webp up to 5MB</small>
+            </label>
+
+            <label for="blog-image-url">
+              External image URL
+              <input
+                id="blog-image-url"
+                type="url"
+                [(ngModel)]="form.featuredImageUrl"
+                (input)="onImageUrlChange()"
+                placeholder="https://example.com/cover.webp"
+              />
+            </label>
+          </div>
+
+          <div class="featured-image-preview">
+            <div class="featured-image-preview-header">
+              <span>Preview</span>
+              <span class="source-hint">{{ imageSourceHint() }}</span>
+            </div>
+            <img [src]="previewImageUrl" alt="Featured image preview" />
+            <button type="button" class="btn-ghost btn-small" (click)="clearUploadedImage()">Clear uploaded image</button>
+          </div>
+        </div>
 
         <div class="actions">
-          <button type="button" class="btn-primary" (click)="save()">{{ isEditing ? 'Update Post' : 'Add Post' }}</button>
+          <button type="button" class="btn-primary" [disabled]="isSaving || isUploading" (click)="save()">
+            {{ isSaving ? 'Saving...' : (isEditing ? 'Update Post' : 'Add Post') }}
+          </button>
           <button *ngIf="isEditing" type="button" class="btn-ghost" (click)="cancelEdit()">Cancel</button>
         </div>
       </div>
@@ -81,7 +124,7 @@
           <div class="post-item" *ngFor="let post of posts">
             <div class="post-main">
               <div class="post-title">{{ post.title }}</div>
-              <div class="post-meta">{{ post.category }} · {{ post.tag }}</div>
+              <div class="post-meta">{{ post.category }} - {{ post.tag }}</div>
             </div>
             <div class="post-actions">
               <button type="button" class="btn-mini" (click)="edit(post)"><i class="pi pi-pencil text-app-primary"></i></button>

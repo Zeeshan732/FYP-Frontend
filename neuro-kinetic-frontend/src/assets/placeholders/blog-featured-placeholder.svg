@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Blog image placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1b2e" />
+      <stop offset="100%" stop-color="#1f4068" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)" />
+  <g fill="none" stroke="#5fa8f5" stroke-width="10" opacity="0.5">
+    <path d="M120 460l180-170 160 130 220-210 200 210 200-190" />
+    <circle cx="420" cy="260" r="48" />
+  </g>
+  <text x="50%" y="54%" text-anchor="middle" fill="#dce9f8" font-size="48" font-family="Arial, sans-serif">
+    NeuroSync Blog
+  </text>
+</svg>

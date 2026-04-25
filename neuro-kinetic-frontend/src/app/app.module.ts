@@ -48,6 +48,8 @@ import { ConsultationComponent } from './pages/consultation/consultation.compone
 import { FingerTapComponent } from './pages/finger-tap/finger-tap.component';
 import { AboutComponent } from './pages/about/about.component';
 import { BlogComponent } from './pages/blog/blog.component';
+import { BlogDetailComponent } from './pages/blog-detail/blog-detail.component';
+import { BlogAllComponent } from './pages/blog-all/blog-all.component';
 import { ChatHistoryComponent } from './pages/chat-history/chat-history.component';
 import { ProfileSettingsComponent } from './pages/profile-settings/profile-settings.component';
 import { ContactMessagesComponent } from './pages/contact-messages/contact-messages.component';
@@ -89,6 +91,8 @@ import { SharedModule } from './shared/shared.module';
     FingerTapComponent,
     AboutComponent,
     BlogComponent,
+    BlogAllComponent,
+    BlogDetailComponent,
     ChatHistoryComponent,
     ProfileSettingsComponent,
     ContactMessagesComponent,
