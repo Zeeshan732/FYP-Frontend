@@ -455,117 +455,146 @@
       </div>
 
       <!-- Main Results Card -->
-      <div class="ptv-wrap">
-        <div class="ptv-header">
-          <div class="ptv-header-left">
-            <div class="ptv-header-title">Voice Test Result</div>
-            <div class="ptv-header-sub">This is a screening tool, not a clinical diagnosis</div>
+      <div class="ftr-wrap">
+        <div class="ftr-header">
+          <div class="ftr-header-left">
+            <div class="ftr-header-title">{{ getResultScreenTitle() }}</div>
+            <div class="ftr-header-sub">This is a screening tool, not a clinical diagnosis</div>
           </div>
-          <div class="ptv-header-actions">
-            <button class="ptv-btn-ghost" type="button" (click)="startNewTest()">Test again</button>
-            <button class="ptv-btn-ghost" type="button" (click)="viewMyTests()">My tests</button>
+          <div class="ftr-header-actions">
+            <button class="ftr-btn-ghost" type="button" (click)="startNewTest()">Test again</button>
+            <button class="ftr-btn-ghost" type="button" (click)="viewMyTests()">My tests</button>
           </div>
         </div>
 
-        <div class="ptv-report-actions" *ngIf="currentSessionId">
-          <button (click)="downloadCsvReport()" class="ptv-btn-download ptv-btn-download--csv">⬇ Download CSV</button>
-          <button (click)="downloadPdfReport()" class="ptv-btn-download ptv-btn-download--pdf">⬇ Download PDF Report</button>
+        <div class="ftr-report-actions" *ngIf="currentSessionId">
+          <button (click)="downloadCsvReport()" class="ftr-btn-download ftr-btn-download--csv">⬇ Download CSV</button>
+          <button (click)="downloadPdfReport()" class="ftr-btn-download ftr-btn-download--pdf">⬇ Download PDF Report</button>
         </div>
 
-        <div class="ptv-card">
-          <div class="ptv-badge">
-            <div class="ptv-badge-main">
-              <div class="ptv-badge-icon">🎙</div>
-              <div class="ptv-badge-text">
-                <h2 class="ptv-badge-title">{{ getDisplayPrediction() }}</h2>
-                <p class="ptv-badge-sub">AI screening · voice modality</p>
+        <div class="ftr-card" [ngClass]="getResultToneClass()">
+          <div
+            class="ftr-badge"
+            [style.background]="getResultBadgeBackground()"
+            [style.border-color]="getResultBadgeBorderColor()">
+            <div class="ftr-badge-main">
+              <div class="ftr-badge-icon" [style.background]="getResultIconBackground()">
+                <svg *ngIf="(analysisResult?.riskLevel || '').toLowerCase() === 'low'" width="18" height="18"
+                     viewBox="0 0 24 24" fill="none" [attr.stroke]="getResultAccentSoftColor()"
+                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <svg *ngIf="(analysisResult?.riskLevel || '').toLowerCase() !== 'low'" width="18" height="18"
+                     viewBox="0 0 24 24" fill="none" [attr.stroke]="getResultAccentSoftColor()"
+                     stroke-width="2" stroke-linecap="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </div>
+              <div class="ftr-badge-text">
+                <h2 class="ftr-badge-title" [style.color]="getResultAccentSoftColor()">{{ getDisplayPrediction() }}</h2>
+                <p class="ftr-badge-sub">AI model confidence · {{ getResultModalitySubtitle() }}</p>
               </div>
             </div>
-            <div class="ptv-risk-pill">{{ analysisResult?.riskLevel || 'Unknown' }} Risk</div>
+            <div class="ftr-risk-row">
+              <div
+                class="ftr-risk-pill"
+                [style.background]="getResultIconBackground()"
+                [style.border-color]="getResultBadgeBorderColor()"
+                [style.color]="getResultAccentSoftColor()">
+                {{ analysisResult?.riskLevel || 'Unknown' }} Risk
+              </div>
+              <div class="ftr-status-pill">{{ getDisplayPrediction() }}</div>
+            </div>
           </div>
 
-          <div class="ptv-main-row">
-            <div class="ptv-big-num-wrap">
-              <div [class]="'ptv-big-num ' + getRiskPercentClassValue()">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</div>
-              <div class="ptv-big-num-label">Parkinson's risk score</div>
+          <div class="ftr-main-row">
+            <div class="ftr-big-num-wrap">
+              <div [class]="'ftr-big-num ' + getRiskPercentClassValue()">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</div>
+              <div class="ftr-big-num-label">Parkinson's risk score</div>
             </div>
 
-            <div class="ptv-right-col">
-              <div class="ptv-bar-section">
-                <div class="ptv-bar-header">
+            <div class="ftr-right-col">
+              <div class="ftr-bar-section">
+                <div class="ftr-bar-header">
                   <span>Risk level</span>
-                  <span class="ptv-em">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</span>
+                  <span class="ftr-em">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</span>
                 </div>
-                <div class="ptv-bar-track">
-                  <div class="ptv-bar-fill" [style.width.%]="getRiskPercentDisplay()"></div>
+                <div class="ftr-bar-track">
+                  <div class="ftr-bar-fill" [style.width.%]="getRiskPercentDisplay()" [style.background]="getResultBarGradient()"></div>
                 </div>
-                <div class="ptv-bar-legend">
+                <div class="ftr-bar-legend">
                   <span>0% Low</span>
                   <span>50% Mod</span>
                   <span>100% High</span>
                 </div>
               </div>
 
-              <div class="ptv-mini-stats">
-                <div class="ptv-mini-stat">
-                  <div class="ptv-mini-val">{{ (getRiskPercentDisplay() / 100) | number:'1.3-3' }}</div>
-                  <div class="ptv-mini-label">PD risk (model)</div>
+              <div class="ftr-mini-stats">
+                <div class="ftr-mini-stat">
+                  <div class="ftr-mini-val">{{ (getRiskPercentDisplay() / 100) | number:'1.3-3' }}</div>
+                  <div class="ftr-mini-label">Probability</div>
                 </div>
-                <div class="ptv-mini-stat">
-                  <div class="ptv-mini-val">{{ (getConfidenceScoreDisplay() / 100) | number:'1.3-3' }}</div>
-                  <div class="ptv-mini-label">Model certainty</div>
+                <div class="ftr-mini-stat">
+                  <div class="ftr-mini-val" [style.color]="getResultAccentSoftColor()">{{ analysisResult?.riskLevel || 'Unknown' }}</div>
+                  <div class="ftr-mini-label">Risk level</div>
                 </div>
-                <div class="ptv-mini-stat">
-                  <div class="ptv-mini-val ptv-modality">Voice</div>
-                  <div class="ptv-mini-label">Modality</div>
+                <div class="ftr-mini-stat">
+                  <div class="ftr-mini-val ftr-modality">{{ getResultModalityStat() }}</div>
+                  <div class="ftr-mini-label">Modality</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="ptv-divider"></div>
+          <div class="ftr-divider"></div>
 
-          <div class="ptv-interpret">
-            <div class="ptv-interpret-title">What this means</div>
-            <div class="ptv-interpret-text">
-              This voice-based result indicates potential neurological speech markers. This is a screening result and
-              not a diagnosis. Please consult a qualified clinician for complete evaluation.
+          <div class="ftr-interpret">
+            <div class="ftr-interpret-title">What this means</div>
+            <div class="ftr-interpret-text">
+              {{ getResultInterpretationText() }}
             </div>
           </div>
 
-          <div class="ptv-rec-row">
-            <div class="ptv-rec-card">
-              <div class="ptv-rec-title">Next step</div>
-              <div class="ptv-rec-text">Discuss these findings with a neurologist and compare with clinical history.</div>
+          <div class="ftr-rec-row">
+            <div class="ftr-rec-card">
+              <div class="ftr-rec-title">{{ getResultNextStepTitle() }}</div>
+              <div class="ftr-rec-text">{{ getResultNextStepText() }}</div>
             </div>
-            <div class="ptv-rec-card ptv-rec-blue">
-              <div class="ptv-rec-title">Combine signals</div>
-              <div class="ptv-rec-text">Take gait and finger-tapping tests for complete multi-signal assessment.</div>
-            </div>
-          </div>
-
-          <div class="ptv-breakdown">
-            <div class="ptv-breakdown-label">Signal breakdown</div>
-            <div class="ptv-breakdown-row">
-              <span class="ptv-sig-name">Voice</span>
-              <div class="ptv-sig-track"><div class="ptv-sig-fill" [style.width.%]="getRiskPercentDisplay()"></div></div>
-              <span class="ptv-sig-val">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</span>
-            </div>
-            <div class="ptv-breakdown-row">
-              <span class="ptv-sig-name ptv-sig-muted">Finger tapping</span>
-              <div class="ptv-sig-track"></div>
-              <span class="ptv-sig-val ptv-sig-muted">-</span>
-            </div>
-            <div class="ptv-breakdown-row">
-              <span class="ptv-sig-name ptv-sig-muted">Gait</span>
-              <div class="ptv-sig-track"></div>
-              <span class="ptv-sig-val ptv-sig-muted">-</span>
+            <div class="ftr-rec-card ftr-rec-blue">
+              <div class="ftr-rec-title">Combine signals</div>
+              <div class="ftr-rec-text">{{ getResultCombineSignalsText() }}</div>
             </div>
           </div>
 
-          <div class="ptv-result-actions">
-            <button (click)="startNewTest()" class="ptv-btn-secondary">Take Another Test</button>
-            <button (click)="viewMyTests()" class="ptv-btn-primary">View My Tests</button>
+          <div class="ftr-breakdown">
+            <div class="ftr-breakdown-label">Signal breakdown</div>
+            <div class="ftr-breakdown-row">
+              <span class="ftr-sig-name">{{ getResultPrimarySignalLabel() }}</span>
+              <div class="ftr-sig-track"><div class="ftr-sig-fill" [style.width.%]="getRiskPercentDisplay()"></div></div>
+              <span class="ftr-sig-val">{{ getRiskPercentDisplay() | number:'1.0-1' }}%</span>
+            </div>
+            <div class="ftr-breakdown-row" *ngIf="getResultModalityStat() !== 'Tap'">
+              <span class="ftr-sig-name ftr-sig-muted">Finger tapping</span>
+              <div class="ftr-sig-track"></div>
+              <span class="ftr-sig-val ftr-sig-muted">-</span>
+            </div>
+            <div class="ftr-breakdown-row" *ngIf="getResultModalityStat() !== 'Gait'">
+              <span class="ftr-sig-name ftr-sig-muted">Gait</span>
+              <div class="ftr-sig-track"></div>
+              <span class="ftr-sig-val ftr-sig-muted">-</span>
+            </div>
+            <div class="ftr-breakdown-row" *ngIf="getResultModalityStat() !== 'Voice'">
+              <span class="ftr-sig-name ftr-sig-muted">Voice</span>
+              <div class="ftr-sig-track"></div>
+              <span class="ftr-sig-val ftr-sig-muted">-</span>
+            </div>
+          </div>
+
+          <div class="ftr-result-actions">
+            <button (click)="startNewTest()" class="ftr-btn-secondary">Take Another Test</button>
+            <button (click)="viewMyTests()" class="ftr-btn-primary">View My Tests</button>
           </div>
         </div>
       </div>
@@ -646,3 +675,4 @@
     </div>
   </div>
 </div>
+

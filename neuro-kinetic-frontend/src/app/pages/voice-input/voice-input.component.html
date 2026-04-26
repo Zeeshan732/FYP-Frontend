@@ -163,22 +163,26 @@
         </div>
 
         <div class="ftr-card">
-          <div class="ftr-badge ftr-result-card-primary">
+          <div class="ftr-badge ftr-result-card-primary" [style.background]="resultRiskBg" [style.border-color]="resultRiskBorder">
             <div class="ftr-badge-main ftr-result-header">
-              <div class="ftr-badge-icon ftr-result-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke="currentColor">
-                  <path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z"></path>
-                  <path d="M19 11v1a7 7 0 01-14 0v-1"></path>
-                  <path d="M12 19v3"></path>
-                  <path d="M9 22h6"></path>
+              <div class="ftr-badge-icon ftr-result-icon" [style.background]="resultRiskIconBg">
+                <svg *ngIf="isHealthyVoiceResult" width="18" height="18" viewBox="0 0 24 24" fill="none" [attr.stroke]="resultRiskColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <svg *ngIf="!isHealthyVoiceResult" width="18" height="18" viewBox="0 0 24 24" fill="none" [attr.stroke]="resultRiskColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
               </div>
               <div class="ftr-badge-text">
-                <h2 class="ftr-badge-title ftr-result-title">{{ getPredictionText(prediction) }}</h2>
+                <h2 class="ftr-badge-title ftr-result-title" [style.color]="resultRiskColor">{{ getPredictionText(prediction) }}</h2>
                 <p class="ftr-badge-sub ftr-result-subtitle">AI model confidence<span class="ftr-badge-sub-sep">&nbsp;·&nbsp;</span>voice modality</p>
               </div>
             </div>
-            <div class="ftr-risk-pill ftr-risk-badge">{{ (riskLevel || 'Unknown') + ' Risk' }}</div>
+            <div class="ftr-risk-pill ftr-risk-badge" [style.background]="resultRiskIconBg" [style.border-color]="resultRiskBorder" [style.color]="resultRiskColor">
+              {{ riskLabel }}
+            </div>
           </div>
 
           <div class="ftr-main-row">
@@ -196,7 +200,7 @@
                   <span style="font-weight:500">{{ riskPercent !== undefined ? riskPercent.toFixed(1) : '0.0' }}%</span>
                 </div>
                 <div class="ftr-bar-track ftr-risk-bar-track">
-                  <div class="ftr-bar-fill ftr-risk-bar-fill" [style.width.%]="riskPercent || 0"></div>
+                  <div class="ftr-bar-fill ftr-risk-bar-fill" [style.width.%]="riskPercent || 0" [style.background]="resultBarGradient"></div>
                 </div>
                 <div class="ftr-bar-legend ftr-risk-bar-labels">
                   <span class="ftr-bar-legend-i"><span class="ftr-legend-muted">0%</span> Low</span>
@@ -208,14 +212,10 @@
               <div class="ftr-mini-stats">
                 <div class="ftr-mini-stat">
                   <div class="ftr-mini-val">{{ riskPercent !== undefined ? (riskPercent / 100).toFixed(3) : '0.000' }}</div>
-                  <div class="ftr-mini-label">PD risk (model)</div>
+                  <div class="ftr-mini-label">Probability</div>
                 </div>
                 <div class="ftr-mini-stat">
-                  <div class="ftr-mini-val">{{ confidence !== undefined ? (confidence / 100).toFixed(3) : '0.000' }}</div>
-                  <div class="ftr-mini-label">Model certainty</div>
-                </div>
-                <div class="ftr-mini-stat">
-                  <div class="ftr-mini-val">{{ riskLevel || 'Unknown' }}</div>
+                  <div class="ftr-mini-val" [style.color]="resultRiskColor">{{ (riskLevel || 'Unknown') }}</div>
                   <div class="ftr-mini-label">Risk level</div>
                 </div>
                 <div class="ftr-mini-stat">
@@ -228,7 +228,7 @@
 
           <div class="ftr-divider"></div>
 
-          <div class="ftr-interp">
+          <div class="ftr-interp" [style.border-left-color]="resultRiskColor">
             <div class="ftr-interp-title">What this means</div>
             <div class="ftr-interp-text">
               This voice-based result indicates potential neurological speech markers.
@@ -238,9 +238,9 @@
           </div>
 
           <div class="ftr-rec-row">
-            <div class="ftr-rec-card">
+            <div class="ftr-rec-card" [style.background]="resultRiskBg" [style.border-color]="resultRiskBorder">
               <div>
-                <div class="ftr-rec-title">Next step</div>
+                <div class="ftr-rec-title" [style.color]="resultRiskColor">Next step</div>
                 <div class="ftr-rec-text">Discuss these findings with a neurologist and compare with clinical history.</div>
               </div>
             </div>
@@ -258,9 +258,9 @@
               <div class="ftr-breakdown-row">
                 <span class="ftr-sig-name">Voice</span>
                 <div class="ftr-sig-track">
-                  <div class="ftr-sig-fill" [style.width.%]="riskPercent || 0"></div>
+                  <div class="ftr-sig-fill" [style.width.%]="riskPercent || 0" [style.background]="resultRiskColor"></div>
                 </div>
-                <span class="ftr-sig-val">{{ riskPercent !== undefined ? riskPercent.toFixed(1) : '0.0' }}%</span>
+                <span class="ftr-sig-val" [style.color]="resultRiskColor">{{ riskPercent !== undefined ? riskPercent.toFixed(1) : '0.0' }}%</span>
               </div>
               <div class="ftr-breakdown-row">
                 <span class="ftr-sig-name ftr-sig-muted">Finger tapping</span>

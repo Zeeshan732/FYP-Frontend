@@ -12,6 +12,30 @@ export const GAIT_CSV_REQUIRED_COLUMNS = [
   'step_length_difference'
 ] as const;
 
+/** Preferred production schema: exact 17-feature gait vector order expected by backend ML path. */
+export const GAIT_CSV_MODEL_FEATURE_COLUMNS = [
+  'stride_time_mean',
+  'stride_time_std',
+  'step_time_mean',
+  'step_time_std',
+  'cadence',
+  'velocity',
+  'step_length',
+  'stride_length',
+  'force_asymmetry',
+  'step_time_cv',
+  'stride_time_cv',
+  'left_force_mean',
+  'right_force_mean',
+  'left_force_std',
+  'right_force_std',
+  'swing_time_ratio',
+  'stance_time_ratio'
+] as const;
+
+/** Labels are allowed in CSV for reference only and MUST be ignored for prediction. */
+export const GAIT_CSV_IGNORED_LABEL_COLUMNS = ['status', 'diagnosis_label'] as const;
+
 const MAX_CSV_BYTES = 256 * 1024; // 256 KB — plenty for a few numeric rows
 
 function normalizeHeader(h: string): string {
@@ -57,7 +81,7 @@ function parseNumber(raw: string, column: string): number {
 }
 
 export type GaitCsvParseResult =
-  | { ok: true; values: ClinicalGaitForm; headerLine: string }
+  | { ok: true; values: ClinicalGaitForm; headerLine: string; featureVector?: number[] }
   | { ok: false; errors: string[] };
 
 /**
@@ -89,21 +113,6 @@ export function parseGaitCsvText(content: string): GaitCsvParseResult {
   const dataCells = splitCsvLine(lines[1]);
 
   const headerSet = new Set(headerCells.filter(Boolean));
-  const missing: string[] = [];
-  for (const req of GAIT_CSV_REQUIRED_COLUMNS) {
-    if (!headerSet.has(req)) {
-      missing.push(req);
-    }
-  }
-  if (missing.length) {
-    return {
-      ok: false,
-      errors: [
-        `Missing required column(s): ${missing.join(', ')}.`,
-        `Expected columns: ${GAIT_CSV_REQUIRED_COLUMNS.join(', ')}.`
-      ]
-    };
-  }
 
   const colIndex = new Map<string, number>();
   headerCells.forEach((h, i) => {
@@ -116,11 +125,82 @@ export function parseGaitCsvText(content: string): GaitCsvParseResult {
     );
   }
 
-  const getCell = (name: (typeof GAIT_CSV_REQUIRED_COLUMNS)[number]): string => {
+  const getCell = (name: string): string => {
     const i = colIndex.get(name);
     if (i === undefined) return '';
     return dataCells[i] ?? '';
   };
+
+  const hasAllModelFeatureColumns = GAIT_CSV_MODEL_FEATURE_COLUMNS.every((c) => headerSet.has(c));
+
+  // Preferred path: full 17-feature CSV (extra columns like status/diagnosis_label are ignored).
+  if (hasAllModelFeatureColumns) {
+    try {
+      const featureVector = GAIT_CSV_MODEL_FEATURE_COLUMNS.map((c) => parseNumber(getCell(c), c));
+      const [
+        _strideTimeMean,
+        _strideTimeStd,
+        _stepTimeMean,
+        _stepTimeStd,
+        cadence,
+        velocity,
+        stepLength,
+        strideLength,
+        forceAsymmetry,
+        stepTimeCv,
+        _strideTimeCv,
+        _leftForceMean,
+        _rightForceMean,
+        leftForceStd,
+        rightForceStd,
+        _swingTimeRatio,
+        _stanceTimeRatio
+      ] = featureVector;
+
+      const balancePenalty = Math.max(0, stepTimeCv * 100 + forceAsymmetry * 55 + ((leftForceStd + rightForceStd) / 2) * 0.8);
+      const balanceScore = Math.max(0, Math.min(100, 100 - balancePenalty));
+      const stepLengthDifference = Math.max(-1, Math.min(1, strideLength - 2 * stepLength));
+
+      return {
+        ok: true,
+        values: {
+          gaitVelocity: velocity,
+          strideLength,
+          cadence,
+          stepTimeVariability: stepTimeCv,
+          forceAsymmetry,
+          balanceScore,
+          walkingSpeed: velocity,
+          stepLengthDifference
+        },
+        headerLine: lines[0],
+        featureVector
+      };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return { ok: false, errors: [...errors, msg].filter(Boolean) };
+    }
+  }
+
+  // Legacy fallback path (8-column clinical CSV).
+  const missingLegacy: string[] = [];
+  for (const req of GAIT_CSV_REQUIRED_COLUMNS) {
+    if (!headerSet.has(req)) {
+      missingLegacy.push(req);
+    }
+  }
+  if (missingLegacy.length) {
+    return {
+      ok: false,
+      errors: [
+        `Missing required column(s): ${missingLegacy.join(', ')}.`,
+        `Supported CSV formats:`,
+        `1) Model feature columns: ${GAIT_CSV_MODEL_FEATURE_COLUMNS.join(', ')}`,
+        `2) Clinical columns: ${GAIT_CSV_REQUIRED_COLUMNS.join(', ')}`,
+        `Optional ignored columns: ${GAIT_CSV_IGNORED_LABEL_COLUMNS.join(', ')}`
+      ]
+    };
+  }
 
   try {
     const gaitVelocity = parseNumber(getCell('gait_velocity'), 'gait_velocity');
