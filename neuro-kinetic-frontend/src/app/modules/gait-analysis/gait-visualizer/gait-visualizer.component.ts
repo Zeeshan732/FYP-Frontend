@@ -123,6 +123,8 @@ export class GaitVisualizerComponent {
   csvFileName: string | null = null;
   csvImportErrors: string[] = [];
   csvPreview: { key: string; value: string }[] = [];
+  /** When CSV already provides exact 17-feature vector, use it directly for backend prediction. */
+  csvFeatureVector: number[] | null = null;
 
   @ViewChild('csvFileInput') csvFileInput?: ElementRef<HTMLInputElement>;
 
@@ -194,6 +196,7 @@ export class GaitVisualizerComponent {
       this.form = { ...parsed.values };
       this.gaitValueSource = 'csv';
       this.csvFileName = file!.name;
+      this.csvFeatureVector = parsed.featureVector ? [...parsed.featureVector] : null;
       this.csvImportErrors = [];
       this.csvPreview = [
         { key: 'gait_velocity', value: String(parsed.values.gaitVelocity) },
@@ -223,6 +226,7 @@ export class GaitVisualizerComponent {
     this.csvFileName = null;
     this.csvImportErrors = [];
     this.csvPreview = [];
+    this.csvFeatureVector = null;
   }
 
   /** Clears the result panel when the clinician adjusts inputs after a run. */
@@ -266,7 +270,10 @@ export class GaitVisualizerComponent {
     }
 
     const values = buildModelFeatureVector(this.form);
-    if (Math.max(...values.map(x => Math.abs(x))) < 1e-4) {
+    const finalValues = this.csvFeatureVector && this.csvFeatureVector.length === 17
+      ? [...this.csvFeatureVector]
+      : values;
+    if (Math.max(...finalValues.map(x => Math.abs(x))) < 1e-4) {
       this.error = 'Entered values are too small to analyze. Adjust the gait parameters.';
       return;
     }
@@ -275,7 +282,7 @@ export class GaitVisualizerComponent {
     // Wrap with named clinical fields for backend logging/debug (backend still reads `.features`).
     const gaitDataJson = JSON.stringify({
       clinical: { ...this.form },
-      features: values
+      features: finalValues
     });
 
     this.isProcessing = true;

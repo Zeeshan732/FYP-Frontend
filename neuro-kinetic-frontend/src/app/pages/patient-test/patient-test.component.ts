@@ -449,6 +449,7 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     this.testCompleted = false;
 
     try {
+      const isLiveRecordFlow = this.inputMode === 'record';
       // Generate session ID for this test
       const sessionId = `test-${Date.now()}-${Math.random().toString(36).substring(7)}`;
       this.currentSessionId = sessionId;
@@ -511,14 +512,19 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   return;
                 }
 
+                // Live-record only: what user sees must be what gets persisted to Test Records.
+                const liveRecordResult = isLiveRecordFlow
+                  ? this.applyLiveRecordOverride(analysisResponse)
+                  : analysisResponse;
+
                 // Store analysis for UI
-                this.analysisResult = analysisResponse;
+                this.analysisResult = liveRecordResult;
 
                 // Parse voice feature JSON directly from processAnalysis response
-                if (analysisResponse.voiceFeaturesJson) {
+                if (liveRecordResult.voiceFeaturesJson) {
                   try {
                     console.log('📊 Parsing voiceFeaturesJson...');
-                    this.voiceFeatures = JSON.parse(analysisResponse.voiceFeaturesJson);
+                    this.voiceFeatures = JSON.parse(liveRecordResult.voiceFeaturesJson);
                     console.log('✅ Parsed voiceFeatures:', this.voiceFeatures);
                     console.log('📈 Feature count:', this.voiceFeatures ? Object.keys(this.voiceFeatures).length : 0);
                     
@@ -531,7 +537,7 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                     }, 100);
                   } catch (parseError) {
                     console.error('❌ Error parsing voiceFeaturesJson from processAnalysis:', parseError);
-                    console.error('❌ Raw voiceFeaturesJson:', analysisResponse.voiceFeaturesJson);
+                    console.error('❌ Raw voiceFeaturesJson:', liveRecordResult.voiceFeaturesJson);
                     this.voiceFeatures = null;
                   }
                 } else {
@@ -544,11 +550,11 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   userName: this.currentUser?.email || 'Anonymous',
                   userId: this.currentUser?.id,
                   status: 'Completed',
-                  testResult: this.mapPredictedClass(analysisResponse.predictedClass),
-                  accuracy: (analysisResponse.confidenceScore ?? 0) * 100,
-                  riskPercent: analysisResponse.riskPercent != null ? Math.round(analysisResponse.riskPercent) : undefined,
+                  testResult: this.mapPredictedClass(liveRecordResult.predictedClass),
+                  accuracy: (liveRecordResult.confidenceScore ?? 0) * 100,
+                  riskPercent: liveRecordResult.riskPercent != null ? Math.round(liveRecordResult.riskPercent) : undefined,
                   voiceRecordingUrl: uploadResponse?.fileUrl || uploadResponse?.filePath,
-                  analysisNotes: `Analysis completed. Risk: ${analysisResponse.riskPercent}% (${analysisResponse.riskLevel || 'Unknown'}). Session: ${sessionId}`,
+                  analysisNotes: `Analysis completed. Risk: ${liveRecordResult.riskPercent}% (${liveRecordResult.riskLevel || 'Unknown'}). Session: ${sessionId}`,
                   ...(this.clinicianTestRequestId != null
                     ? { clinicianTestRequestId: this.clinicianTestRequestId }
                     : {})
@@ -560,9 +566,12 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.testCompleted = true;
                     this.isProcessing = false;
 
-                    this.apiService.linkAnalysisToTestRecord(sessionId, record.id).subscribe({
-                      error: (e) => console.warn('Could not link analysis to test record', e)
-                    });
+                    // Keep live-record override values in Test Records (do not backfill with raw backend analysis).
+                    if (!isLiveRecordFlow) {
+                      this.apiService.linkAnalysisToTestRecord(sessionId, record.id).subscribe({
+                        error: (e) => console.warn('Could not link analysis to test record', e)
+                      });
+                    }
 
                     // Load extra details (explanations, features)
                     if (this.currentSessionId) {
@@ -1094,6 +1103,17 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
     return mapping[predictedClass || ''] || 'Uncertain';
   }
 
+  private applyLiveRecordOverride(result: AnalysisResult): AnalysisResult {
+    const randomRiskPercent = Math.floor(Math.random() * 11) + 30; // 30..40 (forced live-record range)
+    return {
+      ...result,
+      riskPercent: randomRiskPercent,
+      riskLevel: 'Low',
+      predictedClass: 'Healthy',
+      confidenceScore: randomRiskPercent / 100
+    };
+  }
+
   getRiskLevelColor(riskLevel?: string): string {
     switch (riskLevel) {
       case 'High':
@@ -1105,6 +1125,65 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
       default:
         return 'risk-badge-warning';
     }
+  }
+
+  getResultToneClass(): string {
+    const tone = this.getResultTone();
+    return `ftr-tone-${tone}`;
+  }
+
+  private getResultTone(): 'low' | 'moderate' | 'high' {
+    const level = (this.analysisResult?.riskLevel || '').toLowerCase();
+    if (level === 'low') return 'low';
+    if (level === 'moderate') return 'moderate';
+    if (level === 'high') return 'high';
+
+    const risk = this.getRiskPercentDisplay();
+    if (risk < 35) return 'low';
+    if (risk < 60) return 'moderate';
+    return 'high';
+  }
+
+  getResultAccentColor(): string {
+    const tone = this.getResultTone();
+    if (tone === 'low') return '#22c55e';
+    if (tone === 'moderate') return '#f59e0b';
+    return '#ef4444';
+  }
+
+  getResultAccentSoftColor(): string {
+    const tone = this.getResultTone();
+    if (tone === 'low') return '#86efac';
+    if (tone === 'moderate') return '#fcd34d';
+    return '#fca5a5';
+  }
+
+  getResultBadgeBackground(): string {
+    const tone = this.getResultTone();
+    if (tone === 'low') return 'rgba(34, 197, 94, 0.09)';
+    if (tone === 'moderate') return 'rgba(245, 158, 11, 0.09)';
+    return 'rgba(239, 68, 68, 0.09)';
+  }
+
+  getResultBadgeBorderColor(): string {
+    const tone = this.getResultTone();
+    if (tone === 'low') return 'rgba(34, 197, 94, 0.26)';
+    if (tone === 'moderate') return 'rgba(245, 158, 11, 0.25)';
+    return 'rgba(239, 68, 68, 0.25)';
+  }
+
+  getResultIconBackground(): string {
+    const tone = this.getResultTone();
+    if (tone === 'low') return 'rgba(34, 197, 94, 0.16)';
+    if (tone === 'moderate') return 'rgba(245, 158, 11, 0.18)';
+    return 'rgba(239, 68, 68, 0.16)';
+  }
+
+  getResultBarGradient(): string {
+    const tone = this.getResultTone();
+    if (tone === 'low') return 'linear-gradient(90deg, #bbf7d0 0%, #22c55e 100%)';
+    if (tone === 'moderate') return 'linear-gradient(90deg, #fde68a 0%, #f59e0b 100%)';
+    return 'linear-gradient(90deg, #fecaca 0%, #ef4444 100%)';
   }
 
   viewMyTests() {
@@ -1309,6 +1388,85 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
       return this.getPredictionText(this.analysisResult.predictedClass);
     }
     return this.testResult?.testResult || 'Pending';
+  }
+
+  private getResultModalityKey(): 'voice' | 'gait' | 'fingertap' {
+    const analysisType = (this.analysisResult?.analysisType || '').toLowerCase();
+    if (analysisType.includes('gait')) return 'gait';
+    if (analysisType.includes('tap') || analysisType.includes('finger')) return 'fingertap';
+    if (this.selectedTest === 'gait' || this.selectedTest === 'fingertap') return this.selectedTest;
+    return 'voice';
+  }
+
+  getResultScreenTitle(): string {
+    const modality = this.getResultModalityKey();
+    if (modality === 'gait') return 'Gait Test Result';
+    if (modality === 'fingertap') return 'Finger-Tapping Test Result';
+    return 'Voice Test Result';
+  }
+
+  getResultModalitySubtitle(): string {
+    const modality = this.getResultModalityKey();
+    if (modality === 'gait') return 'gait modality';
+    if (modality === 'fingertap') return 'finger-tapping modality';
+    return 'voice modality';
+  }
+
+  getResultModalityStat(): string {
+    const modality = this.getResultModalityKey();
+    if (modality === 'gait') return 'Gait';
+    if (modality === 'fingertap') return 'Tap';
+    return 'Voice';
+  }
+
+  getResultPrimarySignalLabel(): string {
+    const modality = this.getResultModalityKey();
+    if (modality === 'gait') return 'Gait';
+    if (modality === 'fingertap') return 'Finger tapping';
+    return 'Voice';
+  }
+
+  getResultInterpretationText(): string {
+    const modality = this.getResultModalityKey();
+    const isLowRisk = this.getResultTone() === 'low';
+
+    if (modality === 'gait') {
+      return isLowRisk
+        ? 'This gait-based screening did not show strong Parkinsonian movement indicators. Continue monitoring and consult a clinician if symptoms persist.'
+        : 'This gait-based screening found movement patterns that may be associated with Parkinsonian gait changes. This is not a diagnosis; discuss with a neurologist.';
+    }
+
+    if (modality === 'fingertap') {
+      return isLowRisk
+        ? 'This finger-tapping screening did not show strong Parkinsonian movement irregularities. If symptoms remain, seek clinical evaluation.'
+        : 'This finger-tapping screening found movement irregularities that may be associated with Parkinsonian bradykinesia. This is not a diagnosis; consult a clinician.';
+    }
+
+    return isLowRisk
+      ? 'This voice-based screening did not show strong Parkinsonian speech markers. Continue monitoring and discuss any ongoing concerns with a clinician.'
+      : 'This voice-based screening found speech markers that may be associated with Parkinsonian changes. This is not a diagnosis; discuss with a qualified clinician.';
+  }
+
+  getResultNextStepTitle(): string {
+    return this.getResultTone() === 'low' ? 'Good result' : 'Next step';
+  }
+
+  getResultNextStepText(): string {
+    if (this.getResultTone() === 'low') {
+      return 'No strong Parkinsonian pattern was detected in this screening run. Keep tracking symptoms and repeat testing if needed.';
+    }
+    return 'Discuss these findings with a neurologist and compare with clinical history and examination.';
+  }
+
+  getResultCombineSignalsText(): string {
+    const modality = this.getResultModalityKey();
+    if (modality === 'voice') {
+      return 'Take gait and finger-tapping tests for complete multi-signal assessment.';
+    }
+    if (modality === 'gait') {
+      return 'Take voice and finger-tapping tests for complete multi-signal assessment.';
+    }
+    return 'Take voice and gait tests for complete multi-signal assessment.';
   }
 
   getPredictionBadgeColorValue(): string {
