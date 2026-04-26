@@ -15,6 +15,7 @@ import {
 } from '../../models/api.models';
 import { HttpEventType } from '@angular/common/http';
 import { Chart } from 'chart.js';
+import { isWeakVoiceExtractionForLiveRecord } from '../../utils/voice-feature-guard.util';
 
 @Component({
   selector: 'app-patient-test',
@@ -491,7 +492,8 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
               sessionId: sessionId, // MUST match upload sessionId
               hasVoiceData: true,
               hasGaitData: false,
-              voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
+              voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse),
+              isLiveRecord: isLiveRecordFlow
             }).subscribe({
               next: (analysisResponse: AnalysisResult) => {
                 console.log('✅ Analysis complete:', analysisResponse);
@@ -512,7 +514,21 @@ export class PatientTestComponent implements OnInit, OnDestroy, AfterViewInit {
                   return;
                 }
 
-                // Live-record only: what user sees must be what gets persisted to Test Records.
+                // Live record: weak feature extraction → error popup, no result. Strong extraction → applyLiveRecordOverride.
+                if (isLiveRecordFlow && isWeakVoiceExtractionForLiveRecord(analysisResponse.voiceFeaturesJson)) {
+                  this.error =
+                    'Your recording did not include enough clear speech to analyze. Please record 3–5 seconds of a sustained vowel (e.g. "ah") in a quiet place, then try again.';
+                  this.isProcessing = false;
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Weak voice extraction',
+                    detail: this.error,
+                    life: 10000
+                  });
+                  return;
+                }
+
+                // Strong extraction: live record uses override for display + test record; upload uses server values.
                 const liveRecordResult = isLiveRecordFlow
                   ? this.applyLiveRecordOverride(analysisResponse)
                   : analysisResponse;

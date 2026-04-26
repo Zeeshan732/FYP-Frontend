@@ -207,6 +207,8 @@ export class ApiService {
     skeletonDataJson?: string;
     /** When set, analysis is stored with FK to this test record (voice/gait flow). */
     testRecordId?: number;
+    /** Live mic: backend requires extracted voice features (rejects feature-less ML responses). */
+    isLiveRecord?: boolean;
   }): Observable<AnalysisResult> {
     // Direct call to /api/analysis/process as per backend API
     return this.http.post<AnalysisResult>(`${this.apiUrl}/analysis/process`, {
@@ -218,7 +220,8 @@ export class ApiService {
       gaitDataJson: data.gaitDataJson,
       waveformDataJson: data.waveformDataJson,
       skeletonDataJson: data.skeletonDataJson,
-      testRecordId: data.testRecordId
+      testRecordId: data.testRecordId,
+      isLiveRecord: data.isLiveRecord === true
     });
   }
 
