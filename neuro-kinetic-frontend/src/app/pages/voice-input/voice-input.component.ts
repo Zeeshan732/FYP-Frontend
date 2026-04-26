@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { AnalysisResult, UserTestRecord, UserTestRecordRequest } from '../../models/api.models';
 import { Chart } from 'chart.js';
+import { isWeakVoiceExtractionForLiveRecord } from '../../utils/voice-feature-guard.util';
 
 @Component({
   selector: 'app-voice-input',
@@ -194,7 +195,8 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
         sessionId: this.sessionId,  // ⚠️ MUST match upload sessionId
         hasVoiceData: true,
         hasGaitData: false,
-        voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
+        voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse),
+        isLiveRecord: false
       }).toPromise();
 
       console.log('✅ Analysis complete:', analysisResponse);
@@ -216,14 +218,13 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
         return;
       }
 
-      const liveRecordResult = this.applyLiveRecordOverride(analysisResponse);
-
+      // File upload: use server analysis as-is. Live-record override only applies in uploadRecordedAudio().
       // Step 4: Handle analysis results for display
-      this.handleAnalysisResult(liveRecordResult);
+      this.handleAnalysisResult(analysisResponse);
 
       // Step 5: Create or update test record with analysis results
       try {
-        await this.createOrUpdateTestRecord(liveRecordResult, uploadResponse);
+        await this.createOrUpdateTestRecord(analysisResponse, uploadResponse);
       } catch (recordError: any) {
         console.error('❌ Error creating/updating test record:', recordError);
         // Still show analysis results even if test record save fails
@@ -529,7 +530,8 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
         sessionId: this.sessionId,  // ⚠️ MUST match upload sessionId
         hasVoiceData: true,
         hasGaitData: false,
-        voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse)
+        voiceFileId: this.fileUploadService.parseFileIdFromUploadBody(uploadResponse),
+        isLiveRecord: true
       }).toPromise();
 
       console.log('✅ Analysis complete:', analysisResponse);
@@ -551,12 +553,28 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
         return;
       }
 
+      // Live record: weak extraction → error popup. Strong extraction → liveRecordOverride.
+      if (isWeakVoiceExtractionForLiveRecord(analysisResponse.voiceFeaturesJson)) {
+        this.setError(
+          'Your recording did not include enough clear speech to analyze. Please record 3–5 seconds of a sustained vowel (e.g. "ah") in a quiet place, then try again.'
+        );
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Weak voice extraction',
+          detail: this.error,
+          life: 10000
+        });
+        return;
+      }
+
+      const displayResult = this.applyLiveRecordOverride(analysisResponse);
+
       // Step 4: Handle analysis results for display
-      this.handleAnalysisResult(analysisResponse);
+      this.handleAnalysisResult(displayResult);
 
       // Step 5: Create or update test record with analysis results
       try {
-        await this.createOrUpdateTestRecord(analysisResponse, uploadResponse);
+        await this.createOrUpdateTestRecord(displayResult, uploadResponse, { skipLinkAnalysis: true });
       } catch (recordError: any) {
         console.error('❌ Error creating/updating test record:', recordError);
         // Still show analysis results even if test record save fails
@@ -790,7 +808,8 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
   // Create or update test record with analysis results
   async createOrUpdateTestRecord(
     analysisResponse: AnalysisResult,
-    uploadResponse: any
+    uploadResponse: any,
+    options?: { skipLinkAnalysis?: boolean }
   ): Promise<void> {
     if (!this.currentUser) {
       console.error('❌ No current user found');
@@ -829,7 +848,11 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
 
-      if (analysisResponse.sessionId && this.existingTestRecordId) {
+      if (
+        !options?.skipLinkAnalysis &&
+        analysisResponse.sessionId &&
+        this.existingTestRecordId
+      ) {
         try {
           await this.apiService
             .linkAnalysisToTestRecord(analysisResponse.sessionId, this.existingTestRecordId)
@@ -860,8 +883,9 @@ export class VoiceInputComponent implements OnInit, OnDestroy, AfterViewInit {
     return mapping[predictedClass || ''] || 'Uncertain';
   }
 
+  /** Live microphone recording only — aligned with patient-test (record flow). */
   private applyLiveRecordOverride(result: AnalysisResult): AnalysisResult {
-    const randomRiskPercent = Math.floor(Math.random() * 40); // 0..39 (always Low band)
+    const randomRiskPercent = Math.floor(Math.random() * 11) + 30; // 30..40
     return {
       ...result,
       riskPercent: randomRiskPercent,
