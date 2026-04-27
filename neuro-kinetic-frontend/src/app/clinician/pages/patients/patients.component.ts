@@ -17,6 +17,8 @@ export class PatientsComponent implements OnInit {
   searchQuery = '';
   filterStatus: FilterStatus = 'all';
   showAddModal = false;
+  showRequestModal = false;
+  requestPatient: Patient | null = null;
   showRemovePatientDialog = false;
   patientPendingRemoval: Patient | null = null;
   deletingId: string | null = null;
@@ -84,6 +86,24 @@ export class PatientsComponent implements OnInit {
     this.calculateStats();
     this.filterPatients();
     this.showAddModal = false;
+    // Streamlined clinician flow: after linking/adding a patient,
+    // open request-test modal so email + in-app request can be sent immediately.
+    this.requestPatient = patient;
+    this.showRequestModal = true;
+  }
+
+  onTestRequested(): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Test requested',
+      detail: 'Patient has been notified with the requested test.'
+    });
+    this.closeRequestModal();
+  }
+
+  closeRequestModal(): void {
+    this.showRequestModal = false;
+    this.requestPatient = null;
   }
 
   navigateToProfile(id: string): void {

@@ -125,3 +125,10 @@
   (close)="showAddModal = false"
   (patientAdded)="onPatientAdded($event)">
 </app-add-patient-modal>
+
+<app-request-test-modal
+  *ngIf="showRequestModal && requestPatient"
+  [patient]="requestPatient"
+  (close)="closeRequestModal()"
+  (testRequested)="onTestRequested()">
+</app-request-test-modal>
