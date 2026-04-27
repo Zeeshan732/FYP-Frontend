@@ -468,8 +468,14 @@
         </div>
 
         <div class="ftr-report-actions" *ngIf="currentSessionId">
-          <button (click)="downloadCsvReport()" class="ftr-btn-download ftr-btn-download--csv">⬇ Download CSV</button>
-          <button (click)="downloadPdfReport()" class="ftr-btn-download ftr-btn-download--pdf">⬇ Download PDF Report</button>
+          <button (click)="downloadCsvReport()" class="ftr-btn-download ftr-btn-download--csv">
+            <span class="ftr-btn-icon" aria-hidden="true">⬇</span>
+            <span>Download CSV</span>
+          </button>
+          <button (click)="downloadPdfReport()" class="ftr-btn-download ftr-btn-download--pdf">
+            <span class="ftr-btn-icon" aria-hidden="true">⬇</span>
+            <span>Download PDF Report</span>
+          </button>
         </div>
 
         <div class="ftr-card" [ngClass]="getResultToneClass()">
