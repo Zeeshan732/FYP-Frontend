@@ -891,7 +891,7 @@
 /* Full-width stacked downloads — normal flow, mobile-friendly tap targets */
 .ftr-download-section {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 12px;
   margin: 0 0 1.25rem;
   padding: 0 4px 8px;
