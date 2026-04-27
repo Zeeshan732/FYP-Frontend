@@ -31,8 +31,19 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   showConfirmPassword = false;
   passwordStrength: 0 | 1 | 2 | 3 | 4 = 0;
   agreeTerms = false;
+  signupFieldErrors: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+    clinicName?: string;
+    licenseNumber?: string;
+    agreeTerms?: string;
+  } = {};
   private subscription: Subscription = new Subscription();
   private previousBodyOverflow = '';
+  private invitedClinicianId?: number;
+  private invitedEmail = '';
 
   // Available roles for signup
   roleOptions = [
@@ -59,6 +70,17 @@ export class SignupModalComponent implements OnInit, OnDestroy {
         }
         // Reset form when modal opens
         if (isOpen) {
+          // Read query params from the active URL directly. This is reliable for modal components
+          // rendered outside routed page components (e.g. app-level modal host).
+          const qp = this.router.parseUrl(this.router.url).queryParams ?? {};
+          const invitedEmail = String(qp['email'] ?? '').trim();
+          const parsedClinicianId = Number(String(qp['clinicianId'] ?? '').trim());
+          this.invitedEmail = invitedEmail;
+          this.invitedClinicianId =
+            Number.isFinite(parsedClinicianId) && parsedClinicianId > 0
+              ? parsedClinicianId
+              : undefined;
+
           this.firstName = '';
           this.lastName = '';
           this.email = '';
@@ -78,6 +100,12 @@ export class SignupModalComponent implements OnInit, OnDestroy {
           this.showConfirmPassword = false;
           this.passwordStrength = 0;
           this.agreeTerms = false;
+          this.signupFieldErrors = {};
+
+          if (this.invitedEmail) {
+            this.email = this.invitedEmail;
+            this.selectRole('patient');
+          }
         }
       })
     );
@@ -140,33 +168,40 @@ export class SignupModalComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    // Validation
-    if (!this.firstName || !this.lastName || !this.email || !this.password) {
-      this.error = 'Please fill in all required fields';
-      return;
-    }
+    this.signupFieldErrors = {};
 
-    if (this.password.length < 8) {
+    const firstName = this.firstName?.trim() || '';
+    const lastName = this.lastName?.trim() || '';
+    const email = this.email?.trim() || '';
+    const password = this.password || '';
+
+    if (!firstName) this.signupFieldErrors.firstName = 'First name is required.';
+    if (!lastName) this.signupFieldErrors.lastName = 'Last name is required.';
+    if (!email) this.signupFieldErrors.email = 'Email address is required.';
+    if (!password) this.signupFieldErrors.password = 'Password is required.';
+
+    if (!this.signupFieldErrors.password && password.length < 8) {
       this.error = 'Password must be at least 8 characters long';
       return;
     }
 
     if (!this.agreeTerms) {
-      this.error = 'Please accept Terms of Service and Privacy Policy';
-      return;
+      this.signupFieldErrors.agreeTerms = 'Please accept Terms of Service and Privacy Policy.';
     }
 
     if (this.role === 'MedicalProfessional') {
-      if (!this.clinicName.trim()) {
-        this.error = 'Clinic name is required for medical professional registration';
-        return;
-      }
-      if (!this.licenseNumber.trim()) {
-        this.error = 'License number is required for medical professional registration';
-        return;
-      }
+      if (!this.clinicName.trim()) this.signupFieldErrors.clinicName = 'Clinic / Hospital name is required.';
+      if (!this.licenseNumber.trim()) this.signupFieldErrors.licenseNumber = 'License number is required.';
     }
 
+    if (Object.keys(this.signupFieldErrors).length > 0) {
+      this.error = '';
+      return;
+    }
+
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
     this.error = '';
     this.info = '';
     this.loading = true;
@@ -184,7 +219,8 @@ export class SignupModalComponent implements OnInit, OnDestroy {
         : undefined,
       researchFocus: undefined,
       // Must match backend RegisterRequest.Role (Public | MedicalProfessional); kept in sync by selectRole().
-      role: this.role
+      role: this.role,
+      clinicianId: this.role === 'Public' ? this.invitedClinicianId : undefined
     };
 
     this.authService.register(registrationData).subscribe({

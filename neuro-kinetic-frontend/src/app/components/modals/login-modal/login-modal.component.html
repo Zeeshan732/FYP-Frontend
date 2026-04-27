@@ -48,11 +48,13 @@
             <input
               type="email"
               [(ngModel)]="email"
+              (ngModelChange)="loginFieldErrors.email = undefined"
               name="email"
               autocomplete="username"
               [disabled]="loading"
               placeholder="you@hospital.com"
               required>
+            <div class="nl-field-error" *ngIf="loginFieldErrors.email">{{ loginFieldErrors.email }}</div>
           </div>
 
           <div class="nl-field">
@@ -61,6 +63,7 @@
               <input
                 [type]="showPassword ? 'text' : 'password'"
                 [(ngModel)]="password"
+                (ngModelChange)="loginFieldErrors.password = undefined"
                 name="password"
                 autocomplete="current-password"
                 [disabled]="loading"
@@ -79,6 +82,7 @@
                 </svg>
               </button>
             </div>
+            <div class="nl-field-error" *ngIf="loginFieldErrors.password">{{ loginFieldErrors.password }}</div>
           </div>
 
           <div class="nl-row">

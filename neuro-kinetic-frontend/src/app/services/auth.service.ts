@@ -64,6 +64,7 @@ export class AuthService {
     licenseDocumentUrl?: string;
     researchFocus?: string;
     role?: 'Public' | 'MedicalProfessional';
+    clinicianId?: number;
   }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data)
       .pipe(
