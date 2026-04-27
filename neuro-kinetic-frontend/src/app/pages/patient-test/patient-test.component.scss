@@ -284,7 +284,10 @@
 
 .ftr-header-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .ftr-btn-ghost {
@@ -293,13 +296,25 @@
   border-radius: 8px;
   color: rgba(255, 255, 255, 0.68);
   font-size: 14px;
-  padding: 8px 16px;
+  padding: 0 16px;
+  min-height: 42px;
+  min-width: 110px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.26);
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.04);
+  }
 }
 
 .ftr-report-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 10px;
   margin-bottom: 12px;
 }
@@ -313,6 +328,21 @@
   font-size: 15px;
   color: #fff;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  transition: filter 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+}
+
+.ftr-btn-icon {
+  line-height: 1;
+  font-size: 14px;
 }
 
 .ftr-btn-download--csv { background: #1a6b3c; }
@@ -689,10 +719,12 @@
 
   .ftr-header-actions {
     width: 100%;
+    justify-content: stretch;
   }
 
   .ftr-header-actions .ftr-btn-ghost {
     flex: 1;
+    min-width: 0;
   }
 
   .ftr-main-row {
