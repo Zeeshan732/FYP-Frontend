@@ -48,6 +48,11 @@ interface FingerTapResult {
   label: string;
 }
 
+/** Browser upload + API proxy + OpenCV/ML can exceed 2 minutes on long or heavy MP4s */
+const FINGER_TAP_PREDICT_TIMEOUT_MS = 300_000;
+/** FFmpeg.wasm can hang on corrupt or exotic MP4s — fail fast with a clear message */
+const FINGER_TAP_COMPRESS_TIMEOUT_MS = 240_000;
+
 @Component({
   selector: 'app-finger-tap',
   templateUrl: './finger-tap.component.html',
@@ -81,8 +86,12 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
   /** Populated after metadata load — used to decide FFmpeg pre-upload compression */
   selectedVideoDurationSec: number | null = null;
   uploadValidationError = '';
-  /** 0–100 while uploading multipart */
-  uploadProgressPercent = 0;
+  /** 0–100 while uploading multipart; null when byte total unknown */
+  uploadProgressPercent: number | null = null;
+  /** Browser did not report Content-Length for multipart — show activity, not stuck 0% */
+  uploadProgressIndeterminate = false;
+  /** Upload finished; waiting for API / ML response */
+  uploadServerPhase = false;
   /** Client-side transcode (FFmpeg.wasm) before API — avoids IIS ~28MB 413s */
   compressionProgress = 0;
   compressionPhase = '';
@@ -376,7 +385,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     this.preparedUploadFile = null;
     this.selectedVideoDurationSec = null;
     this.uploadValidationError = '';
-    this.uploadProgressPercent = 0;
+    this.uploadProgressPercent = null;
+    this.uploadProgressIndeterminate = false;
+    this.uploadServerPhase = false;
     this.compressionProgress = 0;
     this.compressionPhase = '';
     this.compressionOriginalMb = '';
@@ -454,7 +465,8 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       t.includes('Too dark') ||
       t.includes('No clear tapping') ||
       t.includes('Almost no movement') ||
-      t.includes('Could not analyze this video')
+      t.includes('Could not analyze this video') ||
+      t.includes('Motion not concentrated')
     ) {
       return t;
     }
@@ -479,7 +491,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     }
     this.apiError = '';
     this.isProcessing = true;
-    this.uploadProgressPercent = 0;
+    this.uploadProgressPercent = null;
+    this.uploadProgressIndeterminate = false;
+    this.uploadServerPhase = false;
     this.preparedUploadFile = null;
 
     let file = this.selectedFile;
@@ -495,13 +509,17 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
         this.cdr.markForCheck();
 
         try {
-          file = await this.fingerTapVideoPrep.compressForUpload(file, (ratio, label) => {
+          file = await this.compressFingerTapWithTimeout(file, (ratio, label) => {
             this.compressionProgress = Math.round(ratio * 100);
             this.compressionPhase = label;
             this.cdr.markForCheck();
           });
           this.compressionResultMb = this.fingerTapVideoPrep.fmtMb(file.size);
         } catch (encErr) {
+          const msg = String((encErr as Error)?.message || '');
+          if (msg.includes('timed out')) {
+            throw encErr;
+          }
           console.error('Finger-tap FFmpeg compression failed — uploading original file', encErr);
           // `file` stays as selectedFile; browser-side encoding often fails on mobile despite valid clips.
         }
@@ -514,6 +532,9 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
         { text: 'Extracting hand landmarks', done: false, active: false },
         { text: 'Computing movement regularity', done: false, active: false }
       ];
+      this.uploadProgressIndeterminate = true;
+      this.uploadServerPhase = false;
+      this.uploadProgressPercent = null;
       this.cdr.markForCheck();
 
       const result = await this.uploadFingerTapWithRetries(file);
@@ -544,9 +565,33 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
       this.currentState = 'error';
     } finally {
       this.isProcessing = false;
-      this.uploadProgressPercent = 0;
+      this.uploadProgressPercent = null;
+      this.uploadProgressIndeterminate = false;
+      this.uploadServerPhase = false;
       this.fingerTapUploadHints = null;
     }
+  }
+
+  /** Wraps FFmpeg compression so a problematic MP4 cannot hang the UI indefinitely. */
+  private async compressFingerTapWithTimeout(
+    file: File,
+    onProgress: (ratio: number, label: string) => void,
+    opts?: { aggressive?: boolean }
+  ): Promise<File> {
+    return Promise.race([
+      this.fingerTapVideoPrep.compressForUpload(file, onProgress, opts),
+      new Promise<File>((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                'Video optimization timed out. Try a shorter clip, or re-export the MP4 as H.264 video.'
+              )
+            ),
+          FINGER_TAP_COMPRESS_TIMEOUT_MS
+        )
+      )
+    ]);
   }
 
   /** Upload with progress + retries (transient network only — not 413/400). */
@@ -563,7 +608,7 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
           this.compressionPhase = 'Video file too large — applying stronger compression…';
           this.cdr.markForCheck();
           try {
-            const compressed = await this.fingerTapVideoPrep.compressForUpload(
+            const compressed = await this.compressFingerTapWithTimeout(
               file,
               (r, l) => {
                 this.compressionProgress = Math.round(r * 100);
@@ -576,7 +621,10 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
             this.preparedUploadFile = compressed;
             this.currentState = 'processing';
             continue;
-          } catch {
+          } catch (compressErr) {
+            if (String((compressErr as Error)?.message || '').includes('timed out')) {
+              throw compressErr;
+            }
             throw err;
           }
         }
@@ -630,12 +678,27 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
     return firstValueFrom(
       this.http.request<FingerTapResult>(req).pipe(
         tap(event => {
-          if (event.type === HttpEventType.UploadProgress && event.total) {
-            this.uploadProgressPercent = Math.round((100 * event.loaded) / event.total);
+          if (event.type === HttpEventType.UploadProgress) {
+            const ev = event as { loaded: number; total?: number };
+            if (ev.total != null && ev.total > 0) {
+              this.uploadProgressIndeterminate = false;
+              this.uploadServerPhase = false;
+              this.uploadProgressPercent = Math.round((100 * ev.loaded) / ev.total);
+            } else if (ev.loaded > 0) {
+              this.uploadProgressIndeterminate = true;
+              this.uploadProgressPercent = null;
+            }
+            this.cdr.markForCheck();
+          } else if (event.type === HttpEventType.ResponseHeader) {
+            this.uploadServerPhase = true;
+            this.uploadProgressIndeterminate = false;
+            if (this.uploadProgressPercent == null) {
+              this.uploadProgressPercent = 100;
+            }
             this.cdr.markForCheck();
           }
         }),
-        timeout(120000),
+        timeout(FINGER_TAP_PREDICT_TIMEOUT_MS),
         filter((e): e is HttpResponse<FingerTapResult> => e.type === HttpEventType.Response),
         map(e => {
           const b = e.body;
@@ -650,9 +713,18 @@ export class FingerTapComponent implements OnChanges, OnInit, OnDestroy {
 
   private mapUploadFailure(err: unknown): string {
     if ((err as Error)?.name === 'TimeoutError') {
-      return 'Upload timed out. Check your connection and try again.';
+      return (
+        'Analysis timed out (upload or server processing exceeded the time limit). ' +
+        'Try a shorter video, check your connection, and ensure the API and ML service are running.'
+      );
     }
-    const httpErr = err as HttpErrorResponse;
+    if (err instanceof Error && err.message.includes('Video optimization timed out')) {
+      return err.message;
+    }
+    if (!(err instanceof HttpErrorResponse)) {
+      return err instanceof Error ? err.message : String(err ?? 'Analysis failed.');
+    }
+    const httpErr = err;
     if (httpErr.status === 0) {
       return 'Upload failed. Check your connection and try again.';
     }

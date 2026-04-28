@@ -17,6 +17,10 @@ export class LoaderComponent {
   @Input() showCancel = false;
   /** When set (e.g. 0–100), shows an upload progress strip inside the card — keeps layout on one surface */
   @Input() uploadPercent: number | null = null;
+  /** True when byte-length is unknown (multipart); shows activity instead of stuck 0% */
+  @Input() uploadIndeterminate = false;
+  /** When upload bytes are done but server/ML is still working */
+  @Input() uploadServerPhase = false;
   /** Short care tips while upload is in progress (only shown with uploadPercent) */
   @Input() uploadCareHints: string[] | null = null;
   /** Tighter padding / full-bleed friendly (e.g. patient-test modal on phones) */
