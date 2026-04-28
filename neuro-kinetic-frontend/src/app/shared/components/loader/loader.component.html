@@ -87,25 +87,39 @@
     <h2 class="ldr-title">{{ title }}</h2>
     <p class="ldr-subtitle">{{ subtitle }}</p>
 
-    <div class="ldr-upload" *ngIf="uploadPercent !== null">
+    <div class="ldr-upload" *ngIf="uploadPercent !== null || uploadIndeterminate || uploadServerPhase">
       <div class="ldr-upload-head">
-        <span class="ldr-upload-label">Uploading to server</span>
-        <span class="ldr-upload-pct" aria-live="polite">{{ uploadPercent }}%</span>
+        <span class="ldr-upload-label">{{
+          uploadServerPhase ? 'Analyzing on server' : 'Uploading to server'
+        }}</span>
+        <span class="ldr-upload-pct" aria-live="polite" *ngIf="uploadPercent !== null && !uploadIndeterminate && !uploadServerPhase">
+          {{ uploadPercent }}%
+        </span>
+        <span class="ldr-upload-pct ldr-upload-pct--busy" *ngIf="uploadIndeterminate || uploadServerPhase">…</span>
       </div>
       <div
         class="ldr-upload-track"
         role="progressbar"
-        [attr.aria-valuenow]="uploadPercent"
+        [attr.aria-valuenow]="uploadIndeterminate || uploadServerPhase ? null : uploadPercent"
+        [attr.aria-busy]="uploadIndeterminate || uploadServerPhase"
         aria-valuemin="0"
         aria-valuemax="100"
       >
-        <div class="ldr-upload-fill" [style.width.%]="uploadPercent"></div>
+        <div
+          class="ldr-upload-fill"
+          *ngIf="!uploadIndeterminate && !uploadServerPhase"
+          [style.width.%]="uploadPercent ?? 0"
+        ></div>
+        <div
+          class="ldr-upload-fill ldr-upload-fill--indeterminate"
+          *ngIf="uploadIndeterminate || uploadServerPhase"
+        ></div>
       </div>
     </div>
 
     <ul
       class="ldr-upload-hints"
-      *ngIf="uploadPercent !== null && uploadCareHints?.length"
+      *ngIf="(uploadPercent !== null || uploadIndeterminate || uploadServerPhase) && uploadCareHints?.length"
       aria-label="While uploading"
     >
       <li *ngFor="let hint of uploadCareHints">{{ hint }}</li>
